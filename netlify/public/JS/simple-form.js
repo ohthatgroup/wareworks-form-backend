@@ -183,28 +183,80 @@ function setupInputFormatters() {
     // Phone number formatting
     const phoneInput = document.getElementById('phoneNumber');
     if (phoneInput) {
+        // Remove the maxlength attribute to prevent conflicts
+        phoneInput.removeAttribute('maxlength');
+        
         phoneInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
+            
+            // Limit to 10 digits max
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+            
+            // Format the phone number
             if (value.length >= 6) {
                 value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6,10)}`;
             } else if (value.length >= 3) {
                 value = `(${value.slice(0,3)}) ${value.slice(3)}`;
             }
+            
             e.target.value = value;
+        });
+        
+        // Handle backspace and delete properly
+        phoneInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                const cursorPos = e.target.selectionStart;
+                const value = e.target.value;
+                
+                // If cursor is on a formatting character, move cursor back
+                if (cursorPos > 0 && /[\(\)\s\-]/.test(value[cursorPos - 1])) {
+                    setTimeout(() => {
+                        e.target.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                    }, 0);
+                }
+            }
         });
     }
     
     // SSN formatting
     const ssnInput = document.getElementById('socialSecurityNumber');
     if (ssnInput) {
+        // Remove the maxlength attribute to prevent conflicts
+        ssnInput.removeAttribute('maxlength');
+        
         ssnInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
+            
+            // Limit to 9 digits max
+            if (value.length > 9) {
+                value = value.slice(0, 9);
+            }
+            
+            // Format the SSN
             if (value.length >= 5) {
                 value = `${value.slice(0,3)}-${value.slice(3,5)}-${value.slice(5,9)}`;
             } else if (value.length >= 3) {
                 value = `${value.slice(0,3)}-${value.slice(3)}`;
             }
+            
             e.target.value = value;
+        });
+        
+        // Handle backspace and delete properly
+        ssnInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                const cursorPos = e.target.selectionStart;
+                const value = e.target.value;
+                
+                // If cursor is on a dash, move cursor back
+                if (cursorPos > 0 && value[cursorPos - 1] === '-') {
+                    setTimeout(() => {
+                        e.target.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                    }, 0);
+                }
+            }
         });
     }
 }
@@ -248,14 +300,66 @@ function restoreFormData() {
 
 function nextPage() {
     console.log('Next page clicked');
+    
     if (currentPage < totalPages) {
-        // Save current page data before moving
-        saveFormData();
-        loadPage(currentPage + 1);
+        // Validate current page before moving
+        if (validateCurrentPage()) {
+            // Save current page data before moving
+            saveFormData();
+            loadPage(currentPage + 1);
+        } else {
+            showMessage('Please fill in all required fields before continuing.', 'error');
+        }
     } else {
         // On last page, submit the form
         submitApplication();
     }
+}
+
+function validateCurrentPage() {
+    const requiredFields = document.querySelectorAll('#pageContentContainer input[required], #pageContentContainer select[required], #pageContentContainer textarea[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        const value = field.value.trim();
+        
+        // Remove any existing error styling
+        field.style.borderColor = '';
+        
+        if (!value) {
+            field.style.borderColor = '#dc3545';
+            isValid = false;
+        } else if (field.type === 'tel') {
+            // Validate phone number has 10 digits
+            const digits = value.replace(/\D/g, '');
+            if (digits.length !== 10) {
+                field.style.borderColor = '#dc3545';
+                isValid = false;
+            }
+        } else if (field.id === 'socialSecurityNumber') {
+            // Validate SSN has 9 digits
+            const digits = value.replace(/\D/g, '');
+            if (digits.length !== 9) {
+                field.style.borderColor = '#dc3545';
+                isValid = false;
+            }
+        } else if (field.type === 'email') {
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                field.style.borderColor = '#dc3545';
+                isValid = false;
+            }
+        }
+        
+        // Add green border for valid fields
+        if (field.style.borderColor !== '#dc3545') {
+            field.style.borderColor = '#28a745';
+        }
+    });
+    
+    console.log('Page validation result:', isValid);
+    return isValid;
 }
 
 async function submitApplication() {
