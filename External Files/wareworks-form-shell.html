@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WareWorks Application Form</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <style>
+        /* Professional custom styles */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+            border-top-color: #131f5b;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .page.active {
+            animation: fadeIn 0.3s ease-in;
+        }
+        .language-disclaimer-overlay {
+            backdrop-filter: blur(2px);
+        }
+        .progress-steps-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .progress-steps-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+        .progress-steps-container::-webkit-scrollbar-thumb {
+            background: #131f5b;
+            border-radius: 2px;
+        }
+        .file-input {
+            display: none;
+        }
+        .file-upload-area {
+            border-style: dashed;
+        }
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        .page-content-container > .form-page {
+            display: none;
+        }
+        .page-content-container > .form-page.active {
+            display: block !important;
+        }
+        
+        /* Professional step indicators */
+        .step {
+            position: relative;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: 2px solid transparent;
+        }
+        .step.active {
+            background: #131f5b;
+            color: white;
+            border-color: #131f5b;
+        }
+        .step.completed {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .step.completed::after {
+            content: "✓";
+            margin-left: 4px;
+            font-weight: bold;
+        }
+        
+        /* Status message styling */
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border: 1px solid;
+        }
+        .status-message.visible {
+            display: block !important;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .status-message.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+    </style>
+</head>
+<body class="Body">
+    <!-- Language Selection Disclaimer -->
+    <div id="languageDisclaimer" class="language-disclaimer-overlay" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div class="language-disclaimer-content" style="background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin: 20px; padding: 40px; text-align: center; max-width: 600px;">
+            <div class="disclaimer-header">
+                <h2 style="font-family: 'Bricolage Grotesque', sans-serif; color: #131f5b; margin-bottom: 8px; font-size: 2rem; font-weight: 400;">Welcome to WareWorks</h2>
+                <h3 style="font-family: 'Bricolage Grotesque', sans-serif; color: #666; margin-bottom: 32px; font-size: 1.5rem; font-weight: 400;">Bienvenido a WareWorks</h3>
+            </div>
+            <div class="disclaimer-text" style="text-align: left; margin-bottom: 32px; line-height: 1.6;">
+                <p style="margin-bottom: 16px;"><strong>English:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws.</p>
+                <p><strong>Español:</strong> Al continuar, usted reconoce que la información que proporcione será utilizada para fines de empleo y se mantendrá confidencial de acuerdo con las leyes aplicables.</p>
+            </div>
+            <div class="disclaimer-buttons" style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <button type="button" style="background: #131f5b; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; min-width: 200px;" onclick="acceptDisclaimer('en')">Accept & Continue in English</button>
+                <button type="button" style="background: #131f5b; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer; min-width: 200px;" onclick="acceptDisclaimer('es')">Aceptar y Continuar en Español</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Form Container -->
+    <div class="form-container" style="display: none; max-width: 1000px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(19, 31, 91, 0.08); position: relative; overflow: hidden;" id="mainFormContainer">
+        
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); justify-content: center; align-items: center; z-index: 9999;">
+            <div class="loading-content" style="text-align: center;">
+                <div class="loading-spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #131f5b; border-radius: 50%; margin: 0 auto 16px;"></div>
+                <div class="loading-text" style="color: #131f5b; font-weight: 500;" data-translate="loading_application">Loading application...</div>
+            </div>
+        </div>
+
+        <!-- Language Selector -->
+        <div id="languageSelector" style="position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 4px; background: white; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 4px;">
+            <button type="button" class="lang-button" style="background: transparent; border: 1px solid #ddd; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 40px;" data-lang="en">EN</button>
+            <button type="button" class="lang-button" style="background: transparent; border: 1px solid #ddd; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; min-width: 40px;" data-lang="es">ES</button>
+        </div>
+
+        <!-- Progress Container -->
+        <div class="progress-container" style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 32px; padding: 24px;">
+            
+            <!-- Progress Bar -->
+            <div class="progress-bar" style="background: #eff1f7; border-radius: 100px; height: 8px; margin-bottom: 20px; overflow: hidden;">
+                <div class="progress-fill" style="background: linear-gradient(90deg, #131f5b 0%, #1e308e 100%); height: 100%; width: 12.5%; border-radius: 100px; transition: width 0.3s ease;" id="progressFill"></div>
+            </div>
+            
+            <!-- Progress Steps -->
+            <div class="overflow-x-auto pb-2 progress-steps-container" style="overflow-x: auto; padding-bottom: 8px;">
+                <div style="display: flex; min-width: max-content; gap: 16px; padding: 0 8px; font-size: 12px;">
+                    <div class="step" id="step1" data-translate="step_personal">Personal Info</div>
+                    <div class="step" id="step2" data-translate="step_contact">Contact</div>
+                    <div class="step" id="step3" data-translate="step_status">Status</div>
+                    <div class="step" id="step4" data-translate="step_documents">Documents</div>
+                    <div class="step" id="step5" data-translate="step_application">Application</div>
+                    <div class="step" id="step6" data-translate="step_education">Education</div>
+                    <div class="step" id="step7" data-translate="step_employment">Employment</div>
+                    <div class="step" id="step8" data-translate="step_review">Review</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+        <!-- Form -->
+        <div style="padding: 0 24px 24px;">
+            <form id="applicationForm" name="WareWorks Application" data-name="WareWorks Application" method="post" aria-label="WareWorks Application">
+                
+                <!-- Dynamic Page Content Container -->
+                <div id="pageContentContainer" class="page-content-container">
+                    <!-- Page HTML fragments will be loaded here by JavaScript -->
+                </div>
+                
+                <!-- Navigation -->
+                <div class="form-navigation" style="display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 2px solid #eff1f7; gap: 16px;">
+                    <button type="button" style="background: transparent; color: #131f5b; border: 1px solid #131f5b; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer;" id="prevButton" disabled data-translate="previous">Previous</button>
+                    <div style="flex: 1; text-align: center;">
+                        <span id="pageIndicator" style="color: #666; font-size: 14px;" data-translate="page_indicator">Page 1 of 8</span>
+                    </div>
+                    <button type="button" style="background: #131f5b; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 500; cursor: pointer;" id="nextButton" data-translate="next">Next</button>
+                </div>
+            </form>
+        
+            <!-- Success Message -->
+            <div class="success-message" style="display: none; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 16px; border-radius: 6px; margin-top: 16px;" tabindex="-1" role="region" aria-label="WareWorks Application success">
+                <div data-translate="submission_success">Thank you! Your application has been submitted successfully!</div>
+            </div>
+            
+            <!-- Error Message -->
+            <div class="error-message" style="display: none; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 16px; border-radius: 6px; margin-top: 16px;" tabindex="-1" role="region" aria-label="WareWorks Application failure">
+                <div data-translate="submission_error">Oops! Something went wrong while submitting the form.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://wareworks-backend.netlify.app/JS/wareworks-form.js"></script>
+    
+    <!-- Global Function Binding -->
+    <script>
+        // Ensure global functions are available for onclick handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for wareWorksApp to initialize
+            const checkApp = setInterval(() => {
+                if (window.wareWorksApp) {
+                    // Bind global functions for onclick handlers
+                    window.acceptDisclaimer = function(language) {
+                        if (window.wareWorksApp && window.wareWorksApp.acceptDisclaimer) {
+                            window.wareWorksApp.acceptDisclaimer(language);
+                        }
+                    };
+                    
+                    window.nextPage = function() {
+                        if (window.wareWorksApp && window.wareWorksApp.nextPage) {
+                            window.wareWorksApp.nextPage();
+                        }
+                    };
+                    
+                    window.previousPage = function() {
+                        if (window.wareWorksApp && window.wareWorksApp.previousPage) {
+                            window.wareWorksApp.previousPage();
+                        }
+                    };
+                    
+                    // Clear the interval
+                    clearInterval(checkApp);
+                    console.log('Global functions bound successfully');
+                }
+            }, 100);
+            
+            // Clear interval after 10 seconds to prevent infinite checking
+            setTimeout(() => clearInterval(checkApp), 10000);
+        });
+    </script>
+</body>
+</html>
