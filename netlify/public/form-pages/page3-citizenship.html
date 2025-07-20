@@ -1,74 +1,539 @@
-<div class="page" id="page3">
-    <div class="form-block w-form-block">
-        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="citizenship_title">Citizenship or Immigration Status</h2>
-        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="citizenship_subtitle">This information will be verified during the I-9 process</p>
+<div class="form-page" id="page3">
+    <style>
+        /* === FORM PAGE STYLES === */
+        .form-page {
+            font-family: 'Figtree', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+            background: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(19, 31, 91, 0.08);
+        }
         
-        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-            <label class="Input-Label" data-translate="citizenship_select">Select your status (optional):</label>
-            <div class="radio-button-group [Utility] Margin Top XXS-Gap">
-                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eff1f7;
+        }
+        
+        .form-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 2.37rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            line-height: 1.04em;
+            margin-bottom: 0.35em;
+            color: #131f5b;
+        }
+        
+        .form-subtitle {
+            font-size: 1.13rem;
+            line-height: 1.6em;
+            color: #666;
+            margin: 0;
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .form-row {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .form-row.two-col {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .field-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .field-label {
+            font-family: 'Figtree', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #131f5b;
+            letter-spacing: 0.01em;
+        }
+        
+        .field-label.required::after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 0.25rem;
+        }
+        
+        .field-input {
+            font-family: 'Figtree', sans-serif;
+            font-size: 1rem;
+            padding: 1rem;
+            border: 2px solid transparent;
+            border-radius: 0.25rem;
+            background: #f5f4f1;
+            color: #080c24;
+            transition: all 0.2s ease;
+        }
+        
+        .field-input::placeholder {
+            color: rgba(8, 12, 36, 0.4);
+        }
+        
+        .field-input:focus {
+            outline: none;
+            border-color: #131f5b;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(19, 31, 91, 0.1);
+        }
+        
+        .field-error {
+            font-size: 0.75rem;
+            color: #dc3545;
+            display: none;
+        }
+        
+        .field-error.visible {
+            display: block;
+        }
+        
+        /* Radio Button Styling */
+        .radio-group {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .radio-option {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid #eff1f7;
+            border-radius: 0.5rem;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-option:hover {
+            border-color: #131f5b;
+            background: #fafafa;
+        }
+        
+        .radio-option.selected {
+            border-color: #131f5b;
+            background: rgba(19, 31, 91, 0.02);
+        }
+        
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .radio-checkmark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-option:hover .radio-checkmark {
+            border-color: #131f5b;
+        }
+        
+        .radio-option.selected .radio-checkmark {
+            border-color: #131f5b;
+            background: #131f5b;
+        }
+        
+        .radio-option.selected .radio-checkmark::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+        }
+        
+        .radio-label {
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #131f5b;
+            line-height: 1.4;
+        }
+        
+        .radio-description {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.25rem;
+            line-height: 1.4;
+        }
+        
+        /* Conditional Fields */
+        .conditional-section {
+            background: rgba(242, 233, 209, 0.1);
+            border: 2px solid #f2e9d1;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .conditional-section.visible {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .conditional-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.33rem;
+            font-weight: 500;
+            color: #131f5b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .conditional-title::before {
+            content: '📋';
+            font-size: 1.2em;
+        }
+        
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #131f5b;
+            pointer-events: none;
+            font-size: 0.75rem;
+        }
+        
+        select.field-input {
+            appearance: none;
+            cursor: pointer;
+            padding-right: 3rem;
+        }
+        
+        /* Progress indicator */
+        .form-progress {
+            background: #eff1f7;
+            border-radius: 100rem;
+            height: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .form-progress-fill {
+            background: linear-gradient(90deg, #131f5b 0%, #1e308e 100%);
+            height: 100%;
+            width: 37.5%; /* 3 of 8 pages */
+            border-radius: 100rem;
+            transition: width 0.3s ease;
+        }
+        
+        .info-box {
+            background: rgba(19, 31, 91, 0.05);
+            border-left: 4px solid #131f5b;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-box-title {
+            font-weight: 600;
+            color: #131f5b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-box-title::before {
+            content: 'ℹ️';
+        }
+        
+        .info-box-text {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .form-page {
+                padding: 2rem 1rem;
+                border-radius: 0;
+            }
+            
+            .form-title {
+                font-size: 1.89rem;
+            }
+            
+            .form-row.two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .conditional-section {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-title {
+                font-size: 1.52rem;
+            }
+            
+            .field-input {
+                padding: 0.875rem;
+                font-size: 0.9rem;
+            }
+            
+            .radio-option {
+                padding: 0.875rem;
+            }
+        }
+    </style>
+
+    <!-- Progress Bar -->
+    <div class="form-progress">
+        <div class="form-progress-fill"></div>
+    </div>
+
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2 class="form-title" data-translate="citizenship_title">Citizenship & Immigration Status</h2>
+        <p class="form-subtitle" data-translate="citizenship_subtitle">This information will be verified during the I-9 employment verification process</p>
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-grid">
+        <!-- Information Box -->
+        <div class="info-box">
+            <div class="info-box-title">Required for Employment Verification</div>
+            <div class="info-box-text">
+                All employees must provide documentation of their eligibility to work in the United States. This section helps prepare the required I-9 form. Your responses are confidential and used only for compliance purposes.
+            </div>
+        </div>
+
+        <!-- Citizenship Status Selection -->
+        <div class="field-wrapper">
+            <label class="field-label" data-translate="citizenship_select">Select your current status:</label>
+            <div class="radio-group">
+                <label class="radio-option" for="usCitizen">
                     <input type="radio" id="usCitizen" name="citizenshipStatus" value="us_citizen" data-name="Citizenship Status">
-                    <span class="radio-button-label Input-Label" for="usCitizen" data-translate="us_citizen">A citizen of the United States</span>
+                    <div class="radio-checkmark"></div>
+                    <div>
+                        <div class="radio-label" data-translate="us_citizen">U.S. Citizen</div>
+                        <div class="radio-description">You were born in the United States or have been naturalized as a U.S. citizen</div>
+                    </div>
                 </label>
-                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                
+                <label class="radio-option" for="noncitizenNational">
                     <input type="radio" id="noncitizenNational" name="citizenshipStatus" value="noncitizen_national" data-name="Citizenship Status">
-                    <span class="radio-button-label Input-Label" for="noncitizenNational" data-translate="noncitizen_national">A noncitizen national of the United States</span>
+                    <div class="radio-checkmark"></div>
+                    <div>
+                        <div class="radio-label" data-translate="noncitizen_national">U.S. Non-citizen National</div>
+                        <div class="radio-description">You were born in American Samoa, Swains Island, or the Northern Mariana Islands</div>
+                    </div>
                 </label>
-                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                
+                <label class="radio-option" for="lawfulPermanent">
                     <input type="radio" id="lawfulPermanent" name="citizenshipStatus" value="lawful_permanent" data-name="Citizenship Status">
-                    <span class="radio-button-label Input-Label" for="lawfulPermanent" data-translate="lawful_permanent">A lawful permanent resident</span>
+                    <div class="radio-checkmark"></div>
+                    <div>
+                        <div class="radio-label" data-translate="lawful_permanent">Lawful Permanent Resident</div>
+                        <div class="radio-description">You have a Green Card (Permanent Resident Card)</div>
+                    </div>
                 </label>
-                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                
+                <label class="radio-option" for="alienAuthorized">
                     <input type="radio" id="alienAuthorized" name="citizenshipStatus" value="alien_authorized" data-name="Citizenship Status">
-                    <span class="radio-button-label Input-Label" for="alienAuthorized" data-translate="alien_authorized">An alien authorized to work</span>
+                    <div class="radio-checkmark"></div>
+                    <div>
+                        <div class="radio-label" data-translate="alien_authorized">Authorized to Work</div>
+                        <div class="radio-description">You have temporary or conditional authorization to work in the United States</div>
+                    </div>
                 </label>
             </div>
-            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-citizenshipStatus"></div>
+            <div class="field-error" id="error-citizenshipStatus"></div>
         </div>
 
         <!-- Conditional Fields for Lawful Permanent Resident -->
-        <div id="lawfulPermanentFields" class="conditional-field BG-Accent-Tertiary-A10 MD-Radius [Utility] Padding All MD-Gap [Utility] Border Left 4px Border-Accent-Tertiary [Utility] Margin Top MD-Gap">
-            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                <label for="uscisANumber" class="Input-Label" data-translate="uscis_a_number">USCIS or A-Number</label>
-                <input type="text" class="Input" maxlength="256" name="uscisANumber" data-name="USCIS A-Number" placeholder="A000000000" id="uscisANumber">
-                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-uscisANumber"></div>
+        <div id="lawfulPermanentFields" class="conditional-section">
+            <h4 class="conditional-title">Permanent Resident Information</h4>
+            <div class="field-wrapper">
+                <label for="uscisANumber" class="field-label" data-translate="uscis_a_number">USCIS A-Number or Alien Registration Number</label>
+                <input 
+                    type="text" 
+                    class="field-input" 
+                    maxlength="20" 
+                    name="uscisANumber" 
+                    data-name="USCIS A-Number" 
+                    placeholder="A123456789" 
+                    id="uscisANumber"
+                    autocomplete="off"
+                >
+                <div class="field-note">Found on your Green Card, typically starts with "A" followed by 8-9 digits</div>
+                <div class="field-error" id="error-uscisANumber"></div>
             </div>
         </div>
 
         <!-- Conditional Fields for Alien Authorized -->
-        <div id="alienAuthorizedFields" class="conditional-field BG-Accent-Tertiary-A10 MD-Radius [Utility] Padding All MD-Gap [Utility] Border Left 4px Border-Accent-Tertiary [Utility] Margin Top MD-Gap">
-            <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
-                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                    <label for="workAuthExpiration" class="Input-Label" data-translate="work_auth_expiration">Work Authorization Expiration Date</label>
-                    <input type="date" class="Input" name="workAuthExpiration" data-name="Work Auth Expiration" id="workAuthExpiration">
-                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-workAuthExpiration"></div>
+        <div id="alienAuthorizedFields" class="conditional-section">
+            <h4 class="conditional-title">Work Authorization Information</h4>
+            
+            <div class="form-row two-col">
+                <div class="field-wrapper">
+                    <label for="workAuthExpiration" class="field-label" data-translate="work_auth_expiration">Work Authorization Expiration Date</label>
+                    <input 
+                        type="date" 
+                        class="field-input" 
+                        name="workAuthExpiration" 
+                        data-name="Work Auth Expiration" 
+                        id="workAuthExpiration"
+                    >
+                    <div class="field-note">Date when your current work authorization expires</div>
+                    <div class="field-error" id="error-workAuthExpiration"></div>
                 </div>
-                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                    <label for="alienDocumentType" class="Input-Label" data-translate="document_type">Document Type</label>
-                    <select id="alienDocumentType" name="alienDocumentType" data-name="Alien Document Type" class="Input Select">
-                        <option value="" data-translate="select_document_type">Select Document Type</option>
-                        <option value="uscis_a_number" data-translate="uscis_a_number_option">USCIS A-Number</option>
-                        <option value="form_i94" data-translate="form_i94">Form I-94 Admission Number</option>
-                        <option value="foreign_passport" data-translate="foreign_passport">Foreign Passport Number and Country</option>
-                    </select>
-                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-alienDocumentType"></div>
+                
+                <div class="field-wrapper">
+                    <label for="alienDocumentType" class="field-label" data-translate="document_type">Document Type</label>
+                    <div class="select-wrapper">
+                        <select id="alienDocumentType" name="alienDocumentType" data-name="Alien Document Type" class="field-input">
+                            <option value="" data-translate="select_document_type">Select Document Type</option>
+                            <option value="uscis_a_number" data-translate="uscis_a_number_option">USCIS A-Number</option>
+                            <option value="form_i94" data-translate="form_i94">Form I-94 Admission Number</option>
+                            <option value="foreign_passport" data-translate="foreign_passport">Foreign Passport</option>
+                        </select>
+                    </div>
+                    <div class="field-error" id="error-alienDocumentType"></div>
                 </div>
             </div>
             
-            <div id="alienDocumentDetails" class="document-details [Utility] Margin Top MD-Gap">
-                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
-                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                        <label for="alienDocumentNumber" class="Input-Label" data-translate="document_number">Document Number</label>
-                        <input type="text" class="Input" maxlength="256" name="alienDocumentNumber" data-name="Alien Document Number" id="alienDocumentNumber">
-                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-alienDocumentNumber"></div>
-                    </div>
-                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap" id="countryField">
-                        <label for="documentCountry" class="Input-Label" data-translate="country_issuance">Country of Issuance</label>
-                        <input type="text" class="Input" maxlength="256" name="documentCountry" data-name="Document Country" id="documentCountry">
-                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-documentCountry"></div>
-                    </div>
+            <div id="alienDocumentDetails" class="form-row two-col" style="display: none; margin-top: 1rem;">
+                <div class="field-wrapper">
+                    <label for="alienDocumentNumber" class="field-label" data-translate="document_number">Document Number</label>
+                    <input 
+                        type="text" 
+                        class="field-input" 
+                        maxlength="256" 
+                        name="alienDocumentNumber" 
+                        data-name="Alien Document Number" 
+                        id="alienDocumentNumber"
+                        placeholder="Enter document number"
+                    >
+                    <div class="field-error" id="error-alienDocumentNumber"></div>
+                </div>
+                
+                <div class="field-wrapper" id="countryField" style="display: none;">
+                    <label for="documentCountry" class="field-label" data-translate="country_issuance">Country of Issuance</label>
+                    <input 
+                        type="text" 
+                        class="field-input" 
+                        maxlength="100" 
+                        name="documentCountry" 
+                        data-name="Document Country" 
+                        id="documentCountry"
+                        placeholder="Country that issued the passport"
+                    >
+                    <div class="field-error" id="error-documentCountry"></div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Handle radio button styling and conditional field display
+        document.addEventListener('DOMContentLoaded', function() {
+            // Radio button selection styling
+            const radioOptions = document.querySelectorAll('.radio-option');
+            radioOptions.forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+                
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options in this group
+                    const groupName = radio.name;
+                    document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                        r.closest('.radio-option').classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    option.classList.add('selected');
+                    radio.checked = true;
+                    
+                    // Handle conditional field display
+                    handleCitizenshipChange(radio);
+                });
+            });
+            
+            // Document type selection handler
+            const docTypeSelect = document.getElementById('alienDocumentType');
+            if (docTypeSelect) {
+                docTypeSelect.addEventListener('change', handleDocumentTypeChange);
+            }
+        });
+        
+        function handleCitizenshipChange(radio) {
+            const value = radio.value;
+            
+            const lawfulFields = document.getElementById('lawfulPermanentFields');
+            const alienFields = document.getElementById('alienAuthorizedFields');
+            
+            // Hide all conditional sections
+            if (lawfulFields) lawfulFields.classList.remove('visible');
+            if (alienFields) alienFields.classList.remove('visible');
+            
+            // Show relevant section
+            if (value === 'lawful_permanent' && lawfulFields) {
+                lawfulFields.classList.add('visible');
+            } else if (value === 'alien_authorized' && alienFields) {
+                alienFields.classList.add('visible');
+            }
+        }
+        
+        function handleDocumentTypeChange() {
+            const select = document.getElementById('alienDocumentType');
+            const details = document.getElementById('alienDocumentDetails');
+            const countryField = document.getElementById('countryField');
+            
+            if (select.value && details) {
+                details.style.display = 'grid';
+                if (countryField) {
+                    countryField.style.display = select.value === 'foreign_passport' ? 'block' : 'none';
+                }
+            } else if (details) {
+                details.style.display = 'none';
+            }
+        }
+    </script>
 </div>

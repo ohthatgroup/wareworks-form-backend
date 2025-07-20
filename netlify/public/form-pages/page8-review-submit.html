@@ -1,10 +1,837 @@
-<div class="page" id="page8">
-    <div class="form-block w-form-block">
-        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="review_title">Review Your Application</h2>
-        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="review_subtitle">Please review your information before submitting</p>
+<div class="form-page" id="page8">
+    <style>
+        /* === FORM PAGE STYLES === */
+        .form-page {
+            font-family: 'Figtree', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+            background: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(19, 31, 91, 0.08);
+        }
         
-        <div id="reviewContent" class="review-content BG-Secondary MD-Radius [Utility] Padding All MD-Gap [Utility] Margin Bottom MD-Gap">
-            <!-- Review content will be populated by JavaScript -->
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eff1f7;
+        }
+        
+        .form-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 2.37rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            line-height: 1.04em;
+            margin-bottom: 0.35em;
+            color: #131f5b;
+        }
+        
+        .form-subtitle {
+            font-size: 1.13rem;
+            line-height: 1.6em;
+            color: #666;
+            margin: 0;
+        }
+        
+        .review-container {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        /* Review Section Cards */
+        .review-section {
+            background: #fafafa;
+            border: 1px solid #eff1f7;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            transition: all 0.2s ease;
+        }
+        
+        .review-section:hover {
+            border-color: #131f5b;
+            box-shadow: 0 4px 12px rgba(19, 31, 91, 0.08);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eff1f7;
+        }
+        
+        .section-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.33rem;
+            font-weight: 500;
+            color: #131f5b;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-icon {
+            font-size: 1.2em;
+        }
+        
+        .edit-btn {
+            background: transparent;
+            color: #131f5b;
+            border: 1px solid #131f5b;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .edit-btn:hover {
+            background: #131f5b;
+            color: white;
+        }
+        
+        /* Review Items */
+        .review-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(19, 31, 91, 0.1);
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-label {
+            font-weight: 500;
+            color: #131f5b;
+            min-width: 150px;
+            flex-shrink: 0;
+        }
+        
+        .review-value {
+            color: #666;
+            text-align: right;
+            flex: 1;
+            margin-left: 1rem;
+            word-break: break-word;
+        }
+        
+        .review-value.empty {
+            color: #ccc;
+            font-style: italic;
+        }
+        
+        .review-value.highlight {
+            color: #131f5b;
+            font-weight: 500;
+        }
+        
+        /* Document Status */
+        .document-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .status-indicator.provided {
+            background: #28a745;
+        }
+        
+        .status-indicator.missing {
+            background: #dc3545;
+        }
+        
+        .status-indicator.optional {
+            background: #ffc107;
+        }
+        
+        /* Multi-entry sections */
+        .multi-entry-section {
+            margin-top: 1rem;
+        }
+        
+        .entry-card {
+            background: white;
+            border: 1px solid #eff1f7;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .entry-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .entry-title {
+            font-weight: 600;
+            color: #131f5b;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        .entry-details {
+            display: grid;
+            gap: 0.5rem;
+        }
+        
+        .entry-detail {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+        
+        .entry-detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .entry-detail-value {
+            color: #131f5b;
+            text-align: right;
+            margin-left: 1rem;
+        }
+        
+        /* Progress indicator */
+        .form-progress {
+            background: #eff1f7;
+            border-radius: 100rem;
+            height: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .form-progress-fill {
+            background: linear-gradient(90deg, #131f5b 0%, #1e308e 100%);
+            height: 100%;
+            width: 100%; /* 8 of 8 pages */
+            border-radius: 100rem;
+            transition: width 0.3s ease;
+        }
+        
+        /* Submit Section */
+        .submit-section {
+            background: linear-gradient(135deg, rgba(19, 31, 91, 0.05) 0%, rgba(242, 233, 209, 0.1) 100%);
+            border: 2px solid #f2e9d1;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .submit-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.33rem;
+            font-weight: 500;
+            color: #131f5b;
+            margin-bottom: 1rem;
+        }
+        
+        .submit-description {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        
+        .submit-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #131f5b 0%, #1e308e 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 31, 91, 0.2);
+        }
+        
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .back-btn {
+            background: transparent;
+            color: #131f5b;
+            border: 1px solid #131f5b;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .back-btn:hover {
+            background: #131f5b;
+            color: white;
+        }
+        
+        /* Disclaimer */
+        .disclaimer {
+            background: rgba(19, 31, 91, 0.05);
+            border-left: 4px solid #131f5b;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin: 2rem 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #666;
+        }
+        
+        .disclaimer-title {
+            font-weight: 600;
+            color: #131f5b;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Loading State */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff30;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .submit-btn.loading .loading-spinner {
+            display: block;
+        }
+        
+        .submit-btn.loading .submit-text {
+            display: none;
+        }
+        
+        /* Summary Stats */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #eff1f7;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #131f5b;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .form-page {
+                padding: 2rem 1rem;
+                border-radius: 0;
+            }
+            
+            .form-title {
+                font-size: 1.89rem;
+            }
+            
+            .review-section {
+                padding: 1.5rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .review-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            
+            .review-value {
+                text-align: left;
+                margin-left: 0;
+            }
+            
+            .submit-actions {
+                flex-direction: column-reverse;
+            }
+            
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-title {
+                font-size: 1.52rem;
+            }
+            
+            .review-section {
+                padding: 1rem;
+            }
+            
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- Progress Bar -->
+    <div class="form-progress">
+        <div class="form-progress-fill"></div>
+    </div>
+
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2 class="form-title" data-translate="review_title">Review Your Application</h2>
+        <p class="form-subtitle" data-translate="review_subtitle">Please review all information carefully before submitting your application</p>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="summary-stats">
+        <div class="stat-card">
+            <div class="stat-number" id="completionRate">--</div>
+            <div class="stat-label">Completion Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="documentsCount">--</div>
+            <div class="stat-label">Documents</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="educationCount">--</div>
+            <div class="stat-label">Education</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="employmentCount">--</div>
+            <div class="stat-label">Employment</div>
         </div>
     </div>
+
+    <!-- Review Content -->
+    <div class="review-container" id="reviewContent">
+        <!-- Personal Information -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">👤</span>
+                    <span data-translate="personal_info">Personal Information</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(1)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="review-grid" id="personalInfoReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">📞</span>
+                    <span data-translate="contact_details">Contact Information</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(2)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="review-grid" id="contactInfoReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Citizenship Status -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">🏛️</span>
+                    <span data-translate="citizenship_status">Citizenship Status</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(3)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="review-grid" id="citizenshipReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">📄</span>
+                    <span data-translate="documents_submitted">Documents</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(4)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="review-grid" id="documentsReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Application Questions -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">❓</span>
+                    <span data-translate="application_info">Application Questions</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(5)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="review-grid" id="applicationQuestionsReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Education History -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">🎓</span>
+                    <span data-translate="education_history">Education History</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(6)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="multi-entry-section" id="educationReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Employment History -->
+        <div class="review-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="section-icon">💼</span>
+                    <span data-translate="employment_history">Employment History</span>
+                </h3>
+                <button class="edit-btn" onclick="goToPage(7)">
+                    ✏️ Edit
+                </button>
+            </div>
+            <div class="multi-entry-section" id="employmentReview">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+        <div class="disclaimer-title">Application Disclaimer</div>
+        <p>By submitting this application, I certify that all information provided is true and complete to the best of my knowledge. I understand that any false information may result in the rejection of my application or termination of employment if hired. I authorize the verification of any information contained in this application and consent to background checks as required for employment.</p>
+    </div>
+
+    <!-- Submit Section -->
+    <div class="submit-section">
+        <h3 class="submit-title">Ready to Submit?</h3>
+        <p class="submit-description">
+            Once you submit your application, you'll receive a confirmation email and our HR team will review your information. We typically respond within 5-7 business days.
+        </p>
+        <div class="submit-actions">
+            <button type="button" class="back-btn" onclick="goToPage(7)">
+                ← Back to Edit
+            </button>
+            <button type="button" class="submit-btn" id="finalSubmitBtn">
+                <span class="submit-text">🚀 Submit Application</span>
+                <div class="loading-spinner"></div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            generateReviewContent();
+            updateSummaryStats();
+            setupSubmitButton();
+        });
+
+        function generateReviewContent() {
+            // This would be called by the main form JavaScript
+            // For now, we'll show placeholder content
+            
+            // Personal Information
+            const personalInfo = {
+                'Full Name': 'John Michael Doe',
+                'Address': '123 Main St, Apt 4B, Atlanta, GA 30309',
+                'Phone': '(555) 123-4567',
+                'SSN': '***-**-1234'
+            };
+            populateReviewSection('personalInfoReview', personalInfo);
+
+            // Contact Information  
+            const contactInfo = {
+                'Email': 'john.doe@email.com',
+                'Date of Birth': '01/15/1990',
+                'Emergency Contact': 'Jane Doe (Spouse) - (555) 987-6543'
+            };
+            populateReviewSection('contactInfoReview', contactInfo);
+
+            // Citizenship
+            const citizenship = {
+                'Status': 'U.S. Citizen'
+            };
+            populateReviewSection('citizenshipReview', citizenship);
+
+            // Documents
+            const documents = {
+                'Photo ID': createDocumentStatus(true, 'driver_license.pdf'),
+                'Resume': createDocumentStatus(true, 'john_doe_resume.pdf'), 
+                'Certifications': createDocumentStatus(true, '2 files uploaded')
+            };
+            populateReviewSection('documentsReview', documents);
+
+            // Application Questions
+            const appQuestions = {
+                'Age 18+': 'Yes',
+                'Transportation': 'Yes', 
+                'Work Authorization': 'Yes',
+                'Position Applied': 'Warehouse Associate',
+                'Expected Salary': '$45,000',
+                'How Found Job': 'Company Website'
+            };
+            populateReviewSection('applicationQuestionsReview', appQuestions);
+
+            // Education (multi-entry)
+            const education = [
+                {
+                    title: 'Atlanta High School',
+                    details: {
+                        'Year': '2008',
+                        'Major': 'General Studies', 
+                        'Diploma': 'Yes'
+                    }
+                },
+                {
+                    title: 'Georgia Technical College',
+                    details: {
+                        'Year': '2010',
+                        'Major': 'Logistics Management',
+                        'Diploma': 'Yes'
+                    }
+                }
+            ];
+            populateMultiEntrySection('educationReview', education);
+
+            // Employment (multi-entry) 
+            const employment = [
+                {
+                    title: 'ABC Logistics (2018 - Present)',
+                    details: {
+                        'Position': 'Warehouse Associate → Senior Associate',
+                        'Supervisor': 'Mike Johnson',
+                        'Phone': '(555) 444-3333',
+                        'May Contact': 'Yes'
+                    }
+                }
+            ];
+            populateMultiEntrySection('employmentReview', employment);
+        }
+
+        function populateReviewSection(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            Object.entries(data).forEach(([label, value]) => {
+                const item = document.createElement('div');
+                item.className = 'review-item';
+                
+                const labelEl = document.createElement('div');
+                labelEl.className = 'review-label';
+                labelEl.textContent = label;
+                
+                const valueEl = document.createElement('div');
+                valueEl.className = 'review-value';
+                
+                if (typeof value === 'string') {
+                    valueEl.textContent = value || 'Not provided';
+                    if (!value) valueEl.classList.add('empty');
+                } else {
+                    valueEl.appendChild(value);
+                }
+                
+                item.appendChild(labelEl);
+                item.appendChild(valueEl);
+                container.appendChild(item);
+            });
+        }
+
+        function populateMultiEntrySection(containerId, entries) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<p class="review-value empty">No entries provided</p>';
+                return;
+            }
+
+            entries.forEach((entry, index) => {
+                const card = document.createElement('div');
+                card.className = 'entry-card';
+                
+                const title = document.createElement('div');
+                title.className = 'entry-title';
+                title.textContent = entry.title;
+                card.appendChild(title);
+                
+                const details = document.createElement('div');
+                details.className = 'entry-details';
+                
+                Object.entries(entry.details).forEach(([label, value]) => {
+                    const detail = document.createElement('div');
+                    detail.className = 'entry-detail';
+                    
+                    const detailLabel = document.createElement('div');
+                    detailLabel.className = 'entry-detail-label';
+                    detailLabel.textContent = label;
+                    
+                    const detailValue = document.createElement('div');
+                    detailValue.className = 'entry-detail-value';
+                    detailValue.textContent = value || 'Not provided';
+                    
+                    detail.appendChild(detailLabel);
+                    detail.appendChild(detailValue);
+                    details.appendChild(detail);
+                });
+                
+                card.appendChild(details);
+                container.appendChild(card);
+            });
+        }
+
+        function createDocumentStatus(provided, filename = '') {
+            const status = document.createElement('div');
+            status.className = 'document-status';
+            
+            const indicator = document.createElement('div');
+            indicator.className = `status-indicator ${provided ? 'provided' : 'missing'}`;
+            
+            const text = document.createElement('span');
+            text.textContent = provided ? (filename || 'Provided') : 'Not uploaded';
+            
+            status.appendChild(indicator);
+            status.appendChild(text);
+            return status;
+        }
+
+        function updateSummaryStats() {
+            // Calculate completion rate
+            const totalSections = 7;
+            const completedSections = 6; // This would be calculated dynamically
+            const completionRate = Math.round((completedSections / totalSections) * 100);
+            
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+            document.getElementById('documentsCount').textContent = '3/3';
+            document.getElementById('educationCount').textContent = '2';
+            document.getElementById('employmentCount').textContent = '1';
+        }
+
+        function setupSubmitButton() {
+            const submitBtn = document.getElementById('finalSubmitBtn');
+            submitBtn.addEventListener('click', handleSubmit);
+        }
+
+        function handleSubmit() {
+            const submitBtn = document.getElementById('finalSubmitBtn');
+            
+            // Add loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            // Simulate submission process
+            setTimeout(() => {
+                // This would call the actual form submission logic
+                // window.handleFormSubmit();
+                
+                // For demo, show success
+                showSubmissionSuccess();
+            }, 3000);
+        }
+
+        function showSubmissionSuccess() {
+            const submitSection = document.querySelector('.submit-section');
+            submitSection.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                    <h3 style="color: #28a745; margin-bottom: 1rem;">Application Submitted Successfully!</h3>
+                    <p style="color: #666; margin-bottom: 2rem;">Thank you for your interest in WareWorks. We've received your application and will review it within 5-7 business days.</p>
+                    <p style="font-size: 0.9rem; color: #666;">Confirmation ID: WW_${Date.now()}_${Math.random().toString(36).substr(2, 9)}</p>
+                </div>
+            `;
+        }
+
+        function goToPage(pageNumber) {
+            // This would be implemented by the main form navigation
+            console.log(`Navigate to page ${pageNumber}`);
+            // window.previousPage() or window.showPage(pageNumber)
+        }
+
+        // Make functions globally available
+        window.generateReviewContent = generateReviewContent;
+        window.goToPage = goToPage;
+    </script>
 </div>

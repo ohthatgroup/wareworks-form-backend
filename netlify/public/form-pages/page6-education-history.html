@@ -1,46 +1,703 @@
-<div class="page" id="page6">
-    <div class="form-block w-form-block">
-        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="education_title">Education History</h2>
-        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="education_subtitle">Providing your educational background helps us understand your qualifications</p>
+<div class="form-page" id="page6">
+    <style>
+        /* === FORM PAGE STYLES === */
+        .form-page {
+            font-family: 'Figtree', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+            background: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 20px rgba(19, 31, 91, 0.08);
+        }
         
-        <div id="educationContainer">
-            <div class="education-entry repeatable-section BG-Secondary LG-Radius [Utility] Border Width 2px Border-Secondary [Utility] Padding All MD-Gap [Utility] Margin All MD-Gap [Utility] Position Relative" data-index="0">
-                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
-                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                        <label for="schoolName_0" class="Input-Label" data-translate="school_name">School Name and Location</label>
-                        <input type="text" class="Input" maxlength="256" name="education[0][schoolName]" data-name="School Name" id="schoolName_0">
-                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-schoolName_0"></div>
-                    </div>
-                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                        <label for="graduationYear_0" class="Input-Label" data-translate="graduation_year">Year</label>
-                        <input type="text" class="Input" maxlength="4" name="education[0][year]" data-name="Graduation Year" placeholder="YYYY" id="graduationYear_0">
-                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-graduationYear_0"></div>
-                    </div>
-                </div>
-                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
-                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                        <label for="major_0" class="Input-Label" data-translate="major_field">Major/Field of Study</label>
-                        <input type="text" class="Input" maxlength="256" name="education[0][major]" data-name="Major" id="major_0">
-                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-major_0"></div>
-                    </div>
-                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
-                        <label class="Input-Label" data-translate="diploma_degree">Diploma/Degree?</label>
-                        <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
-                            <label class="radio-button-field Radio-Toggle">
-                                <input type="radio" id="diploma_0_yes" name="education[0][diploma]" value="yes" data-name="Diploma">
-                                <span class="radio-button-label Input-Label" for="diploma_0_yes" data-translate="yes">Yes</span>
-                            </label>
-                            <label class="radio-button-field Radio-Toggle">
-                                <input type="radio" id="diploma_0_no" name="education[0][diploma]" value="no" data-name="Diploma">
-                                <span class="radio-button-label Input-Label" for="diploma_0_no" data-translate="no">No</span>
-                            </label>
-                        </div>
-                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-diploma_0"></div>
-                    </div>
-                </div>
-                <button type="button" class="Button Secondary [Utility] Margin Top MD-Gap" onclick="removeEducationEntry(this)" data-translate="remove_entry">Remove Entry</button>
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eff1f7;
+        }
+        
+        .form-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 2.37rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            line-height: 1.04em;
+            margin-bottom: 0.35em;
+            color: #131f5b;
+        }
+        
+        .form-subtitle {
+            font-size: 1.13rem;
+            line-height: 1.6em;
+            color: #666;
+            margin: 0;
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .form-row {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .form-row.two-col {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .field-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .field-label {
+            font-family: 'Figtree', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #131f5b;
+            letter-spacing: 0.01em;
+        }
+        
+        .field-label.required::after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 0.25rem;
+        }
+        
+        .field-input {
+            font-family: 'Figtree', sans-serif;
+            font-size: 1rem;
+            padding: 1rem;
+            border: 2px solid transparent;
+            border-radius: 0.25rem;
+            background: #f5f4f1;
+            color: #080c24;
+            transition: all 0.2s ease;
+        }
+        
+        .field-input::placeholder {
+            color: rgba(8, 12, 36, 0.4);
+        }
+        
+        .field-input:focus {
+            outline: none;
+            border-color: #131f5b;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(19, 31, 91, 0.1);
+        }
+        
+        .field-error {
+            font-size: 0.75rem;
+            color: #dc3545;
+            display: none;
+        }
+        
+        .field-error.visible {
+            display: block;
+        }
+        
+        /* Education Entry Card */
+        .education-entry {
+            background: #fafafa;
+            border: 2px solid #eff1f7;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .education-entry:hover {
+            border-color: #131f5b;
+            box-shadow: 0 4px 12px rgba(19, 31, 91, 0.08);
+        }
+        
+        .education-entry.first-entry {
+            border-color: #f2e9d1;
+            background: rgba(242, 233, 209, 0.05);
+        }
+        
+        .education-entry.first-entry:hover {
+            border-color: #131f5b;
+        }
+        
+        .entry-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eff1f7;
+        }
+        
+        .entry-title {
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-size: 1.33rem;
+            font-weight: 500;
+            color: #131f5b;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .entry-number {
+            background: #131f5b;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .remove-entry-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .remove-entry-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+        
+        .remove-entry-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Radio Button Styling */
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .radio-option {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid #eff1f7;
+            border-radius: 0.25rem;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-option:hover {
+            border-color: #131f5b;
+        }
+        
+        .radio-option.selected {
+            border-color: #131f5b;
+            background: rgba(19, 31, 91, 0.05);
+        }
+        
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .radio-checkmark {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-option:hover .radio-checkmark {
+            border-color: #131f5b;
+        }
+        
+        .radio-option.selected .radio-checkmark {
+            border-color: #131f5b;
+            background: #131f5b;
+        }
+        
+        .radio-option.selected .radio-checkmark::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #fff;
+        }
+        
+        .radio-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #131f5b;
+        }
+        
+        /* Add Button */
+        .add-entry-btn {
+            background: linear-gradient(135deg, #131f5b 0%, #1e308e 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 2rem auto 0;
+            min-width: 200px;
+        }
+        
+        .add-entry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 31, 91, 0.2);
+        }
+        
+        .add-entry-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Progress indicator */
+        .form-progress {
+            background: #eff1f7;
+            border-radius: 100rem;
+            height: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .form-progress-fill {
+            background: linear-gradient(90deg, #131f5b 0%, #1e308e 100%);
+            height: 100%;
+            width: 75%; /* 6 of 8 pages */
+            border-radius: 100rem;
+            transition: width 0.3s ease;
+        }
+        
+        .info-box {
+            background: rgba(19, 31, 91, 0.05);
+            border-left: 4px solid #131f5b;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-box-title {
+            font-weight: 600;
+            color: #131f5b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-box-title::before {
+            content: '🎓';
+        }
+        
+        .info-box-text {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .form-page {
+                padding: 2rem 1rem;
+                border-radius: 0;
+            }
+            
+            .form-title {
+                font-size: 1.89rem;
+            }
+            
+            .form-row.two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .education-entry {
+                padding: 1.5rem;
+            }
+            
+            .entry-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-title {
+                font-size: 1.52rem;
+            }
+            
+            .field-input {
+                padding: 0.875rem;
+                font-size: 0.9rem;
+            }
+            
+            .education-entry {
+                padding: 1rem;
+            }
+        }
+    </style>
+
+    <!-- Progress Bar -->
+    <div class="form-progress">
+        <div class="form-progress-fill"></div>
+    </div>
+
+    <!-- Form Header -->
+    <div class="form-header">
+        <h2 class="form-title" data-translate="education_title">Education History</h2>
+        <p class="form-subtitle" data-translate="education_subtitle">Help us understand your educational background and qualifications</p>
+    </div>
+
+    <!-- Form Content -->
+    <div class="form-grid">
+        <!-- Information Box -->
+        <div class="info-box">
+            <div class="info-box-title">Educational Background</div>
+            <div class="info-box-text">
+                Include all relevant education from high school through college, trade schools, certifications, and training programs. This helps us understand your qualifications and background.
             </div>
         </div>
-        <button type="button" class="Button Secondary [Utility] Margin Top MD-Gap" id="addEducationBtn" data-translate="add_another_school">Add Another School</button>
+
+        <!-- Education Entries Container -->
+        <div id="educationContainer">
+            <!-- First Education Entry (template) -->
+            <div class="education-entry first-entry" data-index="0">
+                <div class="entry-header">
+                    <div class="entry-title">
+                        <div class="entry-number">1</div>
+                        <span>Education #1</span>
+                    </div>
+                    <button type="button" class="remove-entry-btn" onclick="removeEducationEntry(this)" disabled>
+                        🗑️ Remove
+                    </button>
+                </div>
+                
+                <div class="form-row two-col">
+                    <div class="field-wrapper">
+                        <label for="schoolName_0" class="field-label" data-translate="school_name">School Name & Location</label>
+                        <input 
+                            type="text" 
+                            class="field-input" 
+                            maxlength="256" 
+                            name="education[0][schoolName]" 
+                            data-name="School Name" 
+                            id="schoolName_0"
+                            placeholder="e.g. Atlanta High School, Atlanta GA"
+                        >
+                        <div class="field-error" id="error-schoolName_0"></div>
+                    </div>
+                    
+                    <div class="field-wrapper">
+                        <label for="graduationYear_0" class="field-label" data-translate="graduation_year">Year Completed</label>
+                        <input 
+                            type="text" 
+                            class="field-input" 
+                            maxlength="4" 
+                            name="education[0][year]" 
+                            data-name="Graduation Year" 
+                            placeholder="YYYY" 
+                            id="graduationYear_0"
+                            pattern="[0-9]{4}"
+                        >
+                        <div class="field-error" id="error-graduationYear_0"></div>
+                    </div>
+                </div>
+                
+                <div class="form-row two-col">
+                    <div class="field-wrapper">
+                        <label for="major_0" class="field-label" data-translate="major_field">Major/Field of Study</label>
+                        <input 
+                            type="text" 
+                            class="field-input" 
+                            maxlength="256" 
+                            name="education[0][major]" 
+                            data-name="Major" 
+                            id="major_0"
+                            placeholder="e.g. Business Administration, General Studies"
+                        >
+                        <div class="field-error" id="error-major_0"></div>
+                    </div>
+                    
+                    <div class="field-wrapper">
+                        <label class="field-label" data-translate="diploma_degree">Did you receive a diploma/degree?</label>
+                        <div class="radio-group">
+                            <label class="radio-option" for="diploma_0_yes">
+                                <input type="radio" id="diploma_0_yes" name="education[0][diploma]" value="yes" data-name="Diploma">
+                                <div class="radio-checkmark"></div>
+                                <span class="radio-label" data-translate="yes">Yes</span>
+                            </label>
+                            <label class="radio-option" for="diploma_0_no">
+                                <input type="radio" id="diploma_0_no" name="education[0][diploma]" value="no" data-name="Diploma">
+                                <div class="radio-checkmark"></div>
+                                <span class="radio-label" data-translate="no">No</span>
+                            </label>
+                        </div>
+                        <div class="field-error" id="error-diploma_0"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Another Education Button -->
+        <button type="button" class="add-entry-btn" id="addEducationBtn" data-translate="add_another_school">
+            ➕ Add Another School
+        </button>
     </div>
+
+    <script>
+        let educationCount = 1;
+        const maxEducationEntries = 5;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setupRadioButtons();
+            setupAddButton();
+            
+            // Year input validation
+            document.addEventListener('input', function(e) {
+                if (e.target.id && e.target.id.includes('graduationYear_')) {
+                    const value = e.target.value.replace(/\D/g, '');
+                    e.target.value = value;
+                    
+                    // Validate year range
+                    if (value.length === 4) {
+                        const year = parseInt(value);
+                        const currentYear = new Date().getFullYear();
+                        if (year < 1950 || year > currentYear + 10) {
+                            showFieldError(e.target.id, 'Please enter a valid year');
+                        } else {
+                            clearFieldError(e.target.id);
+                        }
+                    }
+                }
+            });
+        });
+
+        function setupRadioButtons() {
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.radio-option')) {
+                    const option = e.target.closest('.radio-option');
+                    const radio = option.querySelector('input[type="radio"]');
+                    
+                    if (radio) {
+                        // Remove selected class from all options in this group
+                        const groupName = radio.name;
+                        document.querySelectorAll(`input[name="${groupName}"]`).forEach(r => {
+                            r.closest('.radio-option').classList.remove('selected');
+                        });
+                        
+                        // Add selected class and check radio
+                        option.classList.add('selected');
+                        radio.checked = true;
+                    }
+                }
+            });
+        }
+
+        function setupAddButton() {
+            document.getElementById('addEducationBtn').addEventListener('click', addEducationEntry);
+        }
+
+        function addEducationEntry() {
+            if (educationCount >= maxEducationEntries) {
+                alert(`Maximum ${maxEducationEntries} education entries allowed.`);
+                return;
+            }
+
+            const container = document.getElementById('educationContainer');
+            const newEntryDiv = document.createElement('div');
+            newEntryDiv.className = 'education-entry';
+            newEntryDiv.setAttribute('data-index', educationCount);
+            
+            newEntryDiv.innerHTML = `
+                <div class="entry-header">
+                    <div class="entry-title">
+                        <div class="entry-number">${educationCount + 1}</div>
+                        <span>Education #${educationCount + 1}</span>
+                    </div>
+                    <button type="button" class="remove-entry-btn" onclick="removeEducationEntry(this)">
+                        🗑️ Remove
+                    </button>
+                </div>
+                
+                <div class="form-row two-col">
+                    <div class="field-wrapper">
+                        <label for="schoolName_${educationCount}" class="field-label" data-translate="school_name">School Name & Location</label>
+                        <input 
+                            type="text" 
+                            class="field-input" 
+                            maxlength="256" 
+                            name="education[${educationCount}][schoolName]" 
+                            data-name="School Name" 
+                            id="schoolName_${educationCount}"
+                            placeholder="e.g. Georgia Tech, Atlanta GA"
+                        >
+                        <div class="field-error" id="error-schoolName_${educationCount}"></div>
+                    </div>
+                    
+                    <div class="field-wrapper">
+                        <label for="graduationYear_${educationCount}" class="field-label" data-translate="graduation_year">Year Completed</label>
+                        <input 
+                            type="text" 
+                            class="field-input" 
+                            maxlength="4" 
+                            name="education[${educationCount}][year]" 
+                            data-name="Graduation Year" 
+                            placeholder="YYYY" 
+                            id="graduationYear_${educationCount}"
+                            pattern="[0-9]{4}"
+                        >
+                        <div class="field-error" id="error-graduationYear_${educationCount}"></div>
+                    </div>
+                </div>
+                
+                <div class="form-row two-col">
+                    <div class="field-wrapper">
+                        <label for="major_${educationCount}" class="field-label" data-translate="major_field">Major/Field of Study</label>
+                        <input 
+                            type="text" 
+                            class="field-input" 
+                            maxlength="256" 
+                            name="education[${educationCount}][major]" 
+                            data-name="Major" 
+                            id="major_${educationCount}"
+                            placeholder="e.g. Computer Science, Logistics"
+                        >
+                        <div class="field-error" id="error-major_${educationCount}"></div>
+                    </div>
+                    
+                    <div class="field-wrapper">
+                        <label class="field-label" data-translate="diploma_degree">Did you receive a diploma/degree?</label>
+                        <div class="radio-group">
+                            <label class="radio-option" for="diploma_${educationCount}_yes">
+                                <input type="radio" id="diploma_${educationCount}_yes" name="education[${educationCount}][diploma]" value="yes" data-name="Diploma">
+                                <div class="radio-checkmark"></div>
+                                <span class="radio-label" data-translate="yes">Yes</span>
+                            </label>
+                            <label class="radio-option" for="diploma_${educationCount}_no">
+                                <input type="radio" id="diploma_${educationCount}_no" name="education[${educationCount}][diploma]" value="no" data-name="Diploma">
+                                <div class="radio-checkmark"></div>
+                                <span class="radio-label" data-translate="no">No</span>
+                            </label>
+                        </div>
+                        <div class="field-error" id="error-diploma_${educationCount}"></div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(newEntryDiv);
+            educationCount++;
+            
+            // Update add button state
+            if (educationCount >= maxEducationEntries) {
+                document.getElementById('addEducationBtn').disabled = true;
+                document.getElementById('addEducationBtn').textContent = `Maximum ${maxEducationEntries} entries reached`;
+            }
+            
+            // Animate in the new entry
+            newEntryDiv.style.opacity = '0';
+            newEntryDiv.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                newEntryDiv.style.transition = 'all 0.3s ease';
+                newEntryDiv.style.opacity = '1';
+                newEntryDiv.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function removeEducationEntry(button) {
+            const entry = button.closest('.education-entry');
+            const index = parseInt(entry.getAttribute('data-index'));
+            
+            // Don't allow removing the first entry
+            if (index === 0) {
+                return;
+            }
+            
+            // Animate out and remove
+            entry.style.transition = 'all 0.3s ease';
+            entry.style.opacity = '0';
+            entry.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                entry.remove();
+                educationCount--;
+                
+                // Re-enable add button if needed
+                const addBtn = document.getElementById('addEducationBtn');
+                if (educationCount < maxEducationEntries) {
+                    addBtn.disabled = false;
+                    addBtn.textContent = '➕ Add Another School';
+                }
+                
+                // Update entry numbers
+                updateEntryNumbers();
+            }, 300);
+        }
+
+        function updateEntryNumbers() {
+            const entries = document.querySelectorAll('.education-entry');
+            entries.forEach((entry, index) => {
+                const numberEl = entry.querySelector('.entry-number');
+                const titleEl = entry.querySelector('.entry-title span');
+                if (numberEl) numberEl.textContent = index + 1;
+                if (titleEl) titleEl.textContent = `Education #${index + 1}`;
+                entry.setAttribute('data-index', index);
+            });
+        }
+
+        function showFieldError(fieldId, message) {
+            const errorEl = document.getElementById(`error-${fieldId}`);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.add('visible');
+            }
+        }
+
+        function clearFieldError(fieldId) {
+            const errorEl = document.getElementById(`error-${fieldId}`);
+            if (errorEl) {
+                errorEl.textContent = '';
+                errorEl.classList.remove('visible');
+            }
+        }
+
+        // Make functions globally available
+        window.removeEducationEntry = removeEducationEntry;
+    </script>
 </div>
