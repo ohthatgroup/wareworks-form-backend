@@ -137,43 +137,38 @@ function setupAddressAutocomplete() {
         }
         
         // Debounce API calls
-        autocompleteTimer = setTimeout(async () => {
+        autocompleteTimer = setTimeout(() => {
             try {
                 console.log('Fetching address suggestions for:', value);
                 
-                // Call Google Maps API directly
-                const response = await fetch(
-                    `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(value)}&types=address&components=country:us&key=AIzaSyDQFBttRAtQDhfsQWHVk38RKWQ38tznMYY`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'application/json'
+                // Use Google Maps JavaScript API for autocomplete
+                if (window.google && window.google.maps && window.google.maps.places) {
+                    const service = new google.maps.places.AutocompleteService();
+                    
+                    service.getPlacePredictions({
+                        input: value,
+                        types: ['address'],
+                        componentRestrictions: { country: 'us' }
+                    }, (predictions, status) => {
+                        console.log('Google Maps API response:', predictions, status);
+                        
+                        // Clear previous suggestions
+                        suggestionsList.innerHTML = '';
+                        
+                        if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                            predictions.slice(0, 5).forEach(prediction => {
+                                const option = document.createElement('option');
+                                option.value = prediction.description;
+                                option.dataset.placeId = prediction.place_id;
+                                suggestionsList.appendChild(option);
+                            });
+                            console.log(`Added ${predictions.length} address suggestions`);
+                        } else {
+                            console.log('No address suggestions found or API error:', status);
                         }
-                    }
-                );
-                
-                if (!response.ok) {
-                    console.error('Google Maps API error:', response.status);
-                    return;
-                }
-                
-                const data = await response.json();
-                console.log('Google Maps API response:', data);
-                
-                // Clear previous suggestions
-                suggestionsList.innerHTML = '';
-                
-                // Add new suggestions
-                if (data.predictions && data.predictions.length > 0) {
-                    data.predictions.slice(0, 5).forEach(prediction => {
-                        const option = document.createElement('option');
-                        option.value = prediction.description;
-                        option.dataset.placeId = prediction.place_id;
-                        suggestionsList.appendChild(option);
                     });
-                    console.log(`Added ${data.predictions.length} address suggestions`);
                 } else {
-                    console.log('No address suggestions found');
+                    console.warn('Google Maps JavaScript API not loaded');
                 }
                 
             } catch (error) {
