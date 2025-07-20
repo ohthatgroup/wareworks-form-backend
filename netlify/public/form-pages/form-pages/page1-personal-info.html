@@ -1,0 +1,77 @@
+<div class="page" id="page1">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="personal_info_title">Personal Information</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="personal_info_subtitle">Please provide your basic personal details</p>
+        
+        <div class="form-row Grid-Layout Desktop-3-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="legalFirstName" class="Input-Label required" data-translate="legal_first_name">Legal First Name</label>
+                <input type="text" class="Input" maxlength="256" name="legalFirstName" data-name="Legal First Name" id="legalFirstName" required="">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-legalFirstName"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="middleInitial" class="Input-Label" data-translate="middle_initial">Middle Initial</label>
+                <input type="text" class="Input" maxlength="1" name="middleInitial" data-name="Middle Initial" id="middleInitial">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-middleInitial"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="legalLastName" class="Input-Label required" data-translate="legal_last_name">Legal Last Name</label>
+                <input type="text" class="Input" maxlength="256" name="legalLastName" data-name="Legal Last Name" id="legalLastName" required="">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-legalLastName"></div>
+            </div>
+        </div>
+
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label for="otherLastNames" class="Input-Label" data-translate="other_last_names">Other Last Names Used (if any)</label>
+            <input type="text" class="Input" maxlength="256" name="otherLastNames" data-name="Other Last Names" id="otherLastNames">
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-otherLastNames"></div>
+        </div>
+
+        <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="streetAddress" class="Input-Label required" data-translate="street_address">Street Address</label>
+                <input type="text" class="Input" maxlength="256" name="streetAddress" data-name="Street Address" id="streetAddress" required="" placeholder="Start typing your address...">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-streetAddress"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="aptNumber" class="Input-Label" data-translate="apt_number">Apt. Number (if any)</label>
+                <input type="text" class="Input" maxlength="256" name="aptNumber" data-name="Apt Number" id="aptNumber">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-aptNumber"></div>
+            </div>
+        </div>
+
+        <div class="form-row Grid-Layout Desktop-3-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="city" class="Input-Label required" data-translate="city">City</label>
+                <input type="text" class="Input" maxlength="256" name="city" data-name="City" id="city" required="">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-city"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="state" class="Input-Label required" data-translate="state">State</label>
+                <select id="state" name="state" data-name="State" required="" class="Input Select">
+                    <option value="" data-translate="select_state">Select State</option>
+                    <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</soption><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option><option value="DC">District of Columbia</option>
+                </select>
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-state"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="zipCode" class="Input-Label required" data-translate="zip_code">ZIP Code</label>
+                <input type="text" class="Input" maxlength="10" name="zipCode" data-name="ZIP Code" id="zipCode" required="">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-zipCode"></div>
+            </div>
+        </div>
+
+        <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="phoneNumber" class="Input-Label required" data-translate="phone_number">Phone Number</label>
+                <input type="tel" class="Input" maxlength="12" name="phoneNumber" data-name="Phone Number" placeholder="XXX-XXX-XXXX" id="phoneNumber" required="">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-phoneNumber"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="socialSecurityNumber" class="Input-Label required" data-translate="ssn">Social Security Number</label>
+                <input type="text" class="Input" maxlength="11" name="socialSecurityNumber" data-name="Social Security Number" placeholder="XXX-XX-XXXX" id="socialSecurityNumber" required="">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-socialSecurityNumber"></div>
+            </div>
+        </div>
+    </div>
+</div>
