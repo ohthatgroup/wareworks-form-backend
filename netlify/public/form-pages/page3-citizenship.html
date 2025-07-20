@@ -1,0 +1,74 @@
+<div class="page" id="page3">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="citizenship_title">Citizenship or Immigration Status</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="citizenship_subtitle">This information will be verified during the I-9 process</p>
+        
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label class="Input-Label" data-translate="citizenship_select">Select your status (optional):</label>
+            <div class="radio-button-group [Utility] Margin Top XXS-Gap">
+                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                    <input type="radio" id="usCitizen" name="citizenshipStatus" value="us_citizen" data-name="Citizenship Status">
+                    <span class="radio-button-label Input-Label" for="usCitizen" data-translate="us_citizen">A citizen of the United States</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                    <input type="radio" id="noncitizenNational" name="citizenshipStatus" value="noncitizen_national" data-name="Citizenship Status">
+                    <span class="radio-button-label Input-Label" for="noncitizenNational" data-translate="noncitizen_national">A noncitizen national of the United States</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                    <input type="radio" id="lawfulPermanent" name="citizenshipStatus" value="lawful_permanent" data-name="Citizenship Status">
+                    <span class="radio-button-label Input-Label" for="lawfulPermanent" data-translate="lawful_permanent">A lawful permanent resident</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle [Utility] Display Block [Utility] Margin Bottom XXS-Gap">
+                    <input type="radio" id="alienAuthorized" name="citizenshipStatus" value="alien_authorized" data-name="Citizenship Status">
+                    <span class="radio-button-label Input-Label" for="alienAuthorized" data-translate="alien_authorized">An alien authorized to work</span>
+                </label>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-citizenshipStatus"></div>
+        </div>
+
+        <!-- Conditional Fields for Lawful Permanent Resident -->
+        <div id="lawfulPermanentFields" class="conditional-field BG-Accent-Tertiary-A10 MD-Radius [Utility] Padding All MD-Gap [Utility] Border Left 4px Border-Accent-Tertiary [Utility] Margin Top MD-Gap">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="uscisANumber" class="Input-Label" data-translate="uscis_a_number">USCIS or A-Number</label>
+                <input type="text" class="Input" maxlength="256" name="uscisANumber" data-name="USCIS A-Number" placeholder="A000000000" id="uscisANumber">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-uscisANumber"></div>
+            </div>
+        </div>
+
+        <!-- Conditional Fields for Alien Authorized -->
+        <div id="alienAuthorizedFields" class="conditional-field BG-Accent-Tertiary-A10 MD-Radius [Utility] Padding All MD-Gap [Utility] Border Left 4px Border-Accent-Tertiary [Utility] Margin Top MD-Gap">
+            <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="workAuthExpiration" class="Input-Label" data-translate="work_auth_expiration">Work Authorization Expiration Date</label>
+                    <input type="date" class="Input" name="workAuthExpiration" data-name="Work Auth Expiration" id="workAuthExpiration">
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-workAuthExpiration"></div>
+                </div>
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="alienDocumentType" class="Input-Label" data-translate="document_type">Document Type</label>
+                    <select id="alienDocumentType" name="alienDocumentType" data-name="Alien Document Type" class="Input Select">
+                        <option value="" data-translate="select_document_type">Select Document Type</option>
+                        <option value="uscis_a_number" data-translate="uscis_a_number_option">USCIS A-Number</option>
+                        <option value="form_i94" data-translate="form_i94">Form I-94 Admission Number</option>
+                        <option value="foreign_passport" data-translate="foreign_passport">Foreign Passport Number and Country</option>
+                    </select>
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-alienDocumentType"></div>
+                </div>
+            </div>
+            
+            <div id="alienDocumentDetails" class="document-details [Utility] Margin Top MD-Gap">
+                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="alienDocumentNumber" class="Input-Label" data-translate="document_number">Document Number</label>
+                        <input type="text" class="Input" maxlength="256" name="alienDocumentNumber" data-name="Alien Document Number" id="alienDocumentNumber">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-alienDocumentNumber"></div>
+                    </div>
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap" id="countryField">
+                        <label for="documentCountry" class="Input-Label" data-translate="country_issuance">Country of Issuance</label>
+                        <input type="text" class="Input" maxlength="256" name="documentCountry" data-name="Document Country" id="documentCountry">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-documentCountry"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
