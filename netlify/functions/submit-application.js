@@ -5,8 +5,12 @@
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 const PDFDocument = require('pdfkit');
+const { PDFDocument: PDFLib, rgb } = require('pdf-lib');
+const { getStore } = require('@netlify/blobs');
 const moment = require('moment');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 // Configuration and security constants
 const SECURITY_CONFIG = {
@@ -618,6 +622,7 @@ async function createSheetHeaders(sheets, spreadsheetId, sheetName) {
         'Work Authorization', 'Position Applied', 'Expected Salary', 'Job Discovery',
         'Previously Applied', 'Previous Application Details', 'Education History',
         'Employment History', 'Has ID Document', 'Has Resume', 'Certification Count',
+        'ID Document URL', 'Resume URL', 'Certification URLs',
         'IP Address', 'User Agent', 'Security Fingerprint', 'Processing Time'
     ];
 
@@ -671,8 +676,12 @@ function prepareSheetRowData(data) {
     const docInfo = data.documents ? {
         hasId: !!data.documents.identification,
         hasResume: !!data.documents.resume,
-        certCount: data.documents.certifications ? data.documents.certifications.length : 0
-    } : { hasId: false, hasResume: false, certCount: 0 };
+        certCount: data.documents.certifications ? data.documents.certifications.length : 0,
+        idBlobUrl: data.documents.identification?.blobUrl || '',
+        resumeBlobUrl: data.documents.resume?.blobUrl || '',
+        certificationBlobUrls: data.documents.certifications ? 
+            data.documents.certifications.map(cert => cert.blobUrl).join('; ') : ''
+    } : { hasId: false, hasResume: false, certCount: 0, idBlobUrl: '', resumeBlobUrl: '', certificationBlobUrls: '' };
 
     return [
         data.submissionId,
@@ -715,6 +724,9 @@ function prepareSheetRowData(data) {
         docInfo.hasId ? 'Yes' : 'No',
         docInfo.hasResume ? 'Yes' : 'No',
         docInfo.certCount.toString(),
+        docInfo.idBlobUrl,
+        docInfo.resumeBlobUrl,
+        docInfo.certificationBlobUrls,
         data.ipAddress || '',
         data.userAgent || '',
         data.securityFingerprint || '',
@@ -808,206 +820,473 @@ function generateDocumentId(submissionId, type, index) {
 }
 
 /**
- * Generate comprehensive PDF application package
+ * Generate comprehensive PDF application package using templates
  */
 async function generateApplicationPDF(data) {
-    return new Promise((resolve, reject) => {
-        try {
-            const doc = new PDFDocument({ margin: 50 });
-            const chunks = [];
-
-            doc.on('data', chunk => chunks.push(chunk));
-            doc.on('end', () => resolve(Buffer.concat(chunks)));
-            doc.on('error', reject);
-
-            // Generate the complete application package
-            generateWareWorksApplication(doc, data);
-            doc.addPage();
-            generateI9Form(doc, data);
-            doc.addPage();
-            generateIDVerificationForm(doc, data);
-
-            doc.end();
-
-        } catch (error) {
-            reject(error);
+    try {
+        console.log('Starting PDF generation with templates...');
+        
+        // Create a new PDF document
+        const pdfDoc = await PDFLib.create();
+        
+        // Load and populate template files
+        const populatedApplicationDoc = await loadAndPopulateApplicationTemplate(data);
+        const populatedI9Doc = await loadAndPopulateI9Template(data);
+        
+        // Add populated application template pages
+        console.log('Adding populated application template pages...');
+        const appPages = await pdfDoc.copyPages(populatedApplicationDoc, populatedApplicationDoc.getPageIndices());
+        appPages.forEach((page) => pdfDoc.addPage(page));
+        
+        // Add populated I-9 template pages
+        console.log('Adding populated I-9 template pages...');
+        const i9Pages = await pdfDoc.copyPages(populatedI9Doc, populatedI9Doc.getPageIndices());
+        i9Pages.forEach((page) => pdfDoc.addPage(page));
+        
+        // Add uploaded documents
+        if (data.documents) {
+            await addUploadedDocumentsToPDF(pdfDoc, data.documents);
         }
-    });
-}
-
-/**
- * Generate WareWorks application form PDF
- */
-function generateWareWorksApplication(doc, data) {
-    // Header
-    doc.fontSize(18).font('Helvetica-Bold')
-       .text('WAREWORKS APPLICATION FOR EMPLOYMENT', 50, 50);
-    doc.fontSize(10).font('Helvetica')
-       .text('Equal Opportunity Employer', 50, 75);
-    
-    let y = 100;
-    
-    // Personal Information Section
-    doc.fontSize(14).font('Helvetica-Bold')
-       .text('PERSONAL INFORMATION', 50, y);
-    y += 25;
-    
-    doc.fontSize(10).font('Helvetica');
-    
-    // Name
-    const fullName = `${data.legalFirstName || ''} ${data.middleInitial || ''} ${data.legalLastName || ''}`.trim();
-    doc.text(`Name: ${fullName}`, 50, y);
-    y += 15;
-    
-    // Address
-    const address = `${data.streetAddress || ''} ${data.aptNumber || ''}`.trim();
-    doc.text(`Address: ${address}`, 50, y);
-    y += 15;
-    
-    const cityStateZip = `${data.city || ''}, ${data.state || ''} ${data.zipCode || ''}`.trim();
-    doc.text(`City, State, ZIP: ${cityStateZip}`, 50, y);
-    y += 15;
-    
-    // Contact
-    doc.text(`Phone: ${data.phoneNumber || ''}`, 50, y);
-    doc.text(`Email: ${data.email || 'Not provided'}`, 300, y);
-    y += 15;
-    
-    // SSN (masked for security)
-    const maskedSSN = data.socialSecurityNumber ? 
-        '***-**-' + data.socialSecurityNumber.slice(-4) : 'Not provided';
-    doc.text(`Social Security Number: ${maskedSSN}`, 50, y);
-    doc.text(`Date of Birth: ${data.dateOfBirth || 'Not provided'}`, 300, y);
-    y += 30;
-    
-    // Emergency Contact
-    if (data.emergencyName) {
-        doc.fontSize(12).font('Helvetica-Bold').text('EMERGENCY CONTACT', 50, y);
-        y += 20;
-        doc.fontSize(10).font('Helvetica');
-        doc.text(`Name: ${data.emergencyName}`, 50, y);
-        doc.text(`Phone: ${data.emergencyPhone || ''}`, 300, y);
-        y += 15;
-        doc.text(`Relationship: ${data.emergencyRelationship || ''}`, 50, y);
-        y += 30;
+        
+        // Add a summary page with submission info
+        await addSubmissionSummaryPage(pdfDoc, data);
+        
+        // Generate final PDF buffer
+        const pdfBytes = await pdfDoc.save();
+        console.log('PDF generation completed successfully');
+        
+        return Buffer.from(pdfBytes);
+        
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        throw new Error(`Failed to generate PDF: ${error.message}`);
     }
-    
-    // Application Information
-    doc.fontSize(12).font('Helvetica-Bold').text('APPLICATION INFORMATION', 50, y);
-    y += 20;
-    doc.fontSize(10).font('Helvetica');
-    
-    doc.text(`Position Applied For: ${data.positionApplied || 'Not specified'}`, 50, y);
-    y += 15;
-    doc.text(`Expected Salary: ${data.expectedSalary || 'Not specified'}`, 50, y);
-    y += 15;
-    doc.text(`How did you discover this job? ${data.jobDiscovery || 'Not specified'}`, 50, y);
-    y += 20;
-    
-    // Add more sections as needed...
-    
-    // Footer
-    y += 50;
-    doc.fontSize(8).font('Helvetica');
-    doc.text(`Submission ID: ${data.submissionId}`, 50, y);
-    y += 12;
-    doc.text(`Submitted: ${moment(data.serverTimestamp).format('MMMM DD, YYYY at h:mm A')}`, 50, y);
 }
 
 /**
- * Generate I-9 form (basic template)
+ * Load PDF template from templates folder
  */
-function generateI9Form(doc, data) {
-    doc.fontSize(16).font('Helvetica-Bold')
-       .text('Employment Eligibility Verification', 50, 50);
-    doc.fontSize(12).font('Helvetica')
-       .text('Department of Homeland Security', 50, 70);
-    doc.text('U.S. Citizenship and Immigration Services', 50, 85);
-    doc.fontSize(10).text('USCIS Form I-9', 50, 100);
-    
-    // Employee information would be filled here
-    // This is a template - actual I-9 forms require manual completion
-    
-    let y = 150;
-    doc.fontSize(10).font('Helvetica-Bold')
-       .text('Section 1. Employee Information and Attestation', 50, y);
-    y += 20;
-    
-    doc.fontSize(10).font('Helvetica')
-       .text('(Employee must complete and sign Section 1 no later than the first day of employment)', 50, y);
-    y += 30;
-    
-    // Add form fields...
-    doc.text(`Last Name: ${data.legalLastName || ''}`, 50, y);
-    doc.text(`First Name: ${data.legalFirstName || ''}`, 300, y);
-    y += 20;
-    
-    doc.text(`Middle Initial: ${data.middleInitial || ''}`, 50, y);
-    y += 20;
-    
-    doc.text(`Address: ${data.streetAddress || ''} ${data.aptNumber || ''}`, 50, y);
-    y += 20;
-    
-    doc.text(`City: ${data.city || ''}`, 50, y);
-    doc.text(`State: ${data.state || ''}`, 200, y);
-    doc.text(`ZIP: ${data.zipCode || ''}`, 350, y);
-    y += 30;
-    
-    doc.fontSize(8).font('Helvetica')
-       .text('Note: This form must be completed manually by the employee and employer.', 50, y);
+async function loadTemplate(filename) {
+    try {
+        const templatePath = path.join(__dirname, '../../Templates', filename);
+        console.log('Loading template:', templatePath);
+        
+        if (!fs.existsSync(templatePath)) {
+            throw new Error(`Template file not found: ${filename}`);
+        }
+        
+        const templateBytes = fs.readFileSync(templatePath);
+        const templateDoc = await PDFLib.load(templateBytes);
+        
+        console.log(`Template loaded: ${filename} (${templateDoc.getPageCount()} pages)`);
+        return templateDoc;
+        
+    } catch (error) {
+        console.error(`Error loading template ${filename}:`, error);
+        throw error;
+    }
 }
 
 /**
- * Generate ID verification form
+ * Load and populate WareWorks Application template with form data
  */
-function generateIDVerificationForm(doc, data) {
-    doc.fontSize(16).font('Helvetica-Bold')
-       .text('IDENTIFICATION DOCUMENT VERIFICATION', 50, 50);
-    doc.fontSize(12).font('Helvetica')
-       .text('For Administrative Use Only', 50, 75);
-    
-    let y = 110;
-    
-    doc.fontSize(12).font('Helvetica-Bold').text('EMPLOYEE INFORMATION', 50, y);
-    y += 20;
-    
-    doc.fontSize(10).font('Helvetica');
-    const fullName = `${data.legalFirstName || ''} ${data.legalLastName || ''}`.trim();
-    doc.text(`Employee Name: ${fullName}`, 50, y);
-    y += 15;
-    doc.text(`Submission ID: ${data.submissionId}`, 50, y);
-    y += 15;
-    doc.text(`Date of Verification: _____________________`, 50, y);
-    y += 30;
-    
-    // Document verification table
-    doc.fontSize(12).font('Helvetica-Bold')
-       .text('DOCUMENT VERIFICATION', 50, y);
-    y += 20;
-    
-    doc.fontSize(10).font('Helvetica');
-    doc.text('Document Title:', 50, y);
-    doc.text('Issuing Authority:', 200, y);
-    doc.text('Document Number:', 350, y);
-    doc.text('Expiration Date:', 450, y);
-    
-    y += 20;
-    // Create verification table
-    doc.rect(50, y, 140, 20).stroke();
-    doc.rect(200, y, 140, 20).stroke();
-    doc.rect(350, y, 90, 20).stroke();
-    doc.rect(450, y, 90, 20).stroke();
-    
-    y += 40;
-    
-    // Signature section
-    doc.text('Signature of Employer or Authorized Representative:', 50, y);
-    doc.moveTo(280, y + 10).lineTo(450, y + 10).stroke();
-    
-    y += 30;
-    doc.text('Date:', 50, y);
-    doc.moveTo(100, y + 10).lineTo(200, y + 10).stroke();
+async function loadAndPopulateApplicationTemplate(data) {
+    try {
+        console.log('Loading and populating WareWorks Application template...');
+        
+        const templateDoc = await loadTemplate('Wareworks Application.pdf');
+        const form = templateDoc.getForm();
+        
+        // Helper function to format Yes/No answers with visual indicators
+        const formatYesNo = (value) => {
+            if (!value) return '';
+            const isYes = value.toLowerCase() === 'yes';
+            return isYes ? '☑ YES ☐ No' : '☐ Yes ☑ NO';
+        };
+
+        // Map form data to PDF fields
+        const fieldMappings = {
+            'Legal First Name': data.legalFirstName,
+            'Legal Last Name': data.legalLastName,
+            'Street Address': data.streetAddress,
+            'City': data.city,
+            'State': data.state,
+            'Zip Code': data.zipCode,
+            'Home Phone': data.homePhone || data.phoneNumber,
+            'Cell Phone Number': data.cellPhone || data.phoneNumber,
+            'Social Security Number': data.socialSecurityNumber,
+            'Email': data.email,
+            'Position Applied For': data.positionApplied,
+            'Expected Salary': data.expectedSalary,
+            'How did you discover this job opening': data.jobDiscovery,
+            'Have you previously applied at WareWorks  Yes  No': formatYesNo(data.previouslyApplied),
+            'If yes please specify when and where': data.previousApplicationWhen,
+            
+            // Emergency contact
+            'Name': data.emergencyName,
+            'Number': data.emergencyPhone,
+            'Relationship': data.emergencyRelationship,
+            
+            // Work availability (if we have this data)
+            'Sunday': data.availabilitySunday || '',
+            'Monday': data.availabilityMonday || '',
+            'Tuesday': data.availabilityTuesday || '',
+            'Wednesday': data.availabilityWednesday || '',
+            'Thursday': data.availabilityThursday || '',
+            'Friday': data.availabilityFriday || '',
+            'Saturday': data.availabilitySaturday || '',
+            
+            // Yes/No Questions - using undefined fields as fallback
+            'undefined': formatYesNo(data.age18), // Age 18+ question
+            'undefined_2': formatYesNo(data.transportation), // Transportation question  
+            'undefined_7': formatYesNo(data.workAuthorization) // Work authorization question
+        };
+        
+        // Populate education fields
+        if (data.education && Array.isArray(data.education)) {
+            if (data.education[0]) {
+                fieldMappings['School Name and Location'] = data.education[0].schoolName || '';
+                fieldMappings['Year'] = data.education[0].graduationYear || '';
+                fieldMappings['Major'] = data.education[0].fieldOfStudy || '';
+            }
+            if (data.education[1]) {
+                fieldMappings['School Name and Location_2'] = data.education[1].schoolName || '';
+                fieldMappings['Year_2'] = data.education[1].graduationYear || '';
+                fieldMappings['Major_2'] = data.education[1].fieldOfStudy || '';
+            }
+        }
+        
+        // Populate employment fields
+        if (data.employment && Array.isArray(data.employment)) {
+            if (data.employment[0]) {
+                fieldMappings['Company Name and Location'] = data.employment[0].companyName || '';
+                fieldMappings['Starting Position'] = data.employment[0].startingPosition || '';
+                fieldMappings['Ending Position'] = data.employment[0].endingPosition || '';
+                fieldMappings['Supervisor Name'] = data.employment[0].supervisorName || '';
+                fieldMappings['Telephone Number'] = data.employment[0].supervisorPhone || '';
+                fieldMappings['Responsibilities 1'] = data.employment[0].responsibilities || '';
+                fieldMappings['Reason for Leaving 1'] = data.employment[0].reasonForLeaving || '';
+            }
+            if (data.employment[1]) {
+                fieldMappings['Company Name and Location_2'] = data.employment[1].companyName || '';
+                fieldMappings['Starting Position_2'] = data.employment[1].startingPosition || '';
+                fieldMappings['Ending Position_2'] = data.employment[1].endingPosition || '';
+                fieldMappings['Supervisor Name_2'] = data.employment[1].supervisorName || '';
+                fieldMappings['Telephone Number_2'] = data.employment[1].supervisorPhone || '';
+                fieldMappings['Responsibilities 1_2'] = data.employment[1].responsibilities || '';
+                fieldMappings['Reason for Leaving 1_2'] = data.employment[1].reasonForLeaving || '';
+            }
+        }
+        
+        // Apply field mappings
+        let fieldsPopulated = 0;
+        for (const [fieldName, value] of Object.entries(fieldMappings)) {
+            if (value) {
+                try {
+                    const field = form.getField(fieldName);
+                    if (field && field.constructor.name === 'PDFTextField') {
+                        field.setText(String(value));
+                        fieldsPopulated++;
+                    }
+                } catch (error) {
+                    console.warn(`Could not populate field "${fieldName}":`, error.message);
+                }
+            }
+        }
+        
+        console.log(`WareWorks Application: Populated ${fieldsPopulated} fields`);
+        return templateDoc;
+        
+    } catch (error) {
+        console.error('Error populating WareWorks Application template:', error);
+        throw error;
+    }
 }
+
+/**
+ * Load and populate I-9 template with form data
+ */
+async function loadAndPopulateI9Template(data) {
+    try {
+        console.log('Loading and populating I-9 template...');
+        
+        const templateDoc = await loadTemplate('i-9.pdf');
+        const form = templateDoc.getForm();
+        
+        // Format data for I-9 form
+        const today = moment().format('MM/DD/YYYY');
+        const dobFormatted = data.dateOfBirth ? moment(data.dateOfBirth).format('MM/DD/YYYY') : '';
+        const ssnNumbers = data.socialSecurityNumber ? data.socialSecurityNumber.replace(/\D/g, '') : '';
+        
+        // Map form data to I-9 PDF fields
+        const fieldMappings = {
+            // Employee Section 1
+            'Last Name (Family Name)': data.legalLastName,
+            'First Name Given Name': data.legalFirstName,
+            'Employee Middle Initial (if any)': data.middleInitial,
+            'Employee Other Last Names Used (if any)': data.otherLastNames,
+            'Address Street Number and Name': data.streetAddress,
+            'Apt Number (if any)': data.aptNumber,
+            'City or Town': data.city,
+            'State': data.state,
+            'ZIP Code': data.zipCode,
+            'Date of Birth mmddyyyy': dobFormatted,
+            'US Social Security Number': ssnNumbers,
+            'Employees E-mail Address': data.email,
+            'Telephone Number': data.phoneNumber,
+            'Today\\'s Date mmddyyy': today,
+            
+            // Section 2 fields (some will be filled by employer)
+            'Last Name Family Name from Section 1': data.legalLastName,
+            'First Name Given Name from Section 1': data.legalFirstName,
+            'Middle initial if any from Section 1': data.middleInitial,
+            'Last Name Family Name from Section 1-2': data.legalLastName,
+            'First Name Given Name from Section 1-2': data.legalFirstName,
+            'Middle initial if any from Section 1-2': data.middleInitial,
+            
+            // Today's date in various fields
+            'S2 Todays Date mmddyyyy': today,
+            'Todays Date 0': today,
+            'Todays Date 1': today,
+            'Todays Date 2': today
+        };
+        
+        // Apply field mappings
+        let fieldsPopulated = 0;
+        for (const [fieldName, value] of Object.entries(fieldMappings)) {
+            if (value) {
+                try {
+                    const field = form.getField(fieldName);
+                    if (field) {
+                        if (field.constructor.name === 'PDFTextField') {
+                            field.setText(String(value));
+                            fieldsPopulated++;
+                        } else if (field.constructor.name === 'PDFDropdown') {
+                            field.select(String(value));
+                            fieldsPopulated++;
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Could not populate I-9 field "${fieldName}":`, error.message);
+                }
+            }
+        }
+        
+        console.log(`I-9 Form: Populated ${fieldsPopulated} fields`);
+        return templateDoc;
+        
+    } catch (error) {
+        console.error('Error populating I-9 template:', error);
+        throw error;
+    }
+}
+
+/**
+ * Add uploaded documents to PDF
+ */
+async function addUploadedDocumentsToPDF(pdfDoc, documents) {
+    try {
+        console.log('Adding uploaded documents to PDF...');
+        const store = getStore('wareworks-documents');
+        
+        // Add identification document
+        if (documents.identification?.blobUrl) {
+            await addDocumentFromBlob(pdfDoc, store, documents.identification, 'ID Document');
+        }
+        
+        // Add resume
+        if (documents.resume?.blobUrl) {
+            await addDocumentFromBlob(pdfDoc, store, documents.resume, 'Resume');
+        }
+        
+        // Add certifications
+        if (documents.certifications && documents.certifications.length > 0) {
+            for (let i = 0; i < documents.certifications.length; i++) {
+                const cert = documents.certifications[i];
+                await addDocumentFromBlob(pdfDoc, store, cert, `Certification ${i + 1}`);
+            }
+        }
+        
+        console.log('All uploaded documents added to PDF');
+        
+    } catch (error) {
+        console.error('Error adding uploaded documents:', error);
+        // Don't throw - continue with PDF generation even if some documents fail
+    }
+}
+
+/**
+ * Add a single document from Netlify Blob to PDF
+ */
+async function addDocumentFromBlob(pdfDoc, store, documentInfo, documentLabel) {
+    try {
+        console.log(`Adding ${documentLabel}: ${documentInfo.originalName}`);
+        
+        // Extract document ID from blob URL
+        const documentId = documentInfo.blobUrl.split('/').pop();
+        
+        // Get document from Netlify Blobs
+        const { data: documentBuffer } = await store.get(documentId, { type: 'arrayBuffer' });
+        
+        if (!documentBuffer) {
+            console.warn(`Document not found in blob storage: ${documentId}`);
+            return;
+        }
+        
+        // Add separator page
+        const separatorPage = pdfDoc.addPage();
+        const { width, height } = separatorPage.getSize();
+        
+        separatorPage.drawText(documentLabel, {
+            x: 50,
+            y: height - 100,
+            size: 20,
+            color: rgb(0.075, 0.122, 0.357) // WareWorks blue
+        });
+        
+        separatorPage.drawText(`Original filename: ${documentInfo.originalName}`, {
+            x: 50,
+            y: height - 130,
+            size: 12,
+            color: rgb(0.4, 0.4, 0.4)
+        });
+        
+        // Handle different document types
+        if (documentInfo.mimeType === 'application/pdf') {
+            // Merge PDF pages
+            const uploadedDoc = await PDFLib.load(documentBuffer);
+            const pages = await pdfDoc.copyPages(uploadedDoc, uploadedDoc.getPageIndices());
+            pages.forEach((page) => pdfDoc.addPage(page));
+            
+        } else if (documentInfo.mimeType.startsWith('image/')) {
+            // Embed image
+            let image;
+            if (documentInfo.mimeType === 'image/png') {
+                image = await pdfDoc.embedPng(documentBuffer);
+            } else {
+                image = await pdfDoc.embedJpg(documentBuffer);
+            }
+            
+            const imagePage = pdfDoc.addPage();
+            const imagePageSize = imagePage.getSize();
+            
+            // Scale image to fit page while maintaining aspect ratio
+            const imageWidth = image.width;
+            const imageHeight = image.height;
+            const maxWidth = imagePageSize.width - 100;
+            const maxHeight = imagePageSize.height - 100;
+            
+            let scaledWidth = imageWidth;
+            let scaledHeight = imageHeight;
+            
+            if (imageWidth > maxWidth) {
+                scaledWidth = maxWidth;
+                scaledHeight = (imageHeight * maxWidth) / imageWidth;
+            }
+            
+            if (scaledHeight > maxHeight) {
+                scaledHeight = maxHeight;
+                scaledWidth = (imageWidth * maxHeight) / imageHeight;
+            }
+            
+            imagePage.drawImage(image, {
+                x: (imagePageSize.width - scaledWidth) / 2,
+                y: (imagePageSize.height - scaledHeight) / 2,
+                width: scaledWidth,
+                height: scaledHeight,
+            });
+        }
+        
+        console.log(`Successfully added ${documentLabel} to PDF`);
+        
+    } catch (error) {
+        console.error(`Error adding document ${documentLabel}:`, error);
+        // Don't throw - continue with other documents
+    }
+}
+
+/**
+ * Add submission summary page
+ */
+async function addSubmissionSummaryPage(pdfDoc, data) {
+    try {
+        const summaryPage = pdfDoc.addPage();
+        const { width, height } = summaryPage.getSize();
+        
+        let y = height - 100;
+        
+        // Title
+        summaryPage.drawText('Application Submission Summary', {
+            x: 50,
+            y: y,
+            size: 20,
+            color: rgb(0.075, 0.122, 0.357)
+        });
+        
+        y -= 40;
+        
+        // Submission details
+        const details = [
+            `Submission ID: ${data.submissionId}`,
+            `Submitted: ${moment(data.serverTimestamp).format('MMMM DD, YYYY at h:mm A')}`,
+            `Applicant: ${data.legalFirstName} ${data.legalLastName}`,
+            `Position: ${data.positionApplied || 'Not specified'}`,
+            `Phone: ${data.phoneNumber}`,
+            `Email: ${data.email || 'Not provided'}`,
+            `Language: ${data.language === 'es' ? 'Spanish' : 'English'}`
+        ];
+        
+        details.forEach(detail => {
+            summaryPage.drawText(detail, {
+                x: 50,
+                y: y,
+                size: 12,
+                color: rgb(0.2, 0.2, 0.2)
+            });
+            y -= 20;
+        });
+        
+        y -= 20;
+        
+        // Documents submitted
+        summaryPage.drawText('Documents Included:', {
+            x: 50,
+            y: y,
+            size: 14,
+            color: rgb(0.075, 0.122, 0.357)
+        });
+        
+        y -= 25;
+        
+        const docList = [];
+        if (data.documents?.identification) docList.push('✓ Government-issued ID');
+        if (data.documents?.resume) docList.push('✓ Resume/CV');
+        if (data.documents?.certifications?.length > 0) {
+            docList.push(`✓ ${data.documents.certifications.length} Certification(s)`);
+        }
+        
+        if (docList.length === 0) {
+            docList.push('⚠ No documents uploaded');
+        }
+        
+        docList.forEach(doc => {
+            summaryPage.drawText(doc, {
+                x: 70,
+                y: y,
+                size: 10,
+                color: rgb(0.3, 0.3, 0.3)
+            });
+            y -= 15;
+        });
+        
+        console.log('Added submission summary page');
+        
+    } catch (error) {
+        console.error('Error adding summary page:', error);
+        // Don't throw - summary page is optional
+    }
+}
+
 
 /**
  * Send email notifications

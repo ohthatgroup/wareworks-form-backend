@@ -9,7 +9,9 @@
   "nodemailer": "^6.9.7",
   "pdfkit": "^0.14.0",
   "canvas": "^2.11.2",
-  "node-fetch": "^2.6.1"
+  "node-fetch": "^2.6.1",
+  "@netlify/blobs": "^8.1.0",
+  "pdf-lib": "^1.17.1"
 },
   "scripts": {
     "build": "echo 'Build complete'"

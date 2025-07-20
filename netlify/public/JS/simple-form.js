@@ -405,20 +405,34 @@ async function submitApplication() {
     try {
         // Show loading
         showLoading(true);
-        showMessage('Submitting your application...', 'info');
+        showMessage('Uploading documents...', 'info');
         
         // Save all form data
         saveFormData();
         
-        // Prepare submission data
+        // Generate submission ID
+        const submissionId = generateSubmissionId();
+        
+        // Step 1: Upload documents to Netlify Blobs
+        let documentUploadResults = null;
+        if (window.uploadedDocuments && Object.keys(window.uploadedDocuments).length > 0) {
+            documentUploadResults = await uploadDocuments(submissionId);
+            showMessage('Processing application...', 'info');
+        }
+        
+        // Step 2: Prepare submission data with document URLs
         const submitData = {
-            formData: formData,
+            ...formData, // Spread the form data directly into the object
+            documents: documentUploadResults ? formatDocumentsForSubmission(documentUploadResults) : null,
             language: 'en', // You can track this from disclaimer selection
             submissionTime: new Date().toISOString(),
-            sessionId: 'sess_' + Date.now()
+            sessionId: 'sess_' + Date.now(),
+            submissionId: submissionId
         };
         
-        // Submit to Netlify function
+        showMessage('Submitting your application...', 'info');
+        
+        // Step 3: Submit application to main function
         const response = await fetch('https://wareworks-backend.netlify.app/.netlify/functions/submit-application', {
             method: 'POST',
             headers: {
@@ -440,6 +454,126 @@ async function submitApplication() {
     } finally {
         showLoading(false);
     }
+}
+
+/**
+ * Generate unique submission ID
+ */
+function generateSubmissionId() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    return `WW_${timestamp}_${random}`;
+}
+
+/**
+ * Upload documents to Netlify Blobs
+ */
+async function uploadDocuments(submissionId) {
+    if (!window.uploadedDocuments || Object.keys(window.uploadedDocuments).length === 0) {
+        return null;
+    }
+    
+    // Convert files to base64 format for upload
+    const documents = {};
+    
+    // Process identification document
+    if (window.uploadedDocuments.idDocument) {
+        documents.identification = await fileToDocumentObject(window.uploadedDocuments.idDocument);
+    }
+    
+    // Process resume (optional)
+    if (window.uploadedDocuments.resumeDocument) {
+        documents.resume = await fileToDocumentObject(window.uploadedDocuments.resumeDocument);
+    }
+    
+    // Process certifications
+    if (window.uploadedDocuments.certificationDocuments && window.uploadedDocuments.certificationDocuments.length > 0) {
+        documents.certifications = [];
+        for (const cert of window.uploadedDocuments.certificationDocuments) {
+            const certDoc = await fileToDocumentObject(cert);
+            documents.certifications.push(certDoc);
+        }
+    }
+    
+    // Upload to Netlify Blobs
+    const uploadResponse = await fetch('https://wareworks-backend.netlify.app/.netlify/functions/upload-documents', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            submissionId: submissionId,
+            documents: documents
+        })
+    });
+    
+    if (!uploadResponse.ok) {
+        const error = await uploadResponse.json();
+        throw new Error(`Document upload failed: ${error.error || uploadResponse.status}`);
+    }
+    
+    const uploadResult = await uploadResponse.json();
+    console.log('Document upload successful:', uploadResult);
+    return uploadResult.uploadedFiles;
+}
+
+/**
+ * Convert File object to document object with base64 data
+ */
+async function fileToDocumentObject(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Data = e.target.result.split(',')[1]; // Remove data:mime;base64, prefix
+            resolve({
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                data: base64Data
+            });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+/**
+ * Format uploaded document results for submission
+ */
+function formatDocumentsForSubmission(uploadResults) {
+    const formatted = {};
+    
+    if (uploadResults.identification) {
+        formatted.identification = {
+            blobUrl: uploadResults.identification.blobUrl,
+            originalName: uploadResults.identification.originalName,
+            mimeType: uploadResults.identification.mimeType,
+            size: uploadResults.identification.size,
+            documentId: uploadResults.identification.documentId
+        };
+    }
+    
+    if (uploadResults.resume) {
+        formatted.resume = {
+            blobUrl: uploadResults.resume.blobUrl,
+            originalName: uploadResults.resume.originalName,
+            mimeType: uploadResults.resume.mimeType,
+            size: uploadResults.resume.size,
+            documentId: uploadResults.resume.documentId
+        };
+    }
+    
+    if (uploadResults.certifications && uploadResults.certifications.length > 0) {
+        formatted.certifications = uploadResults.certifications.map(cert => ({
+            blobUrl: cert.blobUrl,
+            originalName: cert.originalName,
+            mimeType: cert.mimeType,
+            size: cert.size,
+            documentId: cert.documentId
+        }));
+    }
+    
+    return formatted;
 }
 
 function showSubmissionSuccess(result) {
