@@ -1,0 +1,46 @@
+<div class="page" id="page6">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="education_title">Education History</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="education_subtitle">Providing your educational background helps us understand your qualifications</p>
+        
+        <div id="educationContainer">
+            <div class="education-entry repeatable-section BG-Secondary LG-Radius [Utility] Border Width 2px Border-Secondary [Utility] Padding All MD-Gap [Utility] Margin All MD-Gap [Utility] Position Relative" data-index="0">
+                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="schoolName_0" class="Input-Label" data-translate="school_name">School Name and Location</label>
+                        <input type="text" class="Input" maxlength="256" name="education[0][schoolName]" data-name="School Name" id="schoolName_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-schoolName_0"></div>
+                    </div>
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="graduationYear_0" class="Input-Label" data-translate="graduation_year">Year</label>
+                        <input type="text" class="Input" maxlength="4" name="education[0][year]" data-name="Graduation Year" placeholder="YYYY" id="graduationYear_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-graduationYear_0"></div>
+                    </div>
+                </div>
+                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="major_0" class="Input-Label" data-translate="major_field">Major/Field of Study</label>
+                        <input type="text" class="Input" maxlength="256" name="education[0][major]" data-name="Major" id="major_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-major_0"></div>
+                    </div>
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label class="Input-Label" data-translate="diploma_degree">Diploma/Degree?</label>
+                        <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
+                            <label class="radio-button-field Radio-Toggle">
+                                <input type="radio" id="diploma_0_yes" name="education[0][diploma]" value="yes" data-name="Diploma">
+                                <span class="radio-button-label Input-Label" for="diploma_0_yes" data-translate="yes">Yes</span>
+                            </label>
+                            <label class="radio-button-field Radio-Toggle">
+                                <input type="radio" id="diploma_0_no" name="education[0][diploma]" value="no" data-name="Diploma">
+                                <span class="radio-button-label Input-Label" for="diploma_0_no" data-translate="no">No</span>
+                            </label>
+                        </div>
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-diploma_0"></div>
+                    </div>
+                </div>
+                <button type="button" class="Button Secondary [Utility] Margin Top MD-Gap" onclick="removeEducationEntry(this)" data-translate="remove_entry">Remove Entry</button>
+            </div>
+        </div>
+        <button type="button" class="Button Secondary [Utility] Margin Top MD-Gap" id="addEducationBtn" data-translate="add_another_school">Add Another School</button>
+    </div>
+</div>
