@@ -6,15 +6,16 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, cache-control" # ADDED 'cache-control' here
-    # You can add other headers if needed, like Cache-Control if you want to control caching
-    # Cache-Control = "no-cache, no-store, must-revalidate"
-    # Pragma = "no-cache"
-    # Expires = "0"
+    Access-Control-Allow-Headers = "Content-Type, cache-control"
 
-# This line ensures your static files (like page fragments and JS) are deployed from the public directory
-# if your main build command or publish directory is not already configured for this.
-# (You might already have this from a previous step, setting "Publish directory" in UI)
+# NEW: Global headers for your static HTML page fragments
+[[headers]]
+  for = "/form-pages/*" # Apply these headers to all requests going to your form pages
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS" # Pages are usually only GET/OPTIONS
+    Access-Control-Allow-Headers = "Content-Type" # Add any other headers your client might send
+
 [build]
   publish = "netlify/public" # Adjust this if your static assets are in a different folder
   functions = "netlify/functions"
