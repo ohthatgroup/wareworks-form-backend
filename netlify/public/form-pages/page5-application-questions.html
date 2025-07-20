@@ -1,0 +1,93 @@
+<div class="page" id="page5">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="application_questions_title">Application Questions</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="application_questions_subtitle">Please answer as completely as possible</p>
+        
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label class="Input-Label" data-translate="age_18_question">Are you 18 years of age or older?</label>
+            <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="age18Yes" name="age18" value="yes" data-name="Age 18">
+                    <span class="radio-button-label Input-Label" for="age18Yes" data-translate="yes">Yes</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="age18No" name="age18" value="no" data-name="Age 18">
+                    <span class="radio-button-label Input-Label" for="age18No" data-translate="no">No</span>
+                </label>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-age18"></div>
+        </div>
+
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label class="Input-Label" data-translate="transportation_question">Do you have reliable transportation?</label>
+            <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="transportationYes" name="transportation" value="yes" data-name="Transportation">
+                    <span class="radio-button-label Input-Label" for="transportationYes" data-translate="yes">Yes</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="transportationNo" name="transportation" value="no" data-name="Transportation">
+                    <span class="radio-button-label Input-Label" for="transportationNo" data-translate="no">No</span>
+                </label>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-transportation"></div>
+        </div>
+
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label class="Input-Label" data-translate="work_auth_question">Are you legally authorized to work in the country where you are applying?</label>
+            <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="workAuthYes" name="workAuthorization" value="yes" data-name="Work Authorization">
+                    <span class="radio-button-label Input-Label" for="workAuthYes" data-translate="yes">Yes</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="workAuthNo" name="workAuthorization" value="no" data-name="Work Authorization">
+                    <span class="radio-button-label Input-Label" for="workAuthNo" data-translate="no">No</span>
+                </label>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-workAuthorization"></div>
+        </div>
+
+        <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="positionApplied" class="Input-Label" data-translate="position_applied">Position Applied For</label>
+                <input type="text" class="Input" maxlength="256" name="positionApplied" data-name="Position Applied" id="positionApplied">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-positionApplied"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="expectedSalary" class="Input-Label" data-translate="expected_salary">Expected Salary</label>
+                <input type="text" class="Input" maxlength="256" name="expectedSalary" data-name="Expected Salary" placeholder="$XX,XXX" id="expectedSalary">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-expectedSalary"></div>
+            </div>
+        </div>
+
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label for="jobDiscovery" class="Input-Label" data-translate="job_discovery">How did you discover this job opening?</label>
+            <input type="text" class="Input" maxlength="256" name="jobDiscovery" data-name="Job Discovery" id="jobDiscovery">
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-jobDiscovery"></div>
+        </div>
+
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label class="Input-Label" data-translate="previously_applied_question">Have you previously applied at WareWorks?</label>
+            <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="previouslyAppliedYes" name="previouslyApplied" value="yes" data-name="Previously Applied">
+                    <span class="radio-button-label Input-Label" for="previouslyAppliedYes" data-translate="yes">Yes</span>
+                </label>
+                <label class="radio-button-field Radio-Toggle">
+                    <input type="radio" id="previouslyAppliedNo" name="previouslyApplied" value="no" data-name="Previously Applied">
+                    <span class="radio-button-label Input-Label" for="previouslyAppliedNo" data-translate="no">No</span>
+                </label>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-previouslyApplied"></div>
+        </div>
+
+        <div id="previousApplicationDetails" class="conditional-field BG-Accent-Tertiary-A10 MD-Radius [Utility] Padding All MD-Gap [Utility] Border Left 4px Border-Accent-Tertiary [Utility] Margin Top MD-Gap">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="previousApplicationWhen" class="Input-Label" data-translate="previous_application_when">When and where did you previously apply?</label>
+                <input type="text" class="Input" maxlength="256" name="previousApplicationWhen" data-name="Previous Application When" id="previousApplicationWhen">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-previousApplicationWhen"></div>
+            </div>
+        </div>
+    </div>
+</div>
