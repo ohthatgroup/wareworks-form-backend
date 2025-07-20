@@ -1,0 +1,60 @@
+<div class="page" id="page4">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="documents_title">Required Documents</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="documents_subtitle">Please upload the required documents for your application</p>
+        
+        <!-- ID Document Upload (Required) -->
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label for="idDocument" class="Input-Label required" data-translate="id_document">Government-Issued Photo ID</label>
+            <div class="file-upload-container [Utility] Margin Bottom XS-Gap">
+                <input type="file" id="idDocument" name="idDocument" accept="image/*,.pdf" required class="file-input">
+                <div class="file-upload-area Border-Secondary LG-Radius [Utility] Padding All LG-Gap [Utility] Text Align Center BG-Secondary" onclick="document.getElementById('idDocument').click()">
+                    <div class="file-upload-icon Icon Extra-Large [Utility] Margin Bottom XXS-Gap">📄</div>
+                    <div class="file-upload-text Paragraph [Utility] Font Weight 500 Text-Primary [Utility] Margin Bottom XXS-Gap" data-translate="upload_id_text">Click to upload or drag and drop</div>
+                    <div class="file-upload-hint Text-Secondary [Utility] Font Size XXS" data-translate="upload_id_hint">Accepted formats: JPG, PNG, PDF (Max 10MB)</div>
+                </div>
+                <div class="file-upload-preview [Utility] Margin Top MD-Gap" id="idDocumentPreview"></div>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-idDocument"></div>
+        </div>
+
+        <!-- Resume Upload (Optional) -->
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label for="resumeDocument" class="Input-Label" data-translate="resume_document">Resume/CV</label>
+            <div class="file-upload-container [Utility] Margin Bottom XS-Gap">
+                <input type="file" id="resumeDocument" name="resumeDocument" accept=".pdf,.doc,.docx" class="file-input">
+                <div class="file-upload-area Border-Secondary LG-Radius [Utility] Padding All LG-Gap [Utility] Text Align Center BG-Secondary" onclick="document.getElementById('resumeDocument').click()">
+                    <div class="file-upload-icon Icon Extra-Large [Utility] Margin Bottom XXS-Gap">📋</div>
+                    <div class="file-upload-text Paragraph [Utility] Font Weight 500 Text-Primary [Utility] Margin Bottom XXS-Gap" data-translate="upload_resume_text">Click to upload or drag and drop</div>
+                    <div class="file-upload-hint Text-Secondary [Utility] Font Size XXS" data-translate="upload_resume_hint">Accepted formats: PDF, DOC, DOCX (Max 10MB)</div>
+                </div>
+                <div class="file-upload-preview [Utility] Margin Top MD-Gap" id="resumeDocumentPreview"></div>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-resumeDocument"></div>
+        </div>
+
+        <!-- Certifications Upload (Required) -->
+        <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+            <label for="certificationDocuments" class="Input-Label required" data-translate="certification_documents">Certifications & Licenses</label>
+            <small class="field-note Text-Secondary [Utility] Font Size XXS [Utility] Margin Top XXS-Gap" data-translate="certification_note">Upload all relevant certifications, licenses, or training certificates (at least one required)</small>
+            <div class="file-upload-container [Utility] Margin Bottom XS-Gap">
+                <input type="file" id="certificationDocuments" name="certificationDocuments" accept="image/*,.pdf" multiple required class="file-input">
+                <div class="file-upload-area Border-Secondary LG-Radius [Utility] Padding All LG-Gap [Utility] Text Align Center BG-Secondary" onclick="document.getElementById('certificationDocuments').click()">
+                    <div class="file-upload-icon Icon Extra-Large [Utility] Margin Bottom XXS-Gap">🏆</div>
+                    <div class="file-upload-text Paragraph [Utility] Font Weight 500 Text-Primary [Utility] Margin Bottom XXS-Gap" data-translate="upload_cert_text">Click to upload or drag and drop multiple files</div>
+                    <div class="file-upload-hint Text-Secondary [Utility] Font Size XXS" data-translate="upload_cert_hint">Accepted formats: JPG, PNG, PDF (Max 10MB each)</div>
+                </div>
+                <div class="file-upload-preview [Utility] Margin Top MD-Gap" id="certificationDocumentsPreview"></div>
+            </div>
+            <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-certificationDocuments"></div>
+        </div>
+
+        <!-- Upload Progress -->
+        <div id="uploadProgress" class="upload-progress BG-Secondary MD-Radius [Utility] Padding All MD-Gap [Utility] Margin Top MD-Gap" style="display: none;">
+            <div class="progress-bar BG-Secondary MD-Radius [Utility] Height 6px [Utility] Margin Bottom XXS-Gap [Utility] Overflow Hidden">
+                <div class="progress-fill BG-Accent-Primary [Utility] Height 100%" id="uploadProgressFill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-text Paragraph [Utility] Font Size S Text-Primary [Utility] Text Align Center" id="uploadProgressText">Preparing files...</div>
+        </div>
+    </div>
+</div>
