@@ -114,6 +114,56 @@ function setupAddressAutocomplete() {
     
     console.log('Setting up address autocomplete for:', addressInput);
     
+    // Load Google Maps API if not already loaded
+    if (!window.google) {
+        loadGoogleMapsAPI().then(() => {
+            initializeAutocomplete(addressInput);
+        }).catch(error => {
+            console.error('Failed to load Google Maps API:', error);
+        });
+    } else {
+        initializeAutocomplete(addressInput);
+    }
+}
+
+function loadGoogleMapsAPI() {
+    return new Promise((resolve, reject) => {
+        // Check if already loaded
+        if (window.google && window.google.maps) {
+            resolve();
+            return;
+        }
+        
+        // Check if script is already being loaded
+        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+        if (existingScript) {
+            // Wait for existing script to load
+            existingScript.addEventListener('load', resolve);
+            existingScript.addEventListener('error', reject);
+            return;
+        }
+        
+        // Create and load the script
+        const script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDQFBttRAtQDhfsQWHVk38RKWQ38tznMYY&libraries=places';
+        script.async = true;
+        script.defer = true;
+        
+        script.addEventListener('load', () => {
+            console.log('Google Maps API loaded successfully');
+            resolve();
+        });
+        
+        script.addEventListener('error', () => {
+            console.error('Failed to load Google Maps API');
+            reject(new Error('Google Maps API failed to load'));
+        });
+        
+        document.head.appendChild(script);
+    });
+}
+
+function initializeAutocomplete(addressInput) {
     let autocompleteTimer;
     
     // Create datalist for suggestions
@@ -168,7 +218,7 @@ function setupAddressAutocomplete() {
                         }
                     });
                 } else {
-                    console.warn('Google Maps JavaScript API not loaded');
+                    console.warn('Google Maps JavaScript API still loading...');
                 }
                 
             } catch (error) {
