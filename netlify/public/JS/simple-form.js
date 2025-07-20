@@ -178,7 +178,95 @@ function setupAddressAutocomplete() {
         }, 300); // 300ms delay
     });
     
+    // Handle address selection to populate other fields
+    addressInput.addEventListener('change', function(e) {
+        const selectedAddress = e.target.value;
+        if (selectedAddress && window.google && window.google.maps) {
+            populateAddressFields(selectedAddress);
+        }
+    });
+    
     console.log('Address autocomplete setup complete');
+}
+
+function populateAddressFields(address) {
+    console.log('Populating address fields for:', address);
+    
+    if (!window.google || !window.google.maps) {
+        console.warn('Google Maps API not available for address parsing');
+        return;
+    }
+    
+    const geocoder = new google.maps.Geocoder();
+    
+    geocoder.geocode({ address: address }, function(results, status) {
+        if (status === 'OK' && results[0]) {
+            const place = results[0];
+            console.log('Geocoded address:', place);
+            
+            // Extract address components
+            const components = place.address_components;
+            let streetNumber = '';
+            let route = '';
+            let city = '';
+            let state = '';
+            let zipCode = '';
+            
+            components.forEach(component => {
+                const types = component.types;
+                
+                if (types.includes('street_number')) {
+                    streetNumber = component.long_name;
+                } else if (types.includes('route')) {
+                    route = component.long_name;
+                } else if (types.includes('locality')) {
+                    city = component.long_name;
+                } else if (types.includes('administrative_area_level_1')) {
+                    state = component.short_name;
+                } else if (types.includes('postal_code')) {
+                    zipCode = component.long_name;
+                }
+            });
+            
+            // Populate the form fields
+            const cityField = document.getElementById('city');
+            const stateField = document.getElementById('state');
+            const zipField = document.getElementById('zipCode');
+            
+            if (city && cityField) {
+                cityField.value = city;
+                console.log('Set city:', city);
+            }
+            
+            if (state && stateField) {
+                stateField.value = state;
+                console.log('Set state:', state);
+            }
+            
+            if (zipCode && zipField) {
+                zipField.value = zipCode;
+                console.log('Set zip code:', zipCode);
+            }
+            
+            // Update the street address with proper formatting
+            const streetAddress = `${streetNumber} ${route}`.trim();
+            const addressField = document.getElementById('streetAddress');
+            if (streetAddress && addressField) {
+                addressField.value = streetAddress;
+                console.log('Set street address:', streetAddress);
+            }
+            
+            // Trigger change events to save data
+            [cityField, stateField, zipField, addressField].forEach(field => {
+                if (field) {
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+            
+        } else {
+            console.warn('Geocoding failed:', status);
+        }
+    });
 }
 
 function setupInputFormatters() {
