@@ -897,8 +897,7 @@ class WareWorksApplication {
             const response = await fetch(CONFIG.NETLIFY_CONFIG_URL, {
                 method: 'GET',
                 headers: {
-                    'Accept': 'application/json',
-                    'Cache-Control': 'no-cache'
+                    'Accept': 'application/json'
                 },
                 signal: controller.signal
             });
@@ -1245,6 +1244,268 @@ class WareWorksApplication {
             this.auditLog.log('auto_save_cleared');
         } catch (error) {
             console.warn('Failed to clear auto-saved data:', error);
+        }
+    }
+
+    // Missing function implementations
+    setupInputFormatters() {
+        // Phone number formatting
+        const phoneInputs = document.querySelectorAll('input[type="tel"]');
+        phoneInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 6) {
+                    value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6,10)}`;
+                } else if (value.length >= 3) {
+                    value = `(${value.slice(0,3)}) ${value.slice(3)}`;
+                }
+                e.target.value = value;
+            });
+        });
+
+        // SSN formatting
+        const ssnInput = document.getElementById('socialSecurityNumber');
+        if (ssnInput) {
+            ssnInput.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 5) {
+                    value = `${value.slice(0,3)}-${value.slice(3,5)}-${value.slice(5,9)}`;
+                } else if (value.length >= 3) {
+                    value = `${value.slice(0,3)}-${value.slice(3)}`;
+                }
+                e.target.value = value;
+            });
+        }
+
+        // ZIP code formatting
+        const zipInputs = document.querySelectorAll('input[name="zipCode"]');
+        zipInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 5) {
+                    value = `${value.slice(0,5)}-${value.slice(5,9)}`;
+                }
+                e.target.value = value;
+            });
+        });
+    }
+
+    serializeDocuments() {
+        const serialized = {};
+        
+        if (this.uploadedDocuments.identification) {
+            serialized.identification = {
+                name: this.uploadedDocuments.identification.name,
+                size: this.uploadedDocuments.identification.size,
+                type: this.uploadedDocuments.identification.type
+            };
+        }
+        
+        if (this.uploadedDocuments.resume) {
+            serialized.resume = {
+                name: this.uploadedDocuments.resume.name,
+                size: this.uploadedDocuments.resume.size,
+                type: this.uploadedDocuments.resume.type
+            };
+        }
+        
+        if (this.uploadedDocuments.certifications && this.uploadedDocuments.certifications.length > 0) {
+            serialized.certifications = this.uploadedDocuments.certifications.map(file => ({
+                name: file.name,
+                size: file.size,
+                type: file.type
+            }));
+        }
+        
+        return serialized;
+    }
+
+    setupConditionalFields() {
+        // Handle conditional field visibility based on form selections
+        const conditionalTriggers = document.querySelectorAll('[data-conditional]');
+        conditionalTriggers.forEach(trigger => {
+            trigger.addEventListener('change', (e) => {
+                const targetField = document.getElementById(e.target.dataset.conditional);
+                if (targetField) {
+                    targetField.style.display = e.target.checked ? 'block' : 'none';
+                }
+            });
+        });
+    }
+
+    setupApplicationQuestions() {
+        // Setup any application-specific question logic
+        const questionInputs = document.querySelectorAll('#page5 input, #page5 select, #page5 textarea');
+        questionInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                this.saveFormData(5);
+            });
+        });
+    }
+
+    setupEducationSection() {
+        // Setup education entry management
+        const addButton = document.getElementById('addEducationEntry');
+        if (addButton) {
+            addButton.addEventListener('click', () => {
+                this.addEducationEntry();
+            });
+        }
+    }
+
+    setupEmploymentSection() {
+        // Setup employment entry management
+        const addButton = document.getElementById('addEmploymentEntry');
+        if (addButton) {
+            addButton.addEventListener('click', () => {
+                this.addEmploymentEntry();
+            });
+        }
+    }
+
+    setupReviewPage() {
+        // Setup review page functionality
+        this.generateReview();
+    }
+
+    generateReview() {
+        // Generate review summary of all form data
+        const reviewContainer = document.getElementById('reviewSummary');
+        if (reviewContainer && this.formDataStore) {
+            let html = '<div class="review-sections">';
+            
+            // Personal Info Section
+            html += '<div class="review-section"><h3>Personal Information</h3>';
+            html += `<p><strong>Name:</strong> ${this.formDataStore.firstName || ''} ${this.formDataStore.lastName || ''}</p>`;
+            html += `<p><strong>Email:</strong> ${this.formDataStore.email || ''}</p>`;
+            html += `<p><strong>Phone:</strong> ${this.formDataStore.phoneNumber || ''}</p>`;
+            html += '</div>';
+            
+            html += '</div>';
+            reviewContainer.innerHTML = html;
+        }
+    }
+
+    addEducationEntry() {
+        // Add new education entry
+        const container = document.getElementById('educationEntries');
+        if (container) {
+            const entryIndex = container.children.length;
+            const entryHtml = `
+                <div class="education-entry" data-index="${entryIndex}">
+                    <input type="text" name="education[${entryIndex}][schoolName]" placeholder="School Name">
+                    <input type="text" name="education[${entryIndex}][degree]" placeholder="Degree">
+                    <input type="date" name="education[${entryIndex}][graduationDate]">
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', entryHtml);
+        }
+    }
+
+    addEmploymentEntry() {
+        // Add new employment entry
+        const container = document.getElementById('employmentEntries');
+        if (container) {
+            const entryIndex = container.children.length;
+            const entryHtml = `
+                <div class="employment-entry" data-index="${entryIndex}">
+                    <input type="text" name="employment[${entryIndex}][companyName]" placeholder="Company Name">
+                    <input type="text" name="employment[${entryIndex}][position]" placeholder="Position">
+                    <input type="date" name="employment[${entryIndex}][startDate]">
+                    <input type="date" name="employment[${entryIndex}][endDate]">
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', entryHtml);
+        }
+    }
+
+    setupFieldValidation() {
+        // Setup real-time field validation
+        const requiredFields = document.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            field.addEventListener('blur', () => {
+                this.validateField(field);
+            });
+        });
+    }
+
+    updateFieldValidationUI(field, isValid, errorMessage) {
+        // Update field visual state based on validation
+        const fieldContainer = field.closest('.form-group') || field.parentElement;
+        let errorElement = fieldContainer.querySelector('.field-error');
+        
+        if (!isValid) {
+            field.classList.add('error');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'field-error';
+                fieldContainer.appendChild(errorElement);
+            }
+            errorElement.textContent = errorMessage;
+        } else {
+            field.classList.remove('error');
+            if (errorElement) {
+                errorElement.remove();
+            }
+        }
+    }
+
+    showValidationErrors() {
+        // Show summary of validation errors
+        if (this.validationErrors.size > 0) {
+            const errors = Array.from(this.validationErrors.values());
+            this.showMessage(`Please fix the following errors: ${errors.join(', ')}`, 'error');
+        }
+    }
+
+    validateEducationEntries() {
+        // Validate education entries
+        const educationEntries = this.formDataStore.education || [];
+        return educationEntries.length > 0;
+    }
+
+    validateEmploymentEntries() {
+        // Validate employment entries
+        const employmentEntries = this.formDataStore.employment || [];
+        return employmentEntries.length > 0;
+    }
+
+    updateFilePreview(documentType, preview) {
+        // Update file upload preview
+        if (!preview) return;
+        
+        const files = this.uploadedDocuments[documentType];
+        if (!files) {
+            preview.innerHTML = '<p>No files selected</p>';
+            return;
+        }
+        
+        let html = '<div class="file-list">';
+        if (Array.isArray(files)) {
+            files.forEach((file, index) => {
+                html += `<div class="file-item">${file.name} (${(file.size/1024/1024).toFixed(2)}MB)</div>`;
+            });
+        } else {
+            html += `<div class="file-item">${files.name} (${(files.size/1024/1024).toFixed(2)}MB)</div>`;
+        }
+        html += '</div>';
+        preview.innerHTML = html;
+    }
+
+    clearAddressSuggestions() {
+        // Clear address autocomplete suggestions
+        const dataList = document.getElementById('addressSuggestions');
+        if (dataList) {
+            dataList.innerHTML = '';
+        }
+    }
+
+    offerRestoreOption(saveData) {
+        // Offer to restore auto-saved data
+        const shouldRestore = confirm('We found previously saved data. Would you like to restore it?');
+        if (shouldRestore) {
+            this.currentPage = saveData.currentPage || 1;
+            this.showMessage('Previous data restored successfully.', 'success');
         }
     }
 }

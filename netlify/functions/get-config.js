@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
     // Define CORS headers
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Cache-Control',
         'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Cache-Control': `public, max-age=${SECURITY_CONFIG.CACHE_TTL}`,
         'Content-Type': 'application/json'
