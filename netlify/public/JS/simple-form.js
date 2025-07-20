@@ -112,14 +112,71 @@ function setupAddressAutocomplete() {
     const addressInput = document.getElementById('streetAddress');
     if (!addressInput) return;
     
-    // Simple address suggestions (you can enhance this with Google Places API)
+    console.log('Setting up address autocomplete for:', addressInput);
+    
+    let autocompleteTimer;
+    
+    // Create datalist for suggestions
+    let suggestionsList = document.getElementById('addressSuggestions');
+    if (!suggestionsList) {
+        suggestionsList = document.createElement('datalist');
+        suggestionsList.id = 'addressSuggestions';
+        document.body.appendChild(suggestionsList);
+        addressInput.setAttribute('list', 'addressSuggestions');
+    }
+    
     addressInput.addEventListener('input', function(e) {
-        const value = e.target.value;
-        if (value.length > 3) {
-            // For now, just console log - you can implement full autocomplete later
-            console.log('Address input:', value);
+        const value = e.target.value.trim();
+        
+        // Clear previous timer
+        clearTimeout(autocompleteTimer);
+        
+        if (value.length < 3) {
+            suggestionsList.innerHTML = '';
+            return;
         }
+        
+        // Debounce API calls
+        autocompleteTimer = setTimeout(async () => {
+            try {
+                console.log('Fetching address suggestions for:', value);
+                
+                const response = await fetch(
+                    `https://wareworks-backend.netlify.app/.netlify/functions/autocomplete-address?input=${encodeURIComponent(value)}`
+                );
+                
+                if (!response.ok) {
+                    console.error('Autocomplete API error:', response.status);
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('Autocomplete response:', data);
+                
+                // Clear previous suggestions
+                suggestionsList.innerHTML = '';
+                
+                // Add new suggestions
+                if (data.predictions && data.predictions.length > 0) {
+                    data.predictions.forEach(prediction => {
+                        const option = document.createElement('option');
+                        option.value = prediction.description;
+                        option.dataset.placeId = prediction.place_id;
+                        suggestionsList.appendChild(option);
+                    });
+                    console.log(`Added ${data.predictions.length} address suggestions`);
+                } else {
+                    console.log('No address suggestions found');
+                }
+                
+            } catch (error) {
+                console.error('Address autocomplete error:', error);
+                // Don't show error to user - just fail silently
+            }
+        }, 300); // 300ms delay
     });
+    
+    console.log('Address autocomplete setup complete');
 }
 
 function setupInputFormatters() {
