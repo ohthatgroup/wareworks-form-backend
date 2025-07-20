@@ -619,7 +619,10 @@ async function createSheetHeaders(sheets, spreadsheetId, sheetName) {
         'Home Phone', 'Cell Phone', 'Emergency Name', 'Emergency Phone', 'Emergency Relationship',
         'Citizenship Status', 'USCIS A-Number', 'Work Auth Expiration', 'Alien Document Type',
         'Alien Document Number', 'Document Country', 'Age 18+', 'Transportation',
-        'Work Authorization', 'Position Applied', 'Expected Salary', 'Job Discovery',
+        'Work Authorization', 'Full-time Employment', 'Swing Shifts', 'Graveyard Shifts',
+        'Sunday Availability', 'Monday Availability', 'Tuesday Availability', 
+        'Wednesday Availability', 'Thursday Availability', 'Friday Availability', 'Saturday Availability',
+        'Position Applied', 'Expected Salary', 'Job Discovery',
         'Previously Applied', 'Previous Application Details', 'Education History',
         'Employment History', 'Has ID Document', 'Has Resume', 'Certification Count',
         'ID Document URL', 'Resume URL', 'Certification URLs',
@@ -714,6 +717,16 @@ function prepareSheetRowData(data) {
         data.age18 || '',
         data.transportation || '',
         data.workAuthorization || '',
+        data.fullTimeEmployment || '',
+        data.swingShifts || '',
+        data.graveyardShifts || '',
+        data.availabilitySunday || '',
+        data.availabilityMonday || '',
+        data.availabilityTuesday || '',
+        data.availabilityWednesday || '',
+        data.availabilityThursday || '',
+        data.availabilityFriday || '',
+        data.availabilitySaturday || '',
         data.positionApplied || '',
         data.expectedSalary || '',
         data.jobDiscovery || '',
@@ -939,7 +952,10 @@ async function loadAndPopulateApplicationTemplate(data) {
             // Yes/No Questions - using undefined fields as fallback
             'undefined': formatYesNo(data.age18), // Age 18+ question
             'undefined_2': formatYesNo(data.transportation), // Transportation question  
-            'undefined_7': formatYesNo(data.workAuthorization) // Work authorization question
+            'undefined_7': formatYesNo(data.workAuthorization), // Work authorization question
+            'undefined_3': formatYesNo(data.fullTimeEmployment), // Full-time employment question
+            'undefined_4': formatYesNo(data.swingShifts), // Swing shifts question
+            'undefined_5': formatYesNo(data.graveyardShifts) // Graveyard shifts question
         };
         
         // Populate education fields
