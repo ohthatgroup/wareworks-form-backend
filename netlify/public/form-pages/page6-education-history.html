@@ -319,7 +319,7 @@
         }
         
         .info-box-title::before {
-            content: '🎓';
+            content: '';
         }
         
         .info-box-text {
@@ -405,7 +405,7 @@
                         <span>Education #1</span>
                     </div>
                     <button type="button" class="remove-entry-btn" onclick="removeEducationEntry(this)" disabled>
-                        🗑️ Remove
+                        Remove
                     </button>
                 </div>
                 
@@ -477,7 +477,7 @@
 
         <!-- Add Another Education Button -->
         <button type="button" class="add-entry-btn" id="addEducationBtn" data-translate="add_another_school">
-            ➕ Add Another School
+            Add Another School
         </button>
     </div>
 
@@ -552,7 +552,7 @@
                         <span>Education #${educationCount + 1}</span>
                     </div>
                     <button type="button" class="remove-entry-btn" onclick="removeEducationEntry(this)">
-                        🗑️ Remove
+                        Remove
                     </button>
                 </div>
                 
@@ -662,7 +662,7 @@
                 const addBtn = document.getElementById('addEducationBtn');
                 if (educationCount < maxEducationEntries) {
                     addBtn.disabled = false;
-                    addBtn.textContent = '➕ Add Another School';
+                    addBtn.textContent = 'Add Another School';
                 }
                 
                 // Update entry numbers

@@ -467,11 +467,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">👤</span>
+                    <span class="section-icon"></span>
                     <span data-translate="personal_info">Personal Information</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(1)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="review-grid" id="personalInfoReview">
@@ -483,11 +483,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">📞</span>
+                    <span class="section-icon"></span>
                     <span data-translate="contact_details">Contact Information</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(2)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="review-grid" id="contactInfoReview">
@@ -499,11 +499,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">🏛️</span>
+                    <span class="section-icon"></span>
                     <span data-translate="citizenship_status">Citizenship Status</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(3)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="review-grid" id="citizenshipReview">
@@ -515,11 +515,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">📄</span>
+                    <span class="section-icon"></span>
                     <span data-translate="documents_submitted">Documents</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(4)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="review-grid" id="documentsReview">
@@ -531,11 +531,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">❓</span>
+                    <span class="section-icon"></span>
                     <span data-translate="application_info">Application Questions</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(5)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="review-grid" id="applicationQuestionsReview">
@@ -547,11 +547,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">🎓</span>
+                    <span class="section-icon"></span>
                     <span data-translate="education_history">Education History</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(6)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="multi-entry-section" id="educationReview">
@@ -563,11 +563,11 @@
         <div class="review-section">
             <div class="section-header">
                 <h3 class="section-title">
-                    <span class="section-icon">💼</span>
+                    <span class="section-icon"></span>
                     <span data-translate="employment_history">Employment History</span>
                 </h3>
                 <button class="edit-btn" onclick="goToPage(7)">
-                    ✏️ Edit
+                    Edit
                 </button>
             </div>
             <div class="multi-entry-section" id="employmentReview">
@@ -593,7 +593,7 @@
                 ← Back to Edit
             </button>
             <button type="button" class="submit-btn" id="finalSubmitBtn">
-                <span class="submit-text">🚀 Submit Application</span>
+                <span class="submit-text">Submit Application</span>
                 <div class="loading-spinner"></div>
             </button>
         </div>
@@ -816,7 +816,7 @@
             const submitSection = document.querySelector('.submit-section');
             submitSection.innerHTML = `
                 <div style="text-align: center; padding: 2rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                    <div style="font-size: 3rem; margin-bottom: 1rem; color: #28a745; font-weight: bold;">SUCCESS</div>
                     <h3 style="color: #28a745; margin-bottom: 1rem;">Application Submitted Successfully!</h3>
                     <p style="color: #666; margin-bottom: 2rem;">Thank you for your interest in WareWorks. We've received your application and will review it within 5-7 business days.</p>
                     <p style="font-size: 0.9rem; color: #666;">Confirmation ID: WW_${Date.now()}_${Math.random().toString(36).substr(2, 9)}</p>

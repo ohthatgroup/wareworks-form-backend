@@ -296,7 +296,7 @@
         }
         
         .requirements-title::before {
-            content: '📋';
+            content: '';
         }
         
         .requirements-list ul {
@@ -401,7 +401,7 @@
         <!-- ID Document Upload (Required) -->
         <div class="field-wrapper">
             <label for="idDocument" class="field-label required document-id-label" data-translate="id_document">
-                📄 Government-Issued Photo ID
+                Government-Issued Photo ID
                 <span class="status-badge status-required">Required</span>
             </label>
             <div class="field-note">
@@ -410,7 +410,7 @@
             <div class="file-upload-container document-id">
                 <input type="file" id="idDocument" name="idDocument" accept="image/*,.pdf" required class="file-input">
                 <div class="file-upload-area" onclick="document.getElementById('idDocument').click()">
-                    <div class="file-upload-icon">🆔</div>
+                    <div class="file-upload-icon">ID</div>
                     <div class="file-upload-text" data-translate="upload_id_text">Click to upload your photo ID</div>
                     <div class="file-upload-hint" data-translate="upload_id_hint">
                         Drag and drop your file here, or click to browse<br>
@@ -425,7 +425,7 @@
         <!-- Resume Upload (Optional) -->
         <div class="field-wrapper">
             <label for="resumeDocument" class="field-label document-resume-label" data-translate="resume_document">
-                📋 Resume/CV
+                Resume/CV
                 <span class="status-badge status-optional">Optional</span>
             </label>
             <div class="field-note">
@@ -434,7 +434,7 @@
             <div class="file-upload-container document-resume">
                 <input type="file" id="resumeDocument" name="resumeDocument" accept=".pdf,.doc,.docx" class="file-input">
                 <div class="file-upload-area" onclick="document.getElementById('resumeDocument').click()">
-                    <div class="file-upload-icon">📄</div>
+                    <div class="file-upload-icon">DOC</div>
                     <div class="file-upload-text" data-translate="upload_resume_text">Click to upload your resume</div>
                     <div class="file-upload-hint" data-translate="upload_resume_hint">
                         Drag and drop your file here, or click to browse<br>
@@ -449,7 +449,7 @@
         <!-- Certifications Upload (Required) -->
         <div class="field-wrapper">
             <label for="certificationDocuments" class="field-label required document-certifications-label" data-translate="certification_documents">
-                🏆 Certifications & Licenses
+                Certifications & Licenses
                 <span class="status-badge status-required">Required</span>
             </label>
             <div class="field-note" data-translate="certification_note">
@@ -458,7 +458,7 @@
             <div class="file-upload-container document-certifications">
                 <input type="file" id="certificationDocuments" name="certificationDocuments" accept="image/*,.pdf" multiple required class="file-input">
                 <div class="file-upload-area" onclick="document.getElementById('certificationDocuments').click()">
-                    <div class="file-upload-icon">📜</div>
+                    <div class="file-upload-icon">CERT</div>
                     <div class="file-upload-text" data-translate="upload_cert_text">Click to upload certifications</div>
                     <div class="file-upload-hint" data-translate="upload_cert_hint">
                         Drag and drop multiple files here, or click to browse<br>
@@ -603,10 +603,10 @@
         }
 
         function getFileIcon(mimeType) {
-            if (mimeType.startsWith('image/')) return '🖼️';
-            if (mimeType === 'application/pdf') return '📄';
-            if (mimeType.includes('document') || mimeType.includes('word')) return '📝';
-            return '📎';
+            if (mimeType.startsWith('image/')) return 'IMG';
+            if (mimeType === 'application/pdf') return 'PDF';
+            if (mimeType.includes('document') || mimeType.includes('word')) return 'DOC';
+            return 'FILE';
         }
 
         function formatFileSize(bytes) {

@@ -290,7 +290,7 @@
         }
         
         .phone-wrapper::before {
-            content: '📞';
+            content: '';
             position: absolute;
             left: 1rem;
             top: 50%;
@@ -338,7 +338,7 @@
         }
         
         .info-box-title::before {
-            content: '💼';
+            content: '';
         }
         
         .info-box-text {
@@ -444,7 +444,7 @@
                         <span>Employment #1</span>
                     </div>
                     <button type="button" class="remove-entry-btn" onclick="removeEmploymentEntry(this)" disabled>
-                        🗑️ Remove
+                        Remove
                     </button>
                 </div>
                 
@@ -609,7 +609,7 @@
 
         <!-- Add Another Employment Button -->
         <button type="button" class="add-entry-btn" id="addEmploymentBtn" data-translate="add_another_employer">
-            ➕ Add Another Employer
+            Add Another Employer
         </button>
     </div>
 
@@ -760,7 +760,7 @@
                         <span>Employment #${index + 1}</span>
                     </div>
                     <button type="button" class="remove-entry-btn" onclick="removeEmploymentEntry(this)">
-                        🗑️ Remove
+                        Remove
                     </button>
                 </div>
                 
@@ -937,7 +937,7 @@
                 const addBtn = document.getElementById('addEmploymentBtn');
                 if (employmentCount < maxEmploymentEntries) {
                     addBtn.disabled = false;
-                    addBtn.textContent = '➕ Add Another Employer';
+                    addBtn.textContent = 'Add Another Employer';
                 }
                 
                 // Update entry numbers
