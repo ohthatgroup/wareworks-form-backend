@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "WareWorks Application Form Backend with PDF Generation",
   "main": "index.js",
-  "dependencies": {
-    "googleapis": "^126.0.1",
-    "nodemailer": "^6.9.7",
-    "pdfkit": "^0.14.0",
-    "canvas": "^2.11.2",
-    "moment": "^2.29.4"
-  },
+ "dependencies": {
+  "googleapis": "^126.0.1",
+  "moment": "^2.29.4",
+  "nodemailer": "^6.9.7",
+  "pdfkit": "^0.14.0",
+  "canvas": "^2.11.2",
+  "node-fetch": "^2.6.1" // Add this line
+},
   "scripts": {
     "build": "echo 'Build complete'"
   },
