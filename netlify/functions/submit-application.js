@@ -42,8 +42,9 @@ exports.handler = async (event, context) => {
     // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Accept',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+        'Access-Control-Max-Age': '86400',
         'Content-Type': 'application/json'
     };
 
@@ -1050,7 +1051,7 @@ async function loadAndPopulateI9Template(data) {
             'US Social Security Number': ssnNumbers,
             'Employees E-mail Address': data.email,
             'Telephone Number': data.phoneNumber,
-            'Today\\'s Date mmddyyy': today,
+            "Today's Date mmddyyy": today,
             
             // Section 2 fields (some will be filled by employer)
             'Last Name Family Name from Section 1': data.legalLastName,
