@@ -96,6 +96,8 @@ function initializePage(pageNum) {
     if (pageNum === 1) {
         setupAddressAutocomplete();
         setupInputFormatters();
+    } else if (pageNum === 4) {
+        setupDocumentUploads();
     } else if (pageNum === 8) {
         setupReviewPage();
     }
@@ -317,6 +319,211 @@ function populateAddressFields(address) {
             console.warn('Geocoding failed:', status);
         }
     });
+}
+
+function setupDocumentUploads() {
+    console.log('Setting up document uploads...');
+    
+    // Initialize each upload field
+    const uploadFields = [
+        { id: 'idDocument', multiple: false },
+        { id: 'resumeDocument', multiple: false },
+        { id: 'certificationDocuments', multiple: true }
+    ];
+    
+    uploadFields.forEach(field => {
+        setupFileUpload(field.id, field.multiple);
+    });
+    
+    console.log('Document uploads initialized');
+    
+    // Make functions globally available for onclick handlers
+    window.removeFile = removeFile;
+}
+
+function setupFileUpload(inputId, multiple = false) {
+    const input = document.getElementById(inputId);
+    const uploadArea = input?.parentElement.querySelector('.file-upload-area');
+    const preview = document.getElementById(inputId + 'Preview');
+    
+    if (!input || !uploadArea || !preview) {
+        console.warn(`Upload elements not found for ${inputId}`);
+        return;
+    }
+    
+    console.log(`Setting up file upload for ${inputId}`);
+    
+    // File selection handler
+    input.addEventListener('change', function(e) {
+        handleFileSelection(e.target.files, inputId, preview, multiple);
+    });
+    
+    // Drag and drop handlers
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        handleFileSelection(e.dataTransfer.files, inputId, preview, multiple);
+    });
+}
+
+function handleFileSelection(files, inputId, preview, multiple) {
+    if (!files || files.length === 0) return;
+    
+    console.log(`Handling file selection for ${inputId}:`, files);
+    
+    const validFiles = [];
+    const errors = [];
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const validation = validateFile(file, inputId);
+        
+        if (validation.isValid) {
+            validFiles.push(file);
+        } else {
+            errors.push(`${file.name}: ${validation.error}`);
+        }
+    }
+    
+    if (errors.length > 0) {
+        showErrors(inputId, errors);
+        return;
+    }
+    
+    // Store files globally
+    window.uploadedDocuments = window.uploadedDocuments || {};
+    
+    if (multiple) {
+        window.uploadedDocuments[inputId] = validFiles;
+    } else {
+        window.uploadedDocuments[inputId] = validFiles[0];
+    }
+    
+    updateFilePreview(inputId, preview);
+    clearErrors(inputId);
+    
+    console.log(`Files stored for ${inputId}:`, window.uploadedDocuments[inputId]);
+}
+
+function validateFile(file, inputId) {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    
+    if (file.size > maxSize) {
+        return { isValid: false, error: 'File size exceeds 10MB limit' };
+    }
+    
+    const allowedTypes = {
+        idDocument: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
+        resumeDocument: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+        certificationDocuments: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
+    };
+    
+    const allowed = allowedTypes[inputId];
+    if (allowed && !allowed.includes(file.type)) {
+        return { isValid: false, error: 'File type not allowed' };
+    }
+    
+    return { isValid: true };
+}
+
+function updateFilePreview(inputId, preview) {
+    preview.innerHTML = '';
+    
+    const documents = window.uploadedDocuments?.[inputId];
+    if (!documents) return;
+    
+    const files = Array.isArray(documents) ? documents : [documents];
+    
+    files.forEach((file, index) => {
+        const previewItem = document.createElement('div');
+        previewItem.className = 'file-preview-item';
+        
+        const icon = getFileIcon(file.type);
+        const size = formatFileSize(file.size);
+        
+        previewItem.innerHTML = `
+            <div class="file-preview-icon">${icon}</div>
+            <div class="file-preview-info">
+                <div class="file-preview-name">${file.name}</div>
+                <div class="file-preview-size">${size}</div>
+            </div>
+            <button type="button" class="file-preview-remove" onclick="removeFile('${inputId}', ${index})">
+                Remove
+            </button>
+        `;
+        
+        preview.appendChild(previewItem);
+    });
+    
+    // Update upload area appearance
+    const uploadArea = document.querySelector(`#${inputId}`).parentElement.querySelector('.file-upload-area');
+    if (uploadArea) {
+        uploadArea.classList.add('has-files');
+    }
+}
+
+function getFileIcon(fileType) {
+    if (fileType.startsWith('image/')) return '📷';
+    if (fileType === 'application/pdf') return '📄';
+    if (fileType.includes('word')) return '📝';
+    return '📎';
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function removeFile(inputId, index) {
+    const documents = window.uploadedDocuments?.[inputId];
+    if (!documents) return;
+    
+    if (Array.isArray(documents)) {
+        documents.splice(index, 1);
+        if (documents.length === 0) {
+            delete window.uploadedDocuments[inputId];
+        }
+    } else {
+        delete window.uploadedDocuments[inputId];
+    }
+    
+    const preview = document.getElementById(inputId + 'Preview');
+    updateFilePreview(inputId, preview);
+    
+    // Clear the input
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = '';
+    }
+}
+
+function showErrors(inputId, errors) {
+    const errorElement = document.getElementById(`error-${inputId}`);
+    if (errorElement) {
+        errorElement.textContent = errors.join(', ');
+        errorElement.classList.add('visible');
+    }
+}
+
+function clearErrors(inputId) {
+    const errorElement = document.getElementById(`error-${inputId}`);
+    if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.classList.remove('visible');
+    }
 }
 
 function setupInputFormatters() {
