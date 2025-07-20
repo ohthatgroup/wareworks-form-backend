@@ -319,46 +319,61 @@ function nextPage() {
 function validateCurrentPage() {
     const requiredFields = document.querySelectorAll('#pageContentContainer input[required], #pageContentContainer select[required], #pageContentContainer textarea[required]');
     let isValid = true;
+    let invalidFields = [];
     
     requiredFields.forEach(field => {
         const value = field.value.trim();
+        let fieldValid = true;
+        let errorReason = '';
         
         // Remove any existing error styling
         field.style.borderColor = '';
         
         if (!value) {
-            field.style.borderColor = '#dc3545';
-            isValid = false;
+            fieldValid = false;
+            errorReason = 'empty';
         } else if (field.type === 'tel') {
             // Validate phone number has 10 digits
             const digits = value.replace(/\D/g, '');
             if (digits.length !== 10) {
-                field.style.borderColor = '#dc3545';
-                isValid = false;
+                fieldValid = false;
+                errorReason = `phone: ${digits.length} digits (need 10)`;
             }
         } else if (field.id === 'socialSecurityNumber') {
             // Validate SSN has 9 digits
             const digits = value.replace(/\D/g, '');
             if (digits.length !== 9) {
-                field.style.borderColor = '#dc3545';
-                isValid = false;
+                fieldValid = false;
+                errorReason = `ssn: ${digits.length} digits (need 9)`;
             }
         } else if (field.type === 'email') {
             // Basic email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(value)) {
-                field.style.borderColor = '#dc3545';
-                isValid = false;
+                fieldValid = false;
+                errorReason = 'invalid email format';
             }
         }
         
-        // Add green border for valid fields
-        if (field.style.borderColor !== '#dc3545') {
+        if (!fieldValid) {
+            field.style.borderColor = '#dc3545';
+            isValid = false;
+            invalidFields.push({
+                id: field.id || field.name,
+                name: field.getAttribute('data-name') || field.name,
+                reason: errorReason,
+                value: value
+            });
+        } else {
+            // Add green border for valid fields
             field.style.borderColor = '#28a745';
         }
     });
     
     console.log('Page validation result:', isValid);
+    if (!isValid) {
+        console.log('Invalid fields:', invalidFields);
+    }
     return isValid;
 }
 
