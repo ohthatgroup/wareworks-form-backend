@@ -1,0 +1,57 @@
+<div class="page" id="page2">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="contact_info_title">Contact Information</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="contact_info_subtitle">Additional contact details to help us reach you</p>
+
+        <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="dateOfBirth" class="Input-Label" data-translate="date_of_birth">Date of Birth (MM/DD/YYYY)</label>
+                <input type="date" class="Input" name="dateOfBirth" data-name="Date of Birth" id="dateOfBirth">
+                <small class="field-note Text-Secondary [Utility] Font Size XXS [Utility] Margin Top XXS-Gap" data-translate="optional_field_note">This information is optional but helps us serve you better</small>
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-dateOfBirth"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="email" class="Input-Label" data-translate="email">Email Address</label>
+                <input type="email" class="Input" maxlength="256" name="email" data-name="Email" id="email">
+                <small class="field-note Text-Secondary [Utility] Font Size XXS [Utility] Margin Top XXS-Gap" data-translate="optional_field_note">This information is optional but helps us serve you better</small>
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-email"></div>
+            </div>
+        </div>
+
+        <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="homePhone" class="Input-Label" data-translate="home_phone">Home Phone (if different)</label>
+                <input type="tel" class="Input" maxlength="12" name="homePhone" data-name="Home Phone" placeholder="XXX-XXX-XXXX" id="homePhone">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-homePhone"></div>
+            </div>
+            <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                <label for="cellPhone" class="Input-Label" data-translate="cell_phone">Cell Phone (if different)</label>
+                <input type="tel" class="Input" maxlength="12" name="cellPhone" data-name="Cell Phone" placeholder="XXX-XXX-XXXX" id="cellPhone">
+                <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-cellPhone"></div>
+            </div>
+        </div>
+
+        <div class="emergency-section [Utility] Margin Top LG-Gap [Utility] Padding Top MD-Gap [Utility] Border Top 1px Border-Secondary">
+            <p class="section-title Text-Accent-Primary [Utility] Font Weight 600 [Utility] Margin Bottom XXS-Gap" data-translate="emergency_contact_title">Emergency Contact</p>
+            <small class="field-note Text-Secondary [Utility] Font Size XXS [Utility] Margin Top XXS-Gap" data-translate="optional_field_note">This information is optional but helps us serve you better</small>
+            
+            <div class="form-row Grid-Layout Desktop-3-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="emergencyName" class="Input-Label" data-translate="emergency_name">Name</label>
+                    <input type="text" class="Input" maxlength="256" name="emergencyName" data-name="Emergency Name" id="emergencyName">
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-emergencyName"></div>
+                </div>
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="emergencyPhone" class="Input-Label" data-translate="emergency_phone">Phone Number</label>
+                    <input type="tel" class="Input" maxlength="12" name="emergencyPhone" data-name="Emergency Phone" placeholder="XXX-XXX-XXXX" id="emergencyPhone">
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-emergencyPhone"></div>
+                </div>
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="emergencyRelationship" class="Input-Label" data-translate="emergency_relationship">Relationship</label>
+                    <input type="text" class="Input" maxlength="256" name="emergencyRelationship" data-name="Emergency Relationship" id="emergencyRelationship">
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-emergencyRelationship"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
