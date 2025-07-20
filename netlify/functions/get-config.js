@@ -2,9 +2,9 @@
 // WareWorks Form Configuration Endpoint
 
 exports.handler = async (event, context) => {
-  // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
+  // Define CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*', // Allows all origins
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'GET, OPTIONS'
   };
@@ -13,7 +13,7 @@ exports.handler = async (event, context) => {
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers,
+      headers: corsHeaders, // Ensure corsHeaders are returned for OPTIONS
       body: ''
     };
   }
@@ -36,7 +36,7 @@ exports.handler = async (event, context) => {
       console.log(`Unauthorized access attempt from: ${referer}`);
       return {
         statusCode: 403,
-        headers,
+        headers: corsHeaders, // Ensure corsHeaders are returned for 403
         body: JSON.stringify({ 
           error: 'Forbidden',
           message: 'Access denied from this domain'
@@ -81,8 +81,8 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      headers: {
-        ...headers,
+      headers: { // Merge corsHeaders with other headers for success response
+        ...corsHeaders,
         'Cache-Control': 'no-cache'
       },
       body: JSON.stringify(config)
@@ -93,7 +93,7 @@ exports.handler = async (event, context) => {
     
     return {
       statusCode: 500,
-      headers,
+      headers: corsHeaders, // Ensure corsHeaders are returned for 500
       body: JSON.stringify({ 
         error: 'Internal Server Error',
         message: 'Failed to load configuration'
