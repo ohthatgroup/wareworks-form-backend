@@ -2,15 +2,22 @@
 <div id="wareWorksForm" style="max-width: 900px; margin: 0 auto; font-family: 'Figtree', sans-serif;">
     
     <!-- Language Disclaimer -->
-    <div id="languageDisclaimer" style="background: white; border-radius: 12px; padding: 40px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px;">
-        <h2 style="color: #131f5b; margin-bottom: 20px; font-family: 'Bricolage Grotesque', sans-serif;">WareWorks Application Form</h2>
-        <p style="margin-bottom: 30px; color: #666;">Please select your preferred language:</p>
+    <div id="languageDisclaimer" style="background: white; border-radius: 12px; padding: 40px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 800px; margin: 0 auto 20px;">
+        <h2 style="color: #131f5b; margin-bottom: 10px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 28px;">Welcome to WareWorks</h2>
+        <h3 style="color: #666; margin-bottom: 30px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 400;">Bienvenido a WareWorks</h3>
+        
+        <div style="text-align: left; margin-bottom: 30px; line-height: 1.6; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <p style="margin-bottom: 15px; font-size: 14px;"><strong>English:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws.</p>
+            <p style="margin-bottom: 0; font-size: 14px;"><strong>Español:</strong> Al continuar, usted reconoce que la información que proporcione será utilizada para fines de empleo y se mantendrá confidencial de acuerdo con las leyes aplicables.</p>
+        </div>
+        
+        <p style="margin-bottom: 25px; color: #666; font-size: 16px;">Please select your preferred language:</p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-            <button onclick="acceptDisclaimer('en')" style="background: #131f5b; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 16px;">
-                Continue in English
+            <button onclick="acceptDisclaimer('en')" style="background: #131f5b; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 16px; min-width: 200px; transition: all 0.2s ease;">
+                Accept & Continue in English
             </button>
-            <button onclick="acceptDisclaimer('es')" style="background: #131f5b; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 16px;">
-                Continuar en Español
+            <button onclick="acceptDisclaimer('es')" style="background: #131f5b; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 16px; min-width: 200px; transition: all 0.2s ease;">
+                Aceptar y Continuar en Español
             </button>
         </div>
     </div>

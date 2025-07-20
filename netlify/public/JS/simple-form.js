@@ -71,6 +71,9 @@ async function loadPage(pageNum) {
             // Hide any style tags that might be visible
             const styleTags = container.querySelectorAll('style');
             styleTags.forEach(style => style.style.display = 'none');
+            
+            // Initialize page-specific functionality
+            initializePage(pageNum);
         }
         
         // Update UI
@@ -88,11 +91,190 @@ async function loadPage(pageNum) {
     }
 }
 
+function initializePage(pageNum) {
+    // Page-specific initialization
+    if (pageNum === 1) {
+        setupAddressAutocomplete();
+        setupInputFormatters();
+    } else if (pageNum === 8) {
+        setupReviewPage();
+    }
+    
+    // Save form data when inputs change
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('change', saveFormData);
+        input.addEventListener('input', saveFormData);
+    });
+}
+
+function setupAddressAutocomplete() {
+    const addressInput = document.getElementById('streetAddress');
+    if (!addressInput) return;
+    
+    // Simple address suggestions (you can enhance this with Google Places API)
+    addressInput.addEventListener('input', function(e) {
+        const value = e.target.value;
+        if (value.length > 3) {
+            // For now, just console log - you can implement full autocomplete later
+            console.log('Address input:', value);
+        }
+    });
+}
+
+function setupInputFormatters() {
+    // Phone number formatting
+    const phoneInput = document.getElementById('phoneNumber');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 6) {
+                value = `(${value.slice(0,3)}) ${value.slice(3,6)}-${value.slice(6,10)}`;
+            } else if (value.length >= 3) {
+                value = `(${value.slice(0,3)}) ${value.slice(3)}`;
+            }
+            e.target.value = value;
+        });
+    }
+    
+    // SSN formatting
+    const ssnInput = document.getElementById('socialSecurityNumber');
+    if (ssnInput) {
+        ssnInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 5) {
+                value = `${value.slice(0,3)}-${value.slice(3,5)}-${value.slice(5,9)}`;
+            } else if (value.length >= 3) {
+                value = `${value.slice(0,3)}-${value.slice(3)}`;
+            }
+            e.target.value = value;
+        });
+    }
+}
+
+function setupReviewPage() {
+    // Remove any duplicate submit buttons from the page content
+    const pageSubmitButtons = document.querySelectorAll('#pageContentContainer button[type="submit"], #pageContentContainer .submit-button');
+    pageSubmitButtons.forEach(btn => {
+        btn.style.display = 'none'; // Hide duplicate buttons
+    });
+    
+    console.log('Review page setup complete');
+}
+
+function saveFormData() {
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.name) {
+            formData[input.name] = input.value;
+        }
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('wareWorksFormData', JSON.stringify(formData));
+}
+
+function restoreFormData() {
+    const saved = localStorage.getItem('wareWorksFormData');
+    if (saved) {
+        formData = JSON.parse(saved);
+        
+        // Restore values to current page inputs
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.name && formData[input.name]) {
+                input.value = formData[input.name];
+            }
+        });
+    }
+}
+
 function nextPage() {
     console.log('Next page clicked');
     if (currentPage < totalPages) {
+        // Save current page data before moving
+        saveFormData();
         loadPage(currentPage + 1);
+    } else {
+        // On last page, submit the form
+        submitApplication();
     }
+}
+
+async function submitApplication() {
+    console.log('Submitting application...');
+    
+    try {
+        // Show loading
+        showLoading(true);
+        showMessage('Submitting your application...', 'info');
+        
+        // Save all form data
+        saveFormData();
+        
+        // Prepare submission data
+        const submitData = {
+            formData: formData,
+            language: 'en', // You can track this from disclaimer selection
+            submissionTime: new Date().toISOString(),
+            sessionId: 'sess_' + Date.now()
+        };
+        
+        // Submit to Netlify function
+        const response = await fetch('https://wareworks-backend.netlify.app/.netlify/functions/submit-application', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(submitData)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showSubmissionSuccess(result);
+        } else {
+            throw new Error(`Submission failed: ${response.status}`);
+        }
+        
+    } catch (error) {
+        console.error('Submission error:', error);
+        showMessage('Error submitting application. Please try again.', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+function showSubmissionSuccess(result) {
+    // Hide form
+    const mainContainer = document.getElementById('mainFormContainer');
+    if (mainContainer) {
+        mainContainer.style.display = 'none';
+    }
+    
+    // Show success message
+    const wareWorksForm = document.getElementById('wareWorksForm');
+    if (wareWorksForm) {
+        const successHtml = `
+            <div style="background: white; border-radius: 12px; padding: 60px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <div style="font-size: 80px; margin-bottom: 30px;">✅</div>
+                <h2 style="color: #28a745; margin-bottom: 20px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px;">Application Submitted Successfully!</h2>
+                <p style="color: #666; margin-bottom: 30px; font-size: 18px; line-height: 1.6;">
+                    Thank you for your interest in WareWorks. We've received your application and will review it within 5-7 business days.
+                </p>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <p style="margin: 0; font-size: 16px; color: #666;">
+                        <strong>Confirmation ID:</strong> ${result.id || 'WW-' + Date.now()}<br>
+                        <strong>Submitted:</strong> ${new Date().toLocaleString()}
+                    </p>
+                </div>
+                <p style="font-size: 14px; color: #666;">Please save this confirmation ID for your records.</p>
+            </div>
+        `;
+        wareWorksForm.innerHTML = successHtml;
+    }
+    
+    // Clear saved form data
+    localStorage.removeItem('wareWorksFormData');
 }
 
 function previousPage() {
