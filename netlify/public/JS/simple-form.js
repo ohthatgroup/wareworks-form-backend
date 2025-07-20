@@ -609,11 +609,31 @@ function setupInputFormatters() {
 }
 
 function setupReviewPage() {
-    // Remove any duplicate submit buttons from the page content
+    console.log('Setting up review page...');
+    
+    // Remove the duplicate submit button from page content
+    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+    if (finalSubmitBtn) {
+        finalSubmitBtn.style.display = 'none';
+        console.log('Hidden duplicate submit button');
+    }
+    
+    // Hide any other duplicate submit buttons
     const pageSubmitButtons = document.querySelectorAll('#pageContentContainer button[type="submit"], #pageContentContainer .submit-button');
     pageSubmitButtons.forEach(btn => {
-        btn.style.display = 'none'; // Hide duplicate buttons
+        if (btn.id !== 'finalSubmitBtn') { // Don't double-hide the main one
+            btn.style.display = 'none';
+        }
     });
+    
+    // Ensure the navigation submit button is visible and properly labeled
+    const nextBtn = document.getElementById('nextButton');
+    if (nextBtn) {
+        nextBtn.textContent = 'Submit Application';
+        nextBtn.style.background = 'linear-gradient(135deg, #131f5b 0%, #1e308e 100%)';
+        nextBtn.style.color = 'white';
+        console.log('Navigation submit button configured');
+    }
     
     console.log('Review page setup complete');
 }
@@ -1002,8 +1022,14 @@ function updateButtons() {
         nextBtn.onclick = nextPage;
         if (currentPage === totalPages) {
             nextBtn.textContent = 'Submit Application';
+            nextBtn.style.background = 'linear-gradient(135deg, #131f5b 0%, #1e308e 100%)';
+            nextBtn.style.color = 'white';
+            nextBtn.style.fontWeight = '600';
         } else {
             nextBtn.textContent = 'Next';
+            nextBtn.style.background = '';
+            nextBtn.style.color = '';
+            nextBtn.style.fontWeight = '';
         }
     }
 }

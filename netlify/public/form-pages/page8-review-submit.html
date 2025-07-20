@@ -592,10 +592,6 @@
             <button type="button" class="back-btn" onclick="goToPage(7)">
                 ← Back to Edit
             </button>
-            <button type="button" class="submit-btn" id="finalSubmitBtn">
-                <span class="submit-text">Submit Application</span>
-                <div class="loading-spinner"></div>
-            </button>
         </div>
     </div>
 
@@ -791,26 +787,10 @@
         }
 
         function setupSubmitButton() {
-            const submitBtn = document.getElementById('finalSubmitBtn');
-            submitBtn.addEventListener('click', handleSubmit);
+            // Submit button is now handled by navigation system
+            console.log('Submit functionality handled by navigation system');
         }
 
-        function handleSubmit() {
-            const submitBtn = document.getElementById('finalSubmitBtn');
-            
-            // Add loading state
-            submitBtn.classList.add('loading');
-            submitBtn.disabled = true;
-            
-            // Simulate submission process
-            setTimeout(() => {
-                // This would call the actual form submission logic
-                // window.handleFormSubmit();
-                
-                // For demo, show success
-                showSubmissionSuccess();
-            }, 3000);
-        }
 
         function showSubmissionSuccess() {
             const submitSection = document.querySelector('.submit-section');
