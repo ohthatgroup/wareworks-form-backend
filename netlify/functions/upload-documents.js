@@ -240,10 +240,8 @@ function validateDocuments(documents) {
         }
     }
     
-    // Validate certifications (required, at least one)
-    if (!documents.certifications || !Array.isArray(documents.certifications) || documents.certifications.length === 0) {
-        errors.push('At least one certification document is required');
-    } else {
+    // Validate certifications (optional)
+    if (documents.certifications && Array.isArray(documents.certifications) && documents.certifications.length > 0) {
         documents.certifications.forEach((cert, index) => {
             const certValidation = validateDocument(cert, 'certifications');
             if (!certValidation.isValid) {

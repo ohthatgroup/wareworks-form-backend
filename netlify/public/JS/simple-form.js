@@ -44,8 +44,38 @@ function acceptDisclaimer(language) {
         mainContainer.style.display = 'block';
     }
     
-    // Load first page
-    loadPage(1);
+    // Load all pages content first, then show page 1
+    loadAllPagesContent().then(() => {
+        loadPage(1);
+    }).catch(() => {
+        // Fallback to original multi-page mode
+        loadPage(1);
+    });
+}
+
+async function loadAllPagesContent() {
+    console.log('Loading all pages content...');
+    
+    try {
+        const response = await fetch('https://wareworks-backend.netlify.app/form-pages/all-pages-content.html');
+        if (!response.ok) {
+            throw new Error('Failed to load all pages content');
+        }
+        
+        const html = await response.text();
+        
+        // Insert all pages into the container
+        const container = document.getElementById('pageContentContainer');
+        if (container) {
+            container.innerHTML = html;
+            console.log('All pages content loaded successfully');
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error loading all pages content:', error);
+        throw error;
+    }
 }
 
 async function loadPage(pageNum) {
@@ -55,25 +85,50 @@ async function loadPage(pageNum) {
         // Show loading
         showLoading(true);
         
-        // Get page content
-        const response = await fetch(pageUrls[pageNum]);
-        if (!response.ok) {
-            throw new Error(`Failed to load page ${pageNum}`);
-        }
+        // Check if we're in single-page mode (all pages already loaded)
+        const allPagesContainer = document.getElementById('allFormPages');
+        const targetPage = document.getElementById(`page${pageNum}`);
         
-        const html = await response.text();
-        
-        // Insert into container
-        const container = document.getElementById('pageContentContainer');
-        if (container) {
-            container.innerHTML = html;
+        if (allPagesContainer && targetPage) {
+            // Single-page mode: just show/hide pages
+            console.log('Single-page mode: switching to page', pageNum);
             
-            // Hide any style tags that might be visible
-            const styleTags = container.querySelectorAll('style');
-            styleTags.forEach(style => style.style.display = 'none');
+            // Hide all pages
+            document.querySelectorAll('.form-page').forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+            
+            // Show target page
+            targetPage.classList.add('active');
+            targetPage.style.display = 'block';
             
             // Initialize page-specific functionality
             initializePage(pageNum);
+        } else {
+            // Original multi-page mode: fetch content
+            console.log('Multi-page mode: fetching page', pageNum);
+            
+            // Get page content
+            const response = await fetch(pageUrls[pageNum]);
+            if (!response.ok) {
+                throw new Error(`Failed to load page ${pageNum}`);
+            }
+            
+            const html = await response.text();
+            
+            // Insert into container
+            const container = document.getElementById('pageContentContainer');
+            if (container) {
+                container.innerHTML = html;
+                
+                // Hide any style tags that might be visible
+                const styleTags = container.querySelectorAll('style');
+                styleTags.forEach(style => style.style.display = 'none');
+                
+                // Initialize page-specific functionality
+                initializePage(pageNum);
+            }
         }
         
         // Update UI
@@ -101,6 +156,9 @@ function initializePage(pageNum) {
     } else if (pageNum === 8) {
         setupReviewPage();
     }
+    
+    // Restore form data first
+    restoreFormData();
     
     // Save form data when inputs change
     const inputs = document.querySelectorAll('input, select, textarea');
@@ -231,10 +289,14 @@ function initializeAutocomplete(addressInput) {
     });
     
     // Handle address selection to populate other fields
+    let isPopulating = false;
     addressInput.addEventListener('change', function(e) {
         const selectedAddress = e.target.value;
-        if (selectedAddress && window.google && window.google.maps) {
-            populateAddressFields(selectedAddress);
+        if (selectedAddress && window.google && window.google.maps && !isPopulating) {
+            isPopulating = true;
+            populateAddressFields(selectedAddress).finally(() => {
+                isPopulating = false;
+            });
         }
     });
     
@@ -246,10 +308,12 @@ function populateAddressFields(address) {
     
     if (!window.google || !window.google.maps) {
         console.warn('Google Maps API not available for address parsing');
-        return;
+        return Promise.reject(new Error('Google Maps API not available'));
     }
     
     const geocoder = new google.maps.Geocoder();
+    
+    return new Promise((resolve, reject) => {
     
     geocoder.geocode({ address: address }, function(results, status) {
         if (status === 'OK' && results[0]) {
@@ -308,16 +372,19 @@ function populateAddressFields(address) {
                 console.log('Set street address:', streetAddress);
             }
             
-            // Trigger change events to save data
-            [cityField, stateField, zipField, addressField].forEach(field => {
+            // Trigger change events to save data (but prevent recursion)
+            [cityField, stateField, zipField].forEach(field => {
                 if (field) {
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             });
             
+            resolve();
         } else {
             console.warn('Geocoding failed:', status);
+            reject(new Error('Geocoding failed: ' + status));
         }
+    });
     });
 }
 
