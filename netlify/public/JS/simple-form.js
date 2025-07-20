@@ -141,24 +141,31 @@ function setupAddressAutocomplete() {
             try {
                 console.log('Fetching address suggestions for:', value);
                 
+                // Call Google Maps API directly
                 const response = await fetch(
-                    `https://wareworks-backend.netlify.app/.netlify/functions/autocomplete-address?input=${encodeURIComponent(value)}`
+                    `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(value)}&types=address&components=country:us&key=AIzaSyDQFBttRAtQDhfsQWHVk38RKWQ38tznMYY`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
                 );
                 
                 if (!response.ok) {
-                    console.error('Autocomplete API error:', response.status);
+                    console.error('Google Maps API error:', response.status);
                     return;
                 }
                 
                 const data = await response.json();
-                console.log('Autocomplete response:', data);
+                console.log('Google Maps API response:', data);
                 
                 // Clear previous suggestions
                 suggestionsList.innerHTML = '';
                 
                 // Add new suggestions
                 if (data.predictions && data.predictions.length > 0) {
-                    data.predictions.forEach(prediction => {
+                    data.predictions.slice(0, 5).forEach(prediction => {
                         const option = document.createElement('option');
                         option.value = prediction.description;
                         option.dataset.placeId = prediction.place_id;
