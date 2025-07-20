@@ -302,8 +302,8 @@ function nextPage() {
     console.log('Next page clicked');
     
     if (currentPage < totalPages) {
-        // Validate current page before moving
-        if (validateCurrentPage()) {
+        // Check if required fields are filled
+        if (checkRequiredFields()) {
             // Save current page data before moving
             saveFormData();
             loadPage(currentPage + 1);
@@ -314,6 +314,26 @@ function nextPage() {
         // On last page, submit the form
         submitApplication();
     }
+}
+
+function checkRequiredFields() {
+    const requiredFields = document.querySelectorAll('#pageContentContainer input[required], #pageContentContainer select[required], #pageContentContainer textarea[required]');
+    
+    for (let field of requiredFields) {
+        const value = field.value.trim();
+        if (!value) {
+            // Highlight empty required field
+            field.style.borderColor = '#dc3545';
+            field.focus();
+            console.log('Required field empty:', field.name || field.id);
+            return false;
+        } else {
+            // Remove error styling
+            field.style.borderColor = '';
+        }
+    }
+    
+    return true;
 }
 
 function validateCurrentPage() {
