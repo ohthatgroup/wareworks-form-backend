@@ -1,0 +1,78 @@
+<div class="page" id="page7">
+    <div class="form-block w-form-block">
+        <h2 class="Heading-2 Text-Accent-Primary [Utility] Text Align Center [Utility] Margin Bottom XXS-Gap" data-translate="employment_title">Employment History</h2>
+        <p class="Paragraph Text-Secondary [Utility] Text Align Center [Utility] Margin Bottom LG-Gap" data-translate="employment_subtitle">Your work history helps us better evaluate your experience</p>
+        
+        <div id="employmentContainer">
+            <div class="employment-entry repeatable-section BG-Secondary LG-Radius [Utility] Border Width 2px Border-Secondary [Utility] Padding All MD-Gap [Utility] Margin All MD-Gap [Utility] Position Relative" data-index="0">
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="companyName_0" class="Input-Label" data-translate="company_name">Company Name and Location</label>
+                    <input type="text" class="Input" maxlength="256" name="employment[0][companyName]" data-name="Company Name" id="companyName_0">
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-companyName_0"></div>
+                </div>
+                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="startDate_0" class="Input-Label" data-translate="date_started">Date Started (MM/DD/YYYY)</label>
+                        <input type="date" class="Input" name="employment[0][startDate]" data-name="Start Date" id="startDate_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-startDate_0"></div>
+                    </div>
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="endDate_0" class="Input-Label" data-translate="date_ended">Date Ended (MM/DD/YYYY)</label>
+                        <input type="date" class="Input" name="employment[0][endDate]" data-name="End Date" id="endDate_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-endDate_0"></div>
+                    </div>
+                </div>
+                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="startingPosition_0" class="Input-Label" data-translate="starting_position">Starting Position</label>
+                        <input type="text" class="Input" maxlength="256" name="employment[0][startingPosition]" data-name="Starting Position" id="startingPosition_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-startingPosition_0"></div>
+                    </div>
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="endingPosition_0" class="Input-Label" data-translate="ending_position">Ending Position</label>
+                        <input type="text" class="Input" maxlength="256" name="employment[0][endingPosition]" data-name="Ending Position" id="endingPosition_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-endingPosition_0"></div>
+                    </div>
+                </div>
+                <div class="form-row Grid-Layout Desktop-2-Column [Utility] Flex Gap MD-Gap Tablet-1-Column Mobile-L-1-Column Mobile-P-1-Column">
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="supervisorName_0" class="Input-Label" data-translate="supervisor_name">Supervisor Name</label>
+                        <input type="text" class="Input" maxlength="256" name="employment[0][supervisorName]" data-name="Supervisor Name" id="supervisorName_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-supervisorName_0"></div>
+                    </div>
+                    <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                        <label for="empPhoneNumber_0" class="Input-Label" data-translate="phone_number">Phone Number</label>
+                        <input type="tel" class="Input" maxlength="12" name="employment[0][phoneNumber]" data-name="Employment Phone" placeholder="XXX-XXX-XXXX" id="empPhoneNumber_0">
+                        <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-empPhoneNumber_0"></div>
+                    </div>
+                </div>
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="responsibilities_0" class="Input-Label" data-translate="responsibilities">Responsibilities</label>
+                    <textarea class="Input Text-Area" maxlength="5000" name="employment[0][responsibilities]" data-name="Responsibilities" id="responsibilities_0" rows="3"></textarea>
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-responsibilities_0"></div>
+                </div>
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label for="reasonLeaving_0" class="Input-Label" data-translate="reason_leaving">Reason for Leaving</label>
+                    <textarea class="Input Text-Area" maxlength="5000" name="employment[0][reasonLeaving]" data-name="Reason Leaving" id="reasonLeaving_0" rows="2"></textarea>
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-reasonLeaving_0"></div>
+                </div>
+                <div class="field-wrapper w-field-wrapper [Utility] Margin Bottom MD-Gap">
+                    <label class="Input-Label" data-translate="may_contact_employer">May we contact this employer?</label>
+                    <div class="radio-button-group [Utility] Flex Horizontal [Utility] Flex Gap MD-Gap [Utility] Margin Top XXS-Gap">
+                        <label class="radio-button-field Radio-Toggle">
+                            <input type="radio" id="mayContact_0_yes" name="employment[0][mayContact]" value="yes" data-name="May Contact">
+                            <span class="radio-button-label Input-Label" for="mayContact_0_yes" data-translate="yes">Yes</span>
+                        </label>
+                        <label class="radio-button-field Radio-Toggle">
+                            <input type="radio" id="mayContact_0_no" name="employment[0][mayContact]" value="no" data-name="May Contact">
+                            <span class="radio-button-label Input-Label" for="mayContact_0_no" data-translate="no">No</span>
+                        </label>
+                    </div>
+                    <div class="field-error Text-Error [Utility] Margin Top XXS-Gap" id="error-mayContact_0"></div>
+                </div>
+                <button type="button" class="Button Secondary [Utility] Margin Top MD-Gap" onclick="removeEmploymentEntry(this)" data-translate="remove_entry">Remove Entry</button>
+            </div>
+        </div>
+        <button type="button" class="Button Secondary [Utility] Margin Top MD-Gap" id="addEmploymentBtn" data-translate="add_another_employer">Add Another Employer</button>
+    </div>
+</div>
