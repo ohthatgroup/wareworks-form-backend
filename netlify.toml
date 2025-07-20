@@ -1,0 +1,20 @@
+# netlify.toml
+
+# Global headers for all Netlify Functions
+[[headers]]
+  for = "/.netlify/functions/*" # Apply these headers to all requests going to your functions
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, cache-control" # ADDED 'cache-control' here
+    # You can add other headers if needed, like Cache-Control if you want to control caching
+    # Cache-Control = "no-cache, no-store, must-revalidate"
+    # Pragma = "no-cache"
+    # Expires = "0"
+
+# This line ensures your static files (like page fragments and JS) are deployed from the public directory
+# if your main build command or publish directory is not already configured for this.
+# (You might already have this from a previous step, setting "Publish directory" in UI)
+[build]
+  publish = "netlify/public" # Adjust this if your static assets are in a different folder
+  functions = "netlify/functions"
