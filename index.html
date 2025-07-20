@@ -1,15 +1,407 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WareWorks Form Backend</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <style>
+        /* === DESIGN TOKENS === */
+        :root {
+            /* Colors */
+            --accent-primary: #131f5b;
+            --accent-primary-hover: #1e308e;
+            --accent-secondary: #eff1f7;
+            --accent-secondary-hover: white;
+            --accent-tertiary: #f2e9d1;
+            --accent-tertiary-hover: white;
+            --neutral-primary: white;
+            --neutral-secondary: #f5f4f1;
+            --neutral-inverse: #080c24;
+            
+            /* Typography */
+            --font-heading: 'Bricolage Grotesque', sans-serif;
+            --font-body: 'Figtree', sans-serif;
+            --font-button: 'Figtree', sans-serif;
+            
+            /* Base Typography */
+            --base-font-size: 1rem;
+            --base-font-weight: 400;
+            --base-letter-spacing: 0em;
+            --base-line-height: 1.6rem;
+            --base-margin-bottom: 0.7em;
+            
+            /* Headings */
+            --h1-size: 4.21rem;
+            --h1-size-tablet: 3.37rem;
+            --h1-size-mobile-l: 2.69rem;
+            --h1-size-mobile-p: 2.15rem;
+            --h1-letter-spacing: -0.01em;
+            --h1-line-height: 1.04em;
+            --h1-weight: 400;
+            --h1-margin-bottom: 0.3em;
+            
+            --h2-size: 2.37rem;
+            --h2-size-tablet: 1.89rem;
+            --h2-size-mobile-l: 1.52rem;
+            --h2-size-mobile-p: 1.21rem;
+            --h2-letter-spacing: -0.01em;
+            --h2-line-height: 1.04em;
+            --h2-weight: 400;
+            --h2-margin-bottom: 0.35em;
+            
+            --h3-size: 1.78rem;
+            --h3-size-tablet: 1.42rem;
+            --h3-size-mobile-l: 1.14rem;
+            --h3-size-mobile-p: 0.91rem;
+            --h3-letter-spacing: -0.01em;
+            --h3-line-height: 1.04em;
+            --h3-weight: 400;
+            --h3-margin-bottom: 0.7em;
+            
+            /* Text Sizes */
+            --text-size: 1rem;
+            --text-lg-size: 1.13rem;
+            --text-xl-size: 1.5rem;
+            --text-xxl-size: 2rem;
+            --text-sm-size: 0.88rem;
+            --text-letter-spacing: 0em;
+            --text-line-height: 1.6em;
+            
+            /* Spacing */
+            --gap-xxs: 0.5rem;
+            --gap-xs: 1rem;
+            --gap-sm: 2rem;
+            --gap-md: 3rem;
+            --gap-lg: 4rem;
+            --gap-xl: 5rem;
+            --gap-xxl: 6rem;
+            
+            /* Radius */
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-round: 100rem;
+            
+            /* Container */
+            --container-width: 1280px;
+            --container-sm-width: 1000px;
+            --container-lg-width: 1440px;
+            --container-padding: 1rem;
+        }
+        
+        /* === BASE STYLES === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            font-size: var(--base-font-size);
+            font-weight: var(--base-font-weight);
+            letter-spacing: var(--base-letter-spacing);
+            line-height: var(--base-line-height);
+            color: var(--neutral-inverse);
+            background-color: var(--neutral-primary);
+            margin: 0;
+        }
+        
+        /* === TYPOGRAPHY === */
+        h1 {
+            font-family: var(--font-heading);
+            font-size: var(--h1-size);
+            font-weight: var(--h1-weight);
+            letter-spacing: var(--h1-letter-spacing);
+            line-height: var(--h1-line-height);
+            margin-bottom: var(--h1-margin-bottom);
+            color: var(--accent-primary);
+        }
+        
+        h2 {
+            font-family: var(--font-heading);
+            font-size: var(--h2-size);
+            font-weight: var(--h2-weight);
+            letter-spacing: var(--h2-letter-spacing);
+            line-height: var(--h2-line-height);
+            margin-bottom: var(--h2-margin-bottom);
+            color: var(--accent-primary);
+        }
+        
+        h3 {
+            font-family: var(--font-heading);
+            font-size: var(--h3-size);
+            font-weight: var(--h3-weight);
+            letter-spacing: var(--h3-letter-spacing);
+            line-height: var(--h3-line-height);
+            margin-bottom: var(--h3-margin-bottom);
+            color: var(--accent-primary);
+        }
+        
+        p {
+            font-size: var(--text-size);
+            letter-spacing: var(--text-letter-spacing);
+            line-height: var(--text-line-height);
+            margin-bottom: var(--base-margin-bottom);
+            color: var(--neutral-inverse);
+        }
+        
+        .text-lg {
+            font-size: var(--text-lg-size);
+        }
+        
+        .text-xl {
+            font-size: var(--text-xl-size);
+        }
+        
+        .text-xxl {
+            font-size: var(--text-xxl-size);
+        }
+        
+        .text-sm {
+            font-size: var(--text-sm-size);
+        }
+        
+        .text-secondary {
+            color: #666;
+        }
+        
+        /* === LAYOUT === */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+        }
+        
+        .container-sm {
+            max-width: var(--container-sm-width);
+        }
+        
+        .container-lg {
+            max-width: var(--container-lg-width);
+        }
+        
+        /* === COMPONENTS === */
+        .card {
+            background: var(--neutral-primary);
+            border: 1px solid var(--accent-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--gap-md);
+            margin-bottom: var(--gap-lg);
+            box-shadow: 0 2px 8px rgba(19, 31, 91, 0.08);
+        }
+        
+        .card-secondary {
+            background: var(--accent-secondary);
+        }
+        
+        .button {
+            font-family: var(--font-button);
+            font-size: var(--base-font-size);
+            font-weight: 500;
+            padding: 1em 1.5em;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        
+        .button-primary {
+            background: var(--accent-primary);
+            color: var(--neutral-primary);
+        }
+        
+        .button-primary:hover {
+            background: var(--accent-primary-hover);
+        }
+        
+        .button-secondary {
+            background: transparent;
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+        }
+        
+        .button-secondary:hover {
+            background: var(--accent-primary);
+            color: var(--neutral-primary);
+        }
+        
+        /* === UTILITIES === */
+        .text-center {
+            text-align: center;
+        }
+        
+        .margin-bottom-xs {
+            margin-bottom: var(--gap-xs);
+        }
+        
+        .margin-bottom-sm {
+            margin-bottom: var(--gap-sm);
+        }
+        
+        .margin-bottom-md {
+            margin-bottom: var(--gap-md);
+        }
+        
+        .margin-bottom-lg {
+            margin-bottom: var(--gap-lg);
+        }
+        
+        .margin-top-lg {
+            margin-top: var(--gap-lg);
+        }
+        
+        .padding-lg {
+            padding: var(--gap-lg);
+        }
+        
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            h1 { font-size: var(--h1-size-tablet); }
+            h2 { font-size: var(--h2-size-tablet); }
+            h3 { font-size: var(--h3-size-tablet); }
+            
+            .card {
+                padding: var(--gap-sm);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: var(--h1-size-mobile-l); }
+            h2 { font-size: var(--h2-size-mobile-l); }
+            h3 { font-size: var(--h3-size-mobile-l); }
+            
+            .card {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: var(--h1-size-mobile-p); }
+            h2 { font-size: var(--h2-size-mobile-p); }
+            h3 { font-size: var(--h3-size-mobile-p); }
+            
+            .container {
+                padding: 0 var(--gap-xs);
+            }
+        }
+        
+        /* === PAGE SPECIFIC === */
+        .hero {
+            background: var(--accent-secondary);
+            padding: var(--gap-xl) 0;
+            border-bottom: 1px solid var(--accent-primary);
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-item {
+            background: var(--neutral-primary);
+            border: 1px solid var(--accent-secondary);
+            border-radius: var(--radius-sm);
+            padding: var(--gap-sm);
+            margin-bottom: var(--gap-xs);
+            transition: all 0.2s ease;
+        }
+        
+        .feature-item:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(19, 31, 91, 0.12);
+        }
+        
+        .feature-item a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .feature-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            background: var(--neutral-inverse);
+            color: var(--neutral-primary);
+            padding: var(--gap-lg) 0;
+            margin-top: var(--gap-xl);
+        }
+    </style>
 </head>
 <body>
-    <h1>WareWorks Form Backend</h1>
-    <p>This site provides backend functions for the WareWorks application form.</p>
-    <p>Functions available:</p>
-    <ul>
-        <li><a href="/.netlify/functions/get-config">Configuration Endpoint</a></li>
-        <li>Form Submission Endpoint (POST only)</li>
-    </ul>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container text-center">
+            <h1>WareWorks Form Backend</h1>
+            <p class="text-lg text-secondary">Secure application processing system for WareWorks employment applications</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container margin-top-lg">
+        <div class="card">
+            <h2>Backend Services</h2>
+            <p>This site provides backend functions for the WareWorks application form with secure document processing, I-9 compliance, and automated workflows.</p>
+        </div>
+
+        <div class="card">
+            <h3>Available Functions</h3>
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <strong>Configuration Endpoint</strong><br>
+                    <span class="text-sm text-secondary">Provides secure configuration data for the application form</span><br>
+                    <a href="/.netlify/functions/get-config" class="button button-secondary margin-top-xs">Access Configuration</a>
+                </li>
+                <li class="feature-item">
+                    <strong>Form Submission Endpoint</strong><br>
+                    <span class="text-sm text-secondary">Handles application submissions with PDF generation and email notifications (POST only)</span><br>
+                    <span class="text-sm">Endpoint: <code>/.netlify/functions/submit-application</code></span>
+                </li>
+                <li class="feature-item">
+                    <strong>Address Autocomplete</strong><br>
+                    <span class="text-sm text-secondary">Server-side proxy for Google Places autocomplete functionality</span><br>
+                    <span class="text-sm">Endpoint: <code>/.netlify/functions/autocomplete-address</code></span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card card-secondary">
+            <h3>Features</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--gap-md);">
+                <div>
+                    <h4>Document Processing</h4>
+                    <p class="text-sm">Secure file upload handling with validation and storage</p>
+                </div>
+                <div>
+                    <h4>I-9 Compliance</h4>
+                    <p class="text-sm">Automated I-9 form generation and verification workflows</p>
+                </div>
+                <div>
+                    <h4>PDF Generation</h4>
+                    <p class="text-sm">Complete application packages with embedded forms</p>
+                </div>
+                <div>
+                    <h4>Email Notifications</h4>
+                    <p class="text-sm">Automated admin alerts with document attachments</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="container text-center">
+            <p class="text-sm">WareWorks Backend Services &copy; 2025</p>
+            <p class="text-sm text-secondary">Secure • Compliant • Efficient</p>
+        </div>
+    </div>
 </body>
 </html>
