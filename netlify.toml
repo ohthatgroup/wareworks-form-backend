@@ -1,160 +1,21 @@
-# netlify.toml - WareWorks Form Backend Configuration
-# Enhanced configuration for improved security, performance, and functionality
+# netlify.toml
 
-[build]
-  publish = "netlify/public"
-  functions = "netlify/functions"
-  command = "echo 'Build complete - WareWorks Form Backend v4.0'"
-
-# Function Configuration
-[functions]
-  directory = "netlify/functions"
-  
-# Environment-specific settings
-[context.production]
-  environment = { NODE_ENV = "production" }
-
-[context.deploy-preview]
-  environment = { NODE_ENV = "staging" }
-
-[context.branch-deploy]
-  environment = { NODE_ENV = "development" }
-
-# Security Headers for Functions
+# Global headers for all Netlify Functions
 [[headers]]
-  for = "/.netlify/functions/*"
+  for = "/.netlify/functions/*" # Apply these headers to all requests going to your functions
   [headers.values]
-    # CORS Headers
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control"
-    Access-Control-Max-Age = "86400"
-    
-    # Security Headers
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.anthropic.com https://maps.googleapis.com; frame-ancestors 'none';"
-    
-    # Cache Control
-    Cache-Control = "no-store, no-cache, must-revalidate, proxy-revalidate"
-    Pragma = "no-cache"
-    Expires = "0"
+    Access-Control-Allow-Headers = "Content-Type, cache-control"
 
-# Security Headers for Static Form Pages
+# NEW: Global headers for your static HTML page fragments
 [[headers]]
-  for = "/form-pages/*"
+  for = "/form-pages/*" # Apply these headers to all requests going to your form pages
   [headers.values]
-    # CORS Headers for form pages
     Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Cache-Control, Accept, Origin"
-    
-    # Security Headers
-    X-Frame-Options = "SAMEORIGIN"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    
-    # Content Type
-    Content-Type = "text/html; charset=utf-8"
-    
-    # Cache Control for form pages
-    Cache-Control = "public, max-age=300, s-maxage=300"
+    Access-Control-Allow-Methods = "GET, OPTIONS" # Pages are usually only GET/OPTIONS
+    Access-Control-Allow-Headers = "Content-Type" # Add any other headers your client might send
 
-# Headers for Static Assets
-[[headers]]
-  for = "/JS/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "application/javascript; charset=utf-8"
-
-[[headers]]
-  for = "/CSS/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "text/css; charset=utf-8"
-
-[[headers]]
-  for = "/images/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Main index.html headers
-[[headers]]
-  for = "/index.html"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://wareworks-backend.netlify.app; frame-ancestors 'none';"
-    Cache-Control = "public, max-age=300, s-maxage=300"
-
-# Redirects and Rewrites
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/form"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/application"
-  to = "/index.html"
-  status = 200
-
-# Error pages
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 404
-
-# Edge Functions Configuration (if using)
-[edge_functions]
-  # Future: Rate limiting, geo-blocking, etc.
-
-# Plugin Configuration
-[[plugins]]
-  package = "@netlify/plugin-sitemap"
-  
-  [plugins.inputs]
-    buildDir = "netlify/public"
-    exclude = [
-      "/form-pages/*",
-      "/.netlify/functions/*"
-    ]
-
-# Custom Domain Configuration (when ready)
-# [[redirects]]
-#   from = "https://wareworks-form.netlify.app/*"
-#   to = "https://form.wareworks.me/:splat"
-#   status = 301
-#   force = true
-
-# Rate Limiting (for future implementation)
-# This would require enterprise Netlify features or custom edge functions
-# [[edge_functions]]
-#   function = "rate-limit"
-#   path = "/.netlify/functions/*"
-
-# Performance Settings
-[template]
-  incoming-hooks = ["github"]
-
-# Development Configuration
-[dev]
-  framework = "#static"
-  targetPort = 8080
-  port = 8888
-  publish = "netlify/public"
+[build]
+  publish = "netlify/public" # Adjust this if your static assets are in a different folder
   functions = "netlify/functions"
-
-# Form Processing (Netlify Forms as backup)
-# This provides a fallback if the custom functions fail
-[forms]
-  # Future: Backup form submission endpoint
