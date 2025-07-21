@@ -34,13 +34,16 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
 
   const isEquipmentSelected = (equipmentKey: string): boolean => {
     const value = watch(equipmentKey as keyof ValidatedApplicationData)
-    return Boolean(value && value !== '' && value !== 'none')
+    return Boolean(value && value !== '')
   }
 
   const toggleEquipment = (equipmentKey: string, checked: boolean) => {
     if (!checked) {
       // Clear the experience level when unchecking
       setValue(equipmentKey as keyof ValidatedApplicationData, '')
+    } else {
+      // Set a placeholder value when checking to show dropdown
+      setValue(equipmentKey as keyof ValidatedApplicationData, 'none')
     }
   }
 
@@ -67,9 +70,6 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                   checked={isSelected}
                   onChange={(e) => {
                     toggleEquipment(equipment.key, e.target.checked)
-                    if (!e.target.checked) {
-                      setValue(equipment.key, '')
-                    }
                   }}
                   className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
                 />

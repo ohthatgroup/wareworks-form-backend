@@ -3,24 +3,16 @@
   command = "npm install --include=dev && npm run build"
   publish = ".next"
 
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "nft"
+# Functions handled by Next.js App Router
+# [functions]
+#   directory = "netlify/functions"
+#   node_bundler = "nft"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Clean API route redirect for V2 functions
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/v2/:splat"
-  status = 200
-
-# Optional: direct alias for submit-application
-[[redirects]]
-  from = "/api/submit-application"
-  to = "/.netlify/functions/v2/submit-application"
-  status = 200
+# API routes are handled by Next.js App Router automatically
+# No redirects needed for /api/* - Next.js will handle these
 
 # Catch-all redirect for SPA fallback (optional)
 [[redirects]]

@@ -104,8 +104,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                         if (!e.target.checked) {
                           setValue(day.key as keyof ValidatedApplicationData, '')
                         } else {
-                          // Set a default value to show the time input field
-                          setValue(day.key as keyof ValidatedApplicationData, ' ')
+                          // Set a placeholder value to show the time input field
+                          setValue(day.key as keyof ValidatedApplicationData, 'available')
                         }
                       }}
                       className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
