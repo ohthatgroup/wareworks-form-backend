@@ -116,13 +116,17 @@ export default function ApplicationForm() {
 
   // Success step
   if (currentStep >= STEPS.length) {
-    return <SuccessStep result={submissionResult} />
+    return (
+      <div className="mx-auto px-4 py-4 max-w-4xl">
+        <SuccessStep result={submissionResult} />
+      </div>
+    )
   }
 
   const CurrentStepComponent = STEPS[currentStep].component
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="mx-auto px-4 py-4 max-w-4xl">
       <ProgressBar 
         currentStep={currentStep} 
         totalSteps={STEPS.length}
