@@ -177,8 +177,12 @@ function initializePage(pageNum) {
     if (pageNum === 1) {
         setupAddressAutocomplete();
         setupInputFormatters();
+    } else if (pageNum === 3) {
+        setupConditionalQuestions();
     } else if (pageNum === 4) {
         setupDocumentUploads();
+    } else if (pageNum === 5) {
+        setupConditionalQuestions();
     } else if (pageNum === 8) {
         setupReviewPage();
     }
@@ -827,6 +831,68 @@ function populateReviewData() {
     }
     
     console.log('Review data populated');
+}
+
+function setupConditionalQuestions() {
+    console.log('Setting up conditional questions...');
+    
+    // Citizenship status conditional fields
+    const citizenshipRadios = document.querySelectorAll('input[name="citizenshipStatus"]');
+    citizenshipRadios.forEach(radio => {
+        radio.addEventListener('change', handleCitizenshipChange);
+    });
+    
+    // Previous application conditional fields
+    const previouslyAppliedRadios = document.querySelectorAll('input[name="previouslyApplied"]');
+    previouslyAppliedRadios.forEach(radio => {
+        radio.addEventListener('change', handlePreviousApplicationChange);
+    });
+    
+    // Initialize conditional sections based on current values
+    handleCitizenshipChange();
+    handlePreviousApplicationChange();
+    
+    console.log('Conditional questions setup complete');
+}
+
+function handleCitizenshipChange() {
+    const selectedCitizenship = document.querySelector('input[name="citizenshipStatus"]:checked');
+    
+    // Hide all conditional sections first
+    const lawfulPermanentFields = document.getElementById('lawfulPermanentFields');
+    const alienAuthorizedFields = document.getElementById('alienAuthorizedFields');
+    
+    if (lawfulPermanentFields) lawfulPermanentFields.style.display = 'none';
+    if (alienAuthorizedFields) alienAuthorizedFields.style.display = 'none';
+    
+    if (selectedCitizenship) {
+        const value = selectedCitizenship.value;
+        console.log('Citizenship status changed to:', value);
+        
+        // Show relevant conditional section
+        if (value === 'lawful_permanent' && lawfulPermanentFields) {
+            lawfulPermanentFields.style.display = 'block';
+            console.log('Showing lawful permanent resident fields');
+        } else if (value === 'alien_authorized' && alienAuthorizedFields) {
+            alienAuthorizedFields.style.display = 'block';
+            console.log('Showing alien authorized fields');
+        }
+    }
+}
+
+function handlePreviousApplicationChange() {
+    const selectedPrevious = document.querySelector('input[name="previouslyApplied"]:checked');
+    const previousApplicationDetails = document.getElementById('previousApplicationDetails');
+    
+    if (previousApplicationDetails) {
+        if (selectedPrevious && selectedPrevious.value === 'yes') {
+            previousApplicationDetails.style.display = 'block';
+            console.log('Showing previous application details');
+        } else {
+            previousApplicationDetails.style.display = 'none';
+            console.log('Hiding previous application details');
+        }
+    }
 }
 
 function saveFormData() {
