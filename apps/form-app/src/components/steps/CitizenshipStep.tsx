@@ -16,10 +16,10 @@ const CITIZENSHIP_OPTIONS = [
   { value: 'alien_authorized', label: 'An alien authorized to work' }
 ]
 
-const DOCUMENT_TYPE_OPTIONS = [
-  { value: 'i766', label: 'Employment Authorization Document (Form I-766)' },
-  { value: 'foreign_passport_i94', label: 'Foreign passport with I-94 or I-94A' },
-  { value: 'drivers_license_i94', label: 'Driver\'s license with I-94 or I-94A' }
+const ALIEN_WORK_AUTH_OPTIONS = [
+  { value: 'uscis_a_number', label: 'USCIS A-Number' },
+  { value: 'form_i94', label: 'Form I-94 Admission Number' },
+  { value: 'foreign_passport', label: 'Foreign Passport Number and Country of Issuance' }
 ]
 
 export function CitizenshipStep({ form }: CitizenshipStepProps) {
@@ -60,29 +60,52 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
           />
           
           <Select
-            label="Alien Document Type"
+            label="Enter one of the following"
             registration={register('alienDocumentType')}
             error={errors.alienDocumentType?.message}
-            options={DOCUMENT_TYPE_OPTIONS}
-            placeholder="Select document type"
+            options={ALIEN_WORK_AUTH_OPTIONS}
+            placeholder="Select which information you will provide"
             required
           />
           
-          <Input
-            label="Alien Document Number"
-            registration={register('alienDocumentNumber')}
-            error={errors.alienDocumentNumber?.message}
-            placeholder="Document number"
-            required
-          />
+          {watch('alienDocumentType') === 'uscis_a_number' && (
+            <Input
+              label="USCIS A-Number"
+              registration={register('alienDocumentNumber')}
+              error={errors.alienDocumentNumber?.message}
+              placeholder="A12345678"
+              required
+            />
+          )}
           
-          <Input
-            label="Document Country of Issuance"
-            registration={register('documentCountry')}
-            error={errors.documentCountry?.message}
-            placeholder="Country that issued the document"
-            required
-          />
+          {watch('alienDocumentType') === 'form_i94' && (
+            <Input
+              label="Form I-94 Admission Number"
+              registration={register('alienDocumentNumber')}
+              error={errors.alienDocumentNumber?.message}
+              placeholder="I-94 admission number"
+              required
+            />
+          )}
+          
+          {watch('alienDocumentType') === 'foreign_passport' && (
+            <div className="space-y-4">
+              <Input
+                label="Foreign Passport Number"
+                registration={register('alienDocumentNumber')}
+                error={errors.alienDocumentNumber?.message}
+                placeholder="Passport number"
+                required
+              />
+              <Input
+                label="Country of Issuance"
+                registration={register('documentCountry')}
+                error={errors.documentCountry?.message}
+                placeholder="Country that issued the passport"
+                required
+              />
+            </div>
+          )}
         </div>
       )}
 
