@@ -2,7 +2,7 @@
 let currentPage = 1;
 const totalPages = 8;
 let formData = {};
-let allPagesHTML = null; // Cache for the full HTML content
+let allPagesHTML = null; // Cache for the full HTML content (reset to force refresh)
 
 // Page URLs
 const pageUrls = {
