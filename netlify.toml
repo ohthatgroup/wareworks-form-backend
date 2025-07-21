@@ -1,21 +1,36 @@
-# netlify.toml
-
-# Global headers for all Netlify Functions
-[[headers]]
-  for = "/.netlify/functions/*" # Apply these headers to all requests going to your functions
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, cache-control"
-
-# NEW: Global headers for your static HTML page fragments
-[[headers]]
-  for = "/form-pages/*" # Apply these headers to all requests going to your form pages
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, OPTIONS" # Pages are usually only GET/OPTIONS
-    Access-Control-Allow-Headers = "Content-Type" # Add any other headers your client might send
-
 [build]
-  publish = "netlify/public" # Adjust this if your static assets are in a different folder
-  functions = "netlify/functions"
+  base = "apps/form-app"
+  command = "npm run build"
+  publish = "apps/form-app/.next"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "nft"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Modern API routes
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/v2/:splat"
+  status = 200
+
+# Legacy compatibility
+[[redirects]]
+  from = "/.netlify/functions/submit-application"
+  to = "/.netlify/functions/legacy/submit-application"
+  status = 200
+
+# Form app routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  NODE_ENV = "production"
+  NEXT_PUBLIC_API_URL = "https://wareworks-backend.netlify.app"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "development"

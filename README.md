@@ -1,278 +1,140 @@
-# WareWorks Application Form System Documentation
+# WareWorks Application Form v2
 
-## Overview
+Modern, hybrid employment application system with Webflow integration.
 
-The WareWorks Application Form System is a comprehensive web-based employment application platform that collects applicant information, processes documents, and generates combined PDF packages for HR review. The system is built on Netlify Functions with Google Sheets integration and secure document storage.
+## 🚀 Quick Start
 
-## Architecture
+```bash
+# Install dependencies
+npm install
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Frontend      │    │  Netlify         │    │  External       │
-│   (Webflow)     │───▶│  Functions       │───▶│  Services       │
-│                 │    │  (Backend)       │    │                 │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │                       │
-                                ▼                       ▼
-                       ┌─────────────────┐    ┌─────────────────┐
-                       │  Netlify Blobs  │    │ Google Sheets   │
-                       │  (File Storage) │    │ (Data Storage)  │
-                       └─────────────────┘    └─────────────────┘
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Deploy to Netlify
+npm run deploy
 ```
 
-## Core Features
+## 📁 Project Structure
 
-1. **Multi-page Form Interface**: 8-page progressive form with validation
-2. **Address Autocomplete**: Google Maps API integration for address suggestions
-3. **Document Upload**: Secure file upload with validation and storage
-4. **PDF Generation**: Automated PDF creation combining templates and uploaded documents
-5. **Data Persistence**: Google Sheets integration for application tracking
-6. **Email Delivery**: Automated email sending with PDF attachments
-7. **Security**: Rate limiting, file validation, and domain restrictions
-
-## File Structure and Descriptions
-
-### Frontend Files (`netlify/public/`)
-
-#### `JS/simple-form.js`
-**Purpose**: Main frontend application logic
-- **Page Navigation**: Handles 8-page form progression with client-side navigation
-- **Single-Page Application**: Loads all form content once and shows/hides pages dynamically
-- **Address Autocomplete**: Integrates Google Maps JavaScript API for address suggestions
-- **Input Formatting**: Automatic formatting for phone numbers and SSN
-- **Document Upload**: Manages file uploads and converts to base64 for transmission
-- **Form Submission**: Three-step process: upload documents → process data → submit application
-- **Data Persistence**: Saves form data to localStorage and restores on page reload
-
-#### `form-pages/all-pages-content.html`
-**Purpose**: Consolidated single-file form containing all 8 pages
-- **Page 1**: Personal information collection (legal name, address with Google Maps autocomplete, contact info, DOB, SSN)
-- **Page 2**: Extended contact and emergency information (phone numbers, emergency contacts)
-- **Page 3**: Citizenship and work authorization (status, USCIS A-Number, document details)
-- **Page 4**: Document upload interface (government ID, resume, certifications with validation)
-- **Page 5**: Employment questions (age verification, transportation, availability, position preferences)
-- **Page 6**: Educational background (school information, degrees, graduation status)
-- **Page 7**: Employment history (previous employers, positions, experience)
-- **Page 8**: Final review and submission (summary, document confirmation, submission trigger)
-- **Optimized CSS**: Clean styling with pagination controls and responsive design
-- **Client-Side Navigation**: JavaScript-controlled page switching without server requests
-
-#### `External Files/simple-webflow-embed.html`
-**Purpose**: Webflow integration code
-- Complete HTML structure for embedding in Webflow
-- Includes Google Maps API integration
-- Language disclaimer and form container
-- Progress indicators and navigation controls
-
-### Backend Functions (`netlify/functions/`)
-
-#### `submit-application.js`
-**Purpose**: Main application processing endpoint
-- **Security Validation**: Rate limiting, domain verification, data sanitization
-- **Data Processing**: Form validation and Google Sheets integration
-- **PDF Generation**: Combines templates with form data and uploaded documents
-- **Email Delivery**: Sends combined PDF to HR recipients
-- **Error Handling**: Comprehensive logging and error management
-
-**Key Functions**:
-- `validateSubmission()`: Security and data validation
-- `processSubmission()`: Orchestrates the entire submission workflow
-- `saveToGoogleSheets()`: Stores application data in Google Sheets
-- `generateApplicationPDF()`: Creates comprehensive PDF package
-- `loadAndPopulateApplicationTemplate()`: Populates WareWorks template
-- `loadAndPopulateI9Template()`: Populates I-9 form template
-- `sendEmailWithAttachment()`: Delivers PDF via email
-
-#### `upload-documents.js`
-**Purpose**: Document upload and storage handler
-- **File Validation**: Type, size, and security checks
-- **Netlify Blobs Storage**: Secure cloud storage with unique document IDs
-- **Metadata Tracking**: File information and upload timestamps
-- **URL Generation**: Creates permanent access URLs for stored documents
-
-**Security Features**:
-- File type whitelist validation
-- 10MB size limit enforcement
-- Base64 encoding validation
-- Unique document ID generation
-
-#### `analyze-templates.js`
-**Purpose**: PDF template analysis utility
-- **Field Discovery**: Identifies fillable form fields in PDF templates
-- **Template Validation**: Ensures templates have expected form structure
-- **Development Tool**: Helps map form data to PDF field names
-
-**Analysis Output**:
-- Field count and types (text, checkbox, radio, dropdown)
-- Field names and current values
-- Template page count and structure
-
-### PDF Templates (`Templates/`)
-
-#### `Wareworks Application.pdf`
-**Purpose**: Official WareWorks employment application template
-- **66 fillable form fields** for comprehensive applicant information
-- Standard employment application format
-- Populated automatically with form data using pdf-lib
-
-#### `i-9.pdf`
-**Purpose**: Federal I-9 Employment Eligibility Verification form
-- **128 fillable form fields** for identity and work authorization verification
-- Required federal form for all employees
-- Populated automatically with citizenship and document information
-
-### Configuration Files
-
-#### `package.json`
-**Purpose**: Node.js project configuration
-- **Dependencies**: All required npm packages
-  - `googleapis`: Google Sheets API integration
-  - `pdf-lib`: PDF manipulation and form filling
-  - `@netlify/blobs`: Document storage
-  - `nodemailer`: Email delivery
-  - `moment`: Date/time handling
-
-#### `.gitignore`
-**Purpose**: Git exclusion rules
-- Excludes `node_modules/` from version control
-- Protects sensitive environment files
-- Prevents temporary files from being committed
-
-### Environment Variables (Not in repository)
-
-#### Required Netlify Environment Variables:
-- `GOOGLE_SHEETS_SPREADSHEET_ID`: Target Google Sheets document ID
-- `GOOGLE_SERVICE_ACCOUNT_EMAIL`: Service account for Sheets API
-- `GOOGLE_PRIVATE_KEY`: Private key for service account authentication
-- `EMAIL_USER`: Gmail account for sending notifications
-- `EMAIL_PASS`: App password for Gmail SMTP
-- `HR_EMAIL_RECIPIENTS`: Comma-separated list of HR email addresses
-- `ENABLE_GOOGLE_SHEETS`: Boolean flag to enable/disable Sheets integration
-- `ENABLE_PDF_GENERATION`: Boolean flag to enable/disable PDF creation
-- `ENABLE_EMAIL_NOTIFICATIONS`: Boolean flag to enable/disable email sending
-
-## Data Flow
-
-### 1. Form Submission Process
 ```
-User loads single-page form → Client-side page navigation → Form validation → 
-Document upload to Blobs → Data submission → Backend validation → 
-Google Sheets storage → PDF generation → Email delivery → Success confirmation
+wareworks-form-v2/
+├── apps/
+│   └── form-app/           # Next.js application
+├── netlify/
+│   └── functions/          # Serverless functions
+├── shared/
+│   ├── types/             # TypeScript definitions
+│   ├── services/          # Business logic
+│   └── validation/        # Zod schemas
+└── package.json           # Root configuration
 ```
 
-### 2. Document Processing
+## 🛠 Technology Stack
+
+- **Frontend**: Next.js 14, React 18, Tailwind CSS
+- **Backend**: Netlify Functions v2, TypeScript
+- **Forms**: React Hook Form, Zod validation
+- **Storage**: Netlify Blobs (documents), Google Sheets (data)
+- **Email**: Gmail SMTP via Nodemailer
+
+## 🔧 Environment Variables
+
+Create `.env.local` in `apps/form-app/`:
+
+```bash
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:8888
+
+# Google Services
+GOOGLE_SHEETS_ID=your_spreadsheet_id
+GOOGLE_SERVICE_ACCOUNT_EMAIL=your_service_account
+GOOGLE_PRIVATE_KEY=your_private_key
+
+# Email Configuration
+GMAIL_USER=your_gmail_account
+GMAIL_APP_PASSWORD=your_app_password
+HR_EMAIL=hr@wareworks.me
+
+# Feature Flags
+ENABLE_PDF_GENERATION=false
+ENABLE_EMAIL_NOTIFICATIONS=false
+ENABLE_GOOGLE_SHEETS=true
 ```
-File upload → Security validation → Base64 encoding → 
-Netlify Blobs storage → URL generation → Metadata tracking → 
-PDF embedding → Permanent storage
+
+## 🚢 Deployment
+
+1. **Connect to Netlify**:
+   ```bash
+   netlify init
+   ```
+
+2. **Set Environment Variables** in Netlify dashboard
+
+3. **Deploy**:
+   ```bash
+   git push origin main
+   ```
+
+## 🎯 Features
+
+- ✅ Multi-step form with progress tracking
+- ✅ Real-time validation with Zod schemas
+- ✅ Responsive design with Tailwind CSS
+- ✅ Modern Netlify Functions v2
+- ✅ TypeScript throughout
+- 🚧 File uploads with Netlify Blobs
+- 🚧 PDF generation with filled templates
+- 🚧 Google Sheets integration
+- 🚧 Email notifications
+
+## 🔗 Integration
+
+### Webflow Integration
+Add this to your Webflow site:
+```html
+<a href="https://apply.wareworks.me" class="cta-button">
+  Start Your Application
+</a>
 ```
 
-### 3. PDF Generation Pipeline
+### Domain Setup
+- Marketing: `wareworks.me` (Webflow)
+- Application: `apply.wareworks.me` (Netlify)
+
+## 📝 Development
+
+1. **Start local development**:
+   ```bash
+   cd apps/form-app
+   npm run dev
+   ```
+
+2. **Test Netlify Functions locally**:
+   ```bash
+   netlify dev
+   ```
+
+3. **Access application**:
+   - Frontend: http://localhost:3000
+   - Functions: http://localhost:8888/.netlify/functions/
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Run linting
+npm run lint
+
+# Type checking
+npm run type-check
 ```
-Form data + Templates + Uploaded documents → 
-Template population → Document merging → 
-Final PDF creation → Email attachment
-```
 
-## Security Features
+## 📄 License
 
-### Input Validation
-- **Data Sanitization**: All inputs cleaned and validated
-- **File Type Restrictions**: Only approved file formats accepted
-- **Size Limits**: 10MB maximum per file
-- **Rate Limiting**: Prevents spam and abuse
-
-### Access Control
-- **Domain Restrictions**: Only specified domains can submit
-- **Referer Validation**: Ensures requests come from authorized sources
-- **CORS Configuration**: Proper cross-origin resource sharing setup
-
-### Data Protection
-- **SSN Hashing**: Social Security Numbers are hashed in Google Sheets
-- **Secure Storage**: Documents stored in encrypted Netlify Blobs
-- **No Logging**: Sensitive data not logged in plain text
-
-## Integration Points
-
-### Google Sheets API
-- **Authentication**: Service account with JSON key
-- **Data Structure**: Structured columns for all form fields
-- **Error Handling**: Graceful fallback if Sheets unavailable
-
-### Google Maps API
-- **Frontend Integration**: JavaScript API for address autocomplete
-- **Restrictions**: Limited to US addresses only
-- **Fallback**: Form still functions without API
-
-### Netlify Blobs
-- **Storage**: Permanent document storage with unique URLs
-- **Metadata**: File information and upload tracking
-- **Access Control**: Secure URL generation for document access
-
-### Email Delivery
-- **SMTP**: Gmail SMTP for reliable delivery
-- **Attachments**: PDF packages attached automatically
-- **Recipients**: Configurable HR email list
-
-## Maintenance and Monitoring
-
-### Error Handling
-- **Comprehensive Logging**: All operations logged with context
-- **Graceful Degradation**: System continues functioning if non-critical services fail
-- **User Feedback**: Clear error messages for form validation issues
-
-### Performance Optimization
-- **Single-Page Loading**: All form content loaded once for fast navigation
-- **Client-Side Routing**: No server requests for page transitions
-- **Debounced Autocomplete**: Prevents excessive API calls
-- **Efficient PDF Generation**: Optimized template processing
-
-### Monitoring Points
-- **Submission Success Rate**: Track successful vs. failed submissions
-- **Document Upload Success**: Monitor file storage reliability
-- **Email Delivery**: Confirm HR notifications sent
-- **API Response Times**: Google Sheets and Maps API performance
-
-## Deployment
-
-### Netlify Configuration
-- **Build Command**: `npm install` (automatically runs)
-- **Functions Directory**: `netlify/functions/`
-- **Public Directory**: `netlify/public/`
-- **Environment Variables**: Set in Netlify dashboard
-
-### Dependencies
-- **Node.js**: Server-side JavaScript runtime
-- **NPM Packages**: Listed in package.json
-- **External APIs**: Google Sheets, Google Maps, Gmail SMTP
-
-## GitHub Deployment
-
-**Important**: Do **NOT** push `node_modules/` to GitHub. The `node_modules` folder should always be included in your `.gitignore` file because:
-
-1. **Size**: node_modules can be extremely large (hundreds of MBs or GBs)
-2. **Redundancy**: Anyone can recreate it by running `npm install`
-3. **Platform differences**: Some packages have platform-specific binaries
-4. **Repository bloat**: It makes your repo unnecessarily large and slow
-
-Instead:
-- Keep your `package.json` and `package-lock.json` files committed
-- Let Netlify run `npm install` during deployment (which it does automatically)
-- Your `.gitignore` should include `node_modules/`
-
-## Troubleshooting
-
-### Common Issues
-1. **Address Autocomplete Not Working**: Check Google Maps API key and restrictions
-2. **Form Submission Failing**: Verify environment variables and API credentials
-3. **PDF Generation Errors**: Ensure template files exist and have fillable fields
-4. **Email Delivery Issues**: Check Gmail app password and SMTP settings
-
-### Debug Tools
-- **Template Analyzer**: Use `analyze-templates.js` to inspect PDF structure
-- **Console Logging**: Comprehensive logs in browser and Netlify Functions
-- **Error Messages**: User-friendly validation feedback
-
----
-
-*This documentation provides a complete technical overview of the WareWorks Application Form System. For implementation details, refer to the individual source code files.*
+Private - WareWorks Internal Use Only

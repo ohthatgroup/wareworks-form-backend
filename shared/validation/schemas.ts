@@ -1,0 +1,122 @@
+import { z } from 'zod'
+
+export const applicationSchema = z.object({
+  submissionId: z.string(),
+  
+  // Personal Information
+  legalFirstName: z.string().min(1, 'First name is required'),
+  middleInitial: z.string().optional(),
+  legalLastName: z.string().min(1, 'Last name is required'),
+  otherLastNames: z.string().optional(),
+  dateOfBirth: z.string().min(1, 'Date of birth is required'),
+  socialSecurityNumber: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, 'Invalid SSN format'),
+  
+  // Contact Information
+  streetAddress: z.string().min(1, 'Street address is required'),
+  aptNumber: z.string().optional(),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().length(2, 'State must be 2 characters'),
+  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
+  phoneNumber: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid phone format'),
+  homePhone: z.string().optional(),
+  cellPhone: z.string().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+  
+  // Emergency Contact
+  emergencyName: z.string().min(1, 'Emergency contact name is required'),
+  emergencyPhone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid emergency contact phone format'),
+  emergencyRelationship: z.string().min(1, 'Emergency contact relationship is required'),
+  
+  // Work Authorization
+  citizenshipStatus: z.string().min(1, 'Citizenship status is required'),
+  workAuthorization: z.string().optional(),
+  uscisANumber: z.string().optional(),
+  workAuthExpiration: z.string().optional(),
+  alienDocumentType: z.string().optional(),
+  alienDocumentNumber: z.string().optional(),
+  documentCountry: z.string().optional(),
+  
+  // Basic Eligibility
+  age18: z.string().min(1, 'Age verification is required'),
+  transportation: z.string().min(1, 'Transportation question is required'),
+  workAuthorizationConfirm: z.string().min(1, 'Work authorization confirmation is required'),
+  
+  // Position & Experience
+  positionApplied: z.string().min(1, 'Position applied for is required'),
+  expectedSalary: z.string().optional(),
+  jobDiscovery: z.string().min(1, 'How you discovered this job is required'),
+  
+  // Equipment Experience
+  equipmentSD: z.string().optional(),
+  equipmentSU: z.string().optional(),
+  equipmentSUR: z.string().optional(),
+  equipmentCP: z.string().optional(),
+  equipmentCL: z.string().optional(),
+  equipmentRidingJack: z.string().optional(),
+  
+  // Skills
+  skills1: z.string().optional(),
+  skills2: z.string().optional(),
+  skills3: z.string().optional(),
+  
+  // Work Preferences
+  fullTimeEmployment: z.string().min(1, 'Full-time employment preference is required'),
+  swingShifts: z.string().min(1, 'Swing shift availability is required'),
+  graveyardShifts: z.string().min(1, 'Graveyard shift availability is required'),
+  
+  // Weekly Availability
+  availabilitySunday: z.string().optional(),
+  availabilityMonday: z.string().optional(),
+  availabilityTuesday: z.string().optional(),
+  availabilityWednesday: z.string().optional(),
+  availabilityThursday: z.string().optional(),
+  availabilityFriday: z.string().optional(),
+  availabilitySaturday: z.string().optional(),
+  
+  // Previous Application
+  previouslyApplied: z.string().min(1, 'Previous application question is required'),
+  previousApplicationWhen: z.string().optional(),
+  
+  // Education History
+  education: z.array(z.object({
+    schoolName: z.string().optional(),
+    graduationYear: z.string().optional(),
+    fieldOfStudy: z.string().optional(),
+    degreeReceived: z.string().optional()
+  })).optional(),
+  
+  // Employment History
+  employment: z.array(z.object({
+    companyName: z.string().optional(),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    startingPosition: z.string().optional(),
+    endingPosition: z.string().optional(),
+    supervisorName: z.string().optional(),
+    supervisorPhone: z.string().optional(),
+    responsibilities: z.string().optional(),
+    reasonForLeaving: z.string().optional(),
+    mayContact: z.string().optional()
+  })).optional(),
+  
+  // Documents
+  documents: z.array(z.object({
+    type: z.enum(['identification', 'resume', 'certification']),
+    name: z.string(),
+    size: z.number(),
+    mimeType: z.string(),
+    data: z.string()
+  })).optional(),
+  
+  // Metadata
+  language: z.string().optional(),
+  ipAddress: z.string().optional(),
+  userAgent: z.string().optional(),
+  submittedAt: z.string()
+})
+
+export type ValidatedApplicationData = z.infer<typeof applicationSchema>
+
+export function validateApplication(data: unknown) {
+  return applicationSchema.safeParse(data)
+}

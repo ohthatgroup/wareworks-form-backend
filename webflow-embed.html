@@ -1,0 +1,214 @@
+<!-- 
+WareWorks Application Form - Webflow Embed Code
+Copy this code into your Webflow embed element
+-->
+
+<div id="wareworks-application-embed" style="width: 100%; min-height: 600px;">
+  <!-- Language Selection Disclaimer -->
+  <div id="language-disclaimer" style="
+    max-width: 600px; 
+    margin: 0 auto; 
+    padding: 2rem; 
+    text-align: center; 
+    background: #f8f9fa; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  ">
+    <h2 style="
+      font-family: 'Bricolage Grotesque', sans-serif; 
+      color: #131f5b; 
+      margin-bottom: 1rem;
+    ">
+      WareWorks Employment Application
+    </h2>
+    
+    <p style="margin-bottom: 2rem; color: #666;">
+      Please select your preferred language to begin your application:
+    </p>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <button onclick="startApplication('en')" style="
+        background: #131f5b;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      " onmouseover="this.style.background='#1e308e'" onmouseout="this.style.background='#131f5b'">
+        🇺🇸 English
+      </button>
+      
+      <button onclick="startApplication('es')" style="
+        background: #131f5b;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      " onmouseover="this.style.background='#1e308e'" onmouseout="this.style.background='#131f5b'">
+        🇪🇸 Español
+      </button>
+    </div>
+    
+    <p style="font-size: 0.9rem; color: #888; margin-top: 1.5rem;">
+      Your application will be processed securely and confidentially.
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div id="application-loading" style="display: none; text-align: center; padding: 3rem;">
+    <div style="
+      width: 40px; 
+      height: 40px; 
+      border: 3px solid #f3f3f3; 
+      border-top: 3px solid #131f5b; 
+      border-radius: 50%; 
+      animation: spin 1s linear infinite; 
+      margin: 0 auto 1rem;
+    "></div>
+    <p style="color: #666;">Loading application...</p>
+  </div>
+
+  <!-- Application Container -->
+  <div id="application-container" style="display: none; width: 100%; min-height: 600px;">
+    <!-- The standalone application will be loaded here -->
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap');
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  // Configuration
+  const CONFIG = {
+    // Use localhost for development, replace with your actual Netlify URL when deployed
+    FORM_APP_URL: window.location.hostname === 'localhost' || window.location.hostname.includes('webflow.io') 
+      ? 'http://localhost:3000' 
+      : 'https://wareworks-backend.netlify.app', // Your actual Netlify URL
+    ANALYTICS_ID: 'G-XXXXXXXXXX', // Replace with your GA4 ID
+    WEBFLOW_DOMAIN: window.location.hostname
+  };
+
+  // Analytics tracking
+  function trackEvent(eventName, parameters = {}) {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', eventName, {
+        ...parameters,
+        source: 'webflow_embed',
+        webflow_domain: CONFIG.WEBFLOW_DOMAIN
+      });
+    }
+  }
+
+  // Start application with language selection
+  window.startApplication = function(language = 'en') {
+    console.log('Starting WareWorks application in language:', language);
+    
+    // Track application start
+    trackEvent('application_start', {
+      language: language,
+      referrer: CONFIG.WEBFLOW_DOMAIN
+    });
+    
+    // Hide disclaimer, show loading
+    document.getElementById('language-disclaimer').style.display = 'none';
+    document.getElementById('application-loading').style.display = 'block';
+    
+    // Build application URL with parameters
+    const url = new URL(CONFIG.FORM_APP_URL);
+    url.searchParams.set('lang', language);
+    url.searchParams.set('source', 'webflow');
+    url.searchParams.set('referrer', CONFIG.WEBFLOW_DOMAIN);
+    
+    // Add UTM parameters if present
+    const urlParams = new URLSearchParams(window.location.search);
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(param => {
+      if (urlParams.has(param)) {
+        url.searchParams.set(param, urlParams.get(param));
+      }
+    });
+    
+    // Redirect to standalone application
+    setTimeout(() => {
+      window.location.href = url.toString();
+    }, 500);
+  };
+
+  // Alternative: Load application in iframe (if you prefer embedded approach)
+  window.loadApplicationEmbed = function(language = 'en') {
+    const container = document.getElementById('application-container');
+    const loading = document.getElementById('application-loading');
+    const disclaimer = document.getElementById('language-disclaimer');
+    
+    // Hide disclaimer and loading, show container
+    disclaimer.style.display = 'none';
+    loading.style.display = 'none';
+    container.style.display = 'block';
+    
+    // Create iframe
+    const iframe = document.createElement('iframe');
+    iframe.src = `${CONFIG.FORM_APP_URL}?lang=${language}&embed=true&source=webflow`;
+    iframe.style.width = '100%';
+    iframe.style.minHeight = '600px';
+    iframe.style.border = 'none';
+    iframe.style.borderRadius = '8px';
+    
+    // Handle iframe messages for height adjustment
+    window.addEventListener('message', function(event) {
+      if (event.origin === new URL(CONFIG.FORM_APP_URL).origin) {
+        if (event.data.type === 'resize') {
+          iframe.style.height = event.data.height + 'px';
+        }
+        if (event.data.type === 'application_complete') {
+          trackEvent('application_complete', event.data.details);
+        }
+      }
+    });
+    
+    container.appendChild(iframe);
+  };
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('WareWorks application embed initialized');
+    });
+  }
+})();
+</script>
+
+<!-- 
+INSTRUCTIONS FOR WEBFLOW:
+
+1. Create a new page or section for the application
+2. Add an HTML Embed element
+3. Paste this entire code into the embed element
+4. Update CONFIG.FORM_APP_URL to your actual Netlify domain
+5. Update CONFIG.ANALYTICS_ID to your Google Analytics ID
+6. Publish your Webflow site
+
+CUSTOMIZATION:
+- Modify styles to match your Webflow theme
+- Update button colors to match WareWorks branding
+- Add additional tracking events as needed
+- Customize the disclaimer text for your requirements
+
+TESTING:
+- Test both language options
+- Verify analytics tracking
+- Check mobile responsiveness
+- Test with UTM parameters
+-->

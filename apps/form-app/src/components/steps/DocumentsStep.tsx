@@ -1,0 +1,204 @@
+import { useState } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { Upload, X, Eye, Download } from 'lucide-react'
+
+interface DocumentsStepProps {
+  form: UseFormReturn<ValidatedApplicationData>
+  isSubmitting: boolean
+}
+
+export function DocumentsStep({ form }: DocumentsStepProps) {
+  const { register, formState: { errors }, setValue, watch } = form
+  const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File[]}>({})
+  const documents = watch('documents') || []
+
+  const handleFileUpload = (type: string, files: FileList) => {
+    const fileArray = Array.from(files)
+    const newFiles = { ...uploadedFiles }
+    
+    if (!newFiles[type]) {
+      newFiles[type] = []
+    }
+    
+    newFiles[type] = [...newFiles[type], ...fileArray]
+    setUploadedFiles(newFiles)
+    
+    // Update form with all documents
+    const allDocuments = Object.values(newFiles).flat()
+    setValue('documents', allDocuments)
+  }
+
+  const removeFile = (type: string, index: number) => {
+    const newFiles = { ...uploadedFiles }
+    newFiles[type].splice(index, 1)
+    
+    if (newFiles[type].length === 0) {
+      delete newFiles[type]
+    }
+    
+    setUploadedFiles(newFiles)
+    
+    // Update form with remaining documents
+    const allDocuments = Object.values(newFiles).flat()
+    setValue('documents', allDocuments)
+  }
+
+  const previewFile = (file: File) => {
+    if (file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file)
+      window.open(url, '_blank')
+    } else if (file.type === 'application/pdf') {
+      const url = URL.createObjectURL(file)
+      window.open(url, '_blank')
+    }
+  }
+
+  const renderFileList = (type: string, files: File[]) => {
+    return (
+      <div className="mt-3 space-y-2">
+        {files.map((file, index) => (
+          <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded border">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                <span className="text-white text-xs font-medium">{file.name.split('.').pop()?.toUpperCase()}</span>
+              </div>
+              <div>
+                <p className="font-medium text-sm">{file.name}</p>
+                <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => previewFile(file)}
+                className="text-primary hover:text-primary-dark p-1"
+                title="Preview"
+              >
+                <Eye size={16} />
+              </button>
+              <a
+                href={URL.createObjectURL(file)}
+                download={file.name}
+                className="text-primary hover:text-primary-dark p-1"
+                title="Download"
+              >
+                <Download size={16} />
+              </a>
+              <button
+                type="button"
+                onClick={() => removeFile(type, index)}
+                className="text-red-600 hover:text-red-800 p-1"
+                title="Remove"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 className="font-medium text-green-900 mb-2">Required Documents</h3>
+        <p className="text-sm text-green-800">
+          Please upload the following documents to complete your application. All files must be in PDF, JPG, or PNG format and under 10MB.
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        {/* Government ID */}
+        <div>
+          <label className="form-label">
+            Government-Issued Photo ID <span className="text-red-500">*</span>
+          </label>
+          <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+            <div className="mt-4">
+              <label htmlFor="id-upload" className="cursor-pointer">
+                <span className="btn-primary inline-block">Choose File</span>
+                <input
+                  id="id-upload"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="sr-only"
+                  onChange={(e) => e.target.files && handleFileUpload('id', e.target.files)}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Driver's License, Passport, or State ID (PDF, JPG, PNG up to 10MB)
+            </p>
+          </div>
+          {uploadedFiles['id'] && renderFileList('id', uploadedFiles['id'])}
+        </div>
+
+        {/* Resume */}
+        <div>
+          <label className="form-label">
+            Resume/CV
+          </label>
+          <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+            <div className="mt-4">
+              <label htmlFor="resume-upload" className="cursor-pointer">
+                <span className="btn-secondary inline-block">Choose File</span>
+                <input
+                  id="resume-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="sr-only"
+                  onChange={(e) => e.target.files && handleFileUpload('resume', e.target.files)}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Your current resume (PDF, DOC, DOCX up to 10MB)
+            </p>
+          </div>
+          {uploadedFiles['resume'] && renderFileList('resume', uploadedFiles['resume'])}
+        </div>
+
+        {/* Certifications */}
+        <div>
+          <label className="form-label">
+            Certifications & Licenses <span className="text-red-500">*</span>
+          </label>
+          <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+            <div className="mt-4">
+              <label htmlFor="cert-upload" className="cursor-pointer">
+                <span className="btn-primary inline-block">Choose Files</span>
+                <input
+                  id="cert-upload"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  multiple
+                  className="sr-only"
+                  onChange={(e) => e.target.files && handleFileUpload('certifications', e.target.files)}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
+              Professional certifications, licenses, or training certificates
+            </p>
+          </div>
+          {uploadedFiles['certifications'] && renderFileList('certifications', uploadedFiles['certifications'])}
+        </div>
+      </div>
+
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <h3 className="font-medium text-gray-900 mb-2">File Requirements</h3>
+        <ul className="text-sm text-gray-700 space-y-1">
+          <li>• Accepted formats: PDF, JPG, JPEG, PNG</li>
+          <li>• Maximum file size: 10MB per file</li>
+          <li>• Documents must be clear and legible</li>
+          <li>• Personal information must be visible</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
