@@ -6,71 +6,137 @@ Copy this code into your Webflow embed element
 <div id="wareworks-application-embed" style="width: 100%; min-height: 600px;">
   <!-- Language Selection Disclaimer -->
   <div id="language-disclaimer" style="
-    max-width: 600px; 
-    margin: 0 auto; 
-    padding: 2rem; 
+    background: white; 
+    border-radius: 0.75rem; 
+    padding: 2.5rem; 
     text-align: center; 
-    background: #f8f9fa; 
-    border-radius: 8px; 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); 
+    margin-bottom: 1.25rem; 
+    max-width: 50rem; 
+    margin: 0 auto 1.25rem;
+    font-family: 'Figtree', sans-serif;
   ">
     <h2 style="
-      font-family: 'Bricolage Grotesque', sans-serif; 
       color: #131f5b; 
-      margin-bottom: 1rem;
+      margin-bottom: 0.625rem; 
+      font-family: 'Bricolage Grotesque', sans-serif; 
+      font-size: 1.75rem;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.04em;
+      margin-bottom: 0.35em;
     ">
-      WareWorks Employment Application
+      Welcome to WareWorks
     </h2>
+    <h3 style="
+      color: #666; 
+      margin-bottom: 1.875rem; 
+      font-family: 'Bricolage Grotesque', sans-serif; 
+      font-size: 1.5rem; 
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.04em;
+      margin-bottom: 0.7em;
+    ">
+      Bienvenido a WareWorks
+    </h3>
     
-    <p style="margin-bottom: 2rem; color: #666;">
-      Please select your preferred language to begin your application:
-    </p>
-    
-    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <button onclick="loadApplicationEmbed('en')" style="
-        background: #131f5b;
-        color: white;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-      " onmouseover="this.style.background='#1e308e'" onmouseout="this.style.background='#131f5b'">
-        🇺🇸 English
-      </button>
-      
-      <button onclick="loadApplicationEmbed('es')" style="
-        background: #131f5b;
-        color: white;
-        border: none;
-        padding: 1rem 2rem;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-      " onmouseover="this.style.background='#1e308e'" onmouseout="this.style.background='#131f5b'">
-        🇪🇸 Español
-      </button>
+    <div style="
+      text-align: left; 
+      margin-bottom: 1.875rem; 
+      line-height: 1.6; 
+      background: #eff1f7; 
+      padding: 1.25rem; 
+      border-radius: 0.5rem;
+    ">
+      <p style="
+        margin-bottom: 0.9375rem; 
+        font-size: 0.88rem;
+        font-family: 'Figtree', sans-serif;
+        line-height: 1.6em;
+        color: #080c24;
+      ">
+        <strong>English:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws.
+      </p>
+      <p style="
+        margin-bottom: 0; 
+        font-size: 0.88rem;
+        font-family: 'Figtree', sans-serif;
+        line-height: 1.6em;
+        color: #080c24;
+      ">
+        <strong>Español:</strong> Al continuar, usted reconoce que la información que proporcione será utilizada para fines de empleo y se mantendrá confidencial de acuerdo con las leyes aplicables.
+      </p>
     </div>
     
-    <p style="font-size: 0.9rem; color: #888; margin-top: 1.5rem;">
-      Your application will be processed securely and confidentially.
+    <p style="
+      margin-bottom: 1.5625rem; 
+      color: #666; 
+      font-size: 1rem;
+      font-family: 'Figtree', sans-serif;
+      line-height: 1.6em;
+    ">
+      Please select your preferred language:
     </p>
+    <div class="button-container" style="display: flex; gap: 0.9375rem; justify-content: center; flex-wrap: wrap;">
+      <button onclick="loadApplicationEmbed('en')" style="
+        background: #131f5b; 
+        color: white; 
+        border: none; 
+        padding: 1em 1.5em; 
+        border-radius: 0.25rem; 
+        cursor: pointer; 
+        font-size: 1rem; 
+        min-width: 12.5rem; 
+        transition: all 0.2s ease;
+        font-family: 'Figtree', sans-serif;
+        font-weight: 400;
+      " onmouseover="this.style.background='#1e308e'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#131f5b'; this.style.transform='none'">
+        Accept & Continue in English
+      </button>
+      <button onclick="loadApplicationEmbed('es')" style="
+        background: #131f5b; 
+        color: white; 
+        border: none; 
+        padding: 1em 1.5em; 
+        border-radius: 0.25rem; 
+        cursor: pointer; 
+        font-size: 1rem; 
+        min-width: 12.5rem; 
+        transition: all 0.2s ease;
+        font-family: 'Figtree', sans-serif;
+        font-weight: 400;
+      " onmouseover="this.style.background='#1e308e'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#131f5b'; this.style.transform='none'">
+        Aceptar y Continuar en Español
+      </button>
+    </div>
   </div>
 
   <!-- Loading State -->
-  <div id="application-loading" style="display: none; text-align: center; padding: 3rem;">
+  <div id="application-loading" style="
+    display: none; 
+    text-align: center; 
+    padding: 3rem;
+    font-family: 'Figtree', sans-serif;
+  ">
     <div style="
-      width: 40px; 
-      height: 40px; 
-      border: 3px solid #f3f3f3; 
-      border-top: 3px solid #131f5b; 
+      width: 2.5rem; 
+      height: 2.5rem; 
+      border: 0.25rem solid #eff1f7; 
+      border-top: 0.25rem solid #131f5b; 
       border-radius: 50%; 
       animation: spin 1s linear infinite; 
       margin: 0 auto 1rem;
     "></div>
-    <p style="color: #666;">Loading application...</p>
+    <p style="
+      color: #666; 
+      font-size: 1rem;
+      font-family: 'Figtree', sans-serif;
+      line-height: 1.6em;
+      margin: 0;
+    ">
+      Loading application...
+    </p>
   </div>
 
   <!-- Application Container -->
@@ -86,6 +152,40 @@ Copy this code into your Webflow embed element
   }
   
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap');
+  
+  /* Responsive styles following style guide breakpoints */
+  @media (max-width: 768px) {
+    #language-disclaimer {
+      margin: 0 1rem 1.25rem !important;
+      padding: 1.5rem !important;
+    }
+    
+    #language-disclaimer h2 {
+      font-size: 1.52rem !important;
+    }
+    
+    #language-disclaimer h3 {
+      font-size: 1.3rem !important;
+    }
+    
+    #language-disclaimer .button-container {
+      flex-direction: column !important;
+    }
+    
+    #language-disclaimer button {
+      min-width: 100% !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    #language-disclaimer h2 {
+      font-size: 1.21rem !important;
+    }
+    
+    #language-disclaimer h3 {
+      font-size: 1.2rem !important;
+    }
+  }
 </style>
 
 <script>

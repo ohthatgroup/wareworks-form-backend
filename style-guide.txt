@@ -1,0 +1,255 @@
+## Style Guide: Wareworks.me
+
+This style guide outlines the foundational design tokens and component-specific styles for the Wareworks.me website.
+
+### I. Foundations
+
+#### [cite_start]A. Colors [cite: 5]
+
+* **Core Accent Colors**
+    * [cite_start]Accent Primary: `#131f5b` [cite: 5]
+    * [cite_start]Accent Primary H... (Hover): `#1e308e` [cite: 5]
+    * [cite_start]Accent Secondary: `#eff1f7` [cite: 5]
+    * [cite_start]Accent Secondary... (Hover): `white` [cite: 5]
+    * [cite_start]Accent Tertiary: `#f2e9d1` [cite: 5]
+    * [cite_start]Accent Tertiary H... (Hover): `white` [cite: 5]
+* **Core Neutral Colors**
+    * [cite_start]Neutral Primary: `white` [cite: 5]
+    * [cite_start]Neutral Secondary: `#f5f4f1` [cite: 5]
+    * [cite_start]Neutral Inverse: `#080c24` [cite: 5]
+
+#### [cite_start]B. Typography [cite: 6]
+
+* **Fonts**
+    * [cite_start]Heading Font: `Bricolage Grotesque` [cite: 6]
+    * [cite_start]Body Font: `Figtree` [cite: 6]
+    * [cite_start]Button Font: `Figtree` [cite: 6]
+* **Base Typography**
+    * [cite_start]Base Font: `Body Font` [cite: 6]
+    * [cite_start]Base Font Size: `1rem` [cite: 6]
+    * [cite_start]Base Font Weight: `400` [cite: 6]
+    * [cite_start]Base Letter Spacing: `0em` [cite: 6]
+    * [cite_start]Base Line Height: `1.6rem` [cite: 6]
+    * [cite_start]Base Margin Bott (Bottom): `0.7em` [cite: 6]
+* **Headings**
+    * **H0 Heading**
+        * [cite_start]H0 Size: `5.61rem` [cite: 1]
+        * [cite_start]H0 Size [Tablet]: `4.49rem` [cite: 1]
+        * [cite_start]H0 Size [Mobile L]: `3.50rem` [cite: 1]
+        * [cite_start]H0 Size [Mobile P]: `2.87rem` [cite: 1]
+        * [cite_start]H0 Letter Spacing: `-0.01em` [cite: 1]
+        * [cite_start]H0 Line Height: `1.04em` [cite: 1]
+        * [cite_start]H0 Weight: `400` [cite: 1]
+        * [cite_start]H0 Margin Bottom: `0.3em` [cite: 1]
+    * **H1 Heading**
+        * [cite_start]H1 Size: `4.21rem` [cite: 1]
+        * [cite_start]H1 Size [Tablet]: `3.37rem` [cite: 1]
+        * [cite_start]H1 Size [Mobile L]: `2.69rem` [cite: 1]
+        * [cite_start]H1 Size [Mobile P]: `2.15rem` [cite: 1]
+        * [cite_start]H1 Letter Spacing: `-0.01em` [cite: 1]
+        * [cite_start]H1 Line Height: `1.04em` [cite: 1]
+        * [cite_start]H1 Weight: `400` [cite: 1]
+        * [cite_start]H1 Margin Bottom: `0.3em` [cite: 1]
+    * **H2 Heading**
+        * [cite_start]H2 Size: `2.37rem` [cite: 1]
+        * [cite_start]H2 Size [Tablet]: `1.89rem` [cite: 1]
+        * [cite_start]H2 Size [Mobile L]: `1.52rem` [cite: 1]
+        * [cite_start]H2 Size [Mobile P]: `1.21rem` [cite: 1]
+        * [cite_start]H2 Letter Spacing: `-0.01em` [cite: 1]
+        * [cite_start]H2 Line Height: `1.04em` [cite: 1]
+        * [cite_start]H2 Weight: `400` [cite: 1]
+        * [cite_start]H2 Margin Bottom: `0.35em` [cite: 1]
+    * **H3 Heading**
+        * [cite_start]H3 Size: `1.78rem` [cite: 1]
+        * [cite_start]H3 Size [Tablet]: `1.42rem` [cite: 1]
+        * [cite_start]H3 Size [Mobile L]: `1.14rem` [cite: 1]
+        * [cite_start]H3 Size [Mobile P]: `0.91rem` [cite: 1]
+        * [cite_start]H3 Letter Spacing: `-0.01em` [cite: 1]
+        * [cite_start]H3 Line Height: `1.04em` [cite: 1]
+        * [cite_start]H3 Weight: `400` [cite: 1]
+        * [cite_start]H3 Margin Bottom: `0.7em` [cite: 1]
+    * **H4 Heading**
+        * [cite_start]H4 Size: `1.33rem` [cite: 8]
+        * [cite_start]H4 Size [Tablet]: `1.2rem` [cite: 8]
+        * [cite_start]H4 Size [Mobile L]: `1.08rem` [cite: 8]
+        * [cite_start]H4 Size [Mobile P]: `0.97rem` [cite: 8]
+        * [cite_start]H4 Letter Spacing: `-0.01em` [cite: 8]
+        * [cite_start]H4 Line Height: `1.3em` [cite: 8]
+        * [cite_start]H4 Weight: `400` [cite: 8]
+        * [cite_start]H4 Margin Bottom: `0.5em` [cite: 8]
+    * **H5 Heading**
+        * [cite_start]H5 Size: `1rem` [cite: 8]
+        * [cite_start]H5 Size [Tablet]: `1rem` [cite: 8]
+        * [cite_start]H5 Size [Mobile L]: `1rem` [cite: 8]
+        * [cite_start]H5 Size [Mobile P]: `1rem` [cite: 8]
+        * [cite_start]H5 Letter Spacing: `0em` [cite: 8]
+        * [cite_start]H5 Line Height: `1.3em` [cite: 8]
+        * [cite_start]H5 Weight: `400` [cite: 8]
+        * [cite_start]H5 Margin Bottom: `0.7em` [cite: 8]
+    * **H6 Heading**
+        * [cite_start]H6 Size: `0.75rem` [cite: 8]
+        * [cite_start]H6 Size [Tablet]: `0.75rem` [cite: 8]
+        * [cite_start]H6 Size [Mobile L]: `0.75rem` [cite: 8]
+        * [cite_start]H6 Size [Mobile P]: `0.75rem` [cite: 8]
+        * [cite_start]H6 Letter Spacing: `0.1em` [cite: 8]
+        * [cite_start]H6 Line Height: `1.3em` [cite: 8]
+        * [cite_start]H6 Weight: `400` [cite: 8]
+        * [cite_start]H6 Margin Bottom: `0.7em` [cite: 8]
+* **Text Sizes**
+    * **Text (Default)**
+        * [cite_start]Text Size: `1rem` [cite: 3]
+        * [cite_start]Text Size [Tablet]: `1rem` [cite: 3]
+        * [cite_start]Text Size [Mobile L]: `1rem` [cite: 3]
+        * [cite_start]Text Size [Mobile P]: `1rem` [cite: 3]
+        * [cite_start]Text Letter Spacing: `0em` [cite: 3]
+        * [cite_start]Text Line Height: `1.6em` [cite: 3]
+    * **Text LG**
+        * [cite_start]LG Text Size: `1.13rem` [cite: 3]
+        * [cite_start]LG Text Size [Tablet]: `1.13rem` [cite: 3]
+        * [cite_start]LG Text Size [Mobile L]: `1.1rem` [cite: 3]
+        * [cite_start]LG Text Size [Mobile P]: `1.1rem` [cite: 3]
+        * [cite_start]LG Text Letter Spacing: `0em` [cite: 3]
+        * [cite_start]LG Text Line Height: `1.6em` [cite: 3]
+    * **Text XL**
+        * [cite_start]XL Text Size: `1.5rem` [cite: 3]
+        * [cite_start]XL Text Size [Tablet]: `1.4rem` [cite: 3]
+        * [cite_start]XL Text Size [Mobile L]: `1.3rem` [cite: 3]
+        * [cite_start]XL Text Size [Mobile P]: `1.2rem` [cite: 3]
+        * [cite_start]XL Text Letter Spacing: `0em` [cite: 3]
+        * [cite_start]XL Text Line Height: `1.6em` [cite: 3]
+    * **Text XXL**
+        * [cite_start]XXL Text Size: `2rem` [cite: 3]
+        * [cite_start]XXL Text Size [Tablet]: `1.8rem` [cite: 3]
+        * [cite_start]XXL Text Size [Mobile L]: `1.6rem` [cite: 3]
+        * [cite_start]XXL Text Size [Mobile P]: `1.4rem` [cite: 3]
+        * [cite_start]XXL Text Letter Spacing: `0em` [cite: 3]
+        * [cite_start]XXL Text Line Height: `1.6em` [cite: 3]
+    * **Text SM**
+        * [cite_start]SM Text Size: `0.88rem` [cite: 8]
+        * [cite_start]SM Text Size [Tablet]: `0.88rem` [cite: 8]
+        * [cite_start]SM Text Size [Mobile L]: `0.88rem` [cite: 8]
+        * [cite_start]SM Text Size [Mobile P]: `0.88rem` [cite: 8]
+        * [cite_start]SM Text Letter Spacing: `0em` [cite: 8]
+        * [cite_start]SM Text Line Hei (Height): `1.6em` [cite: 8]
+
+#### C. Spacing
+
+* [cite_start]**Gap (used for grid and flex layouts)** [cite: 6]
+    * [cite_start]XXS Gap: `0.5x` [cite: 6]
+    * [cite_start]XS Gap: `1x` [cite: 6]
+    * [cite_start]SM Gap: `2x` [cite: 6]
+    * [cite_start]MD Gap: `3x` [cite: 6]
+    * [cite_start]LG Gap: `4x` [cite: 6]
+    * [cite_start]XL Gap: `5x` [cite: 6]
+    * [cite_start]XXL Gap: `6x` [cite: 6]
+* **Radius**
+    * SM Radius: `0.25rem`
+    * MD Radius: `0.5rem`
+    * LG Radius: `0.75rem`
+    * XL Radius: `1rem`
+    * Round: `100rem`
+* **General Spacing Values**
+    * `0.25x`: `0.25rem`
+    * `0.5x`: `0.5rem`
+    * `0.75x`: `0.75rem`
+    * `1x`: `1rem`
+    * `1.25x`: `1.25rem`
+    * `1.5x`: `1.5rem`
+    * `1.75x`: `1.75rem`
+    * `2x`: `2rem`
+    * `3x`: `3rem`
+    * `4x`: `4rem`
+    * `5x`: `5rem`
+    * `6x`: `6rem`
+    * `7x`: `7rem`
+    * `8x`: `8rem`
+
+### II. Components
+
+#### [cite_start]A. Button [cite: 4, 7]
+
+* [cite_start]Button Radius: `0.25rem` [cite: 4, 7]
+* [cite_start]Button Padding V (Vertical): `1em` [cite: 4, 7]
+* [cite_start]Button Padding H (Horizontal): `1.5em` [cite: 4, 7]
+* [cite_start]Button Font: `Button Font` [cite: 4, 7]
+* [cite_start]Button Size: `Base Font Size` [cite: 4, 7]
+* **Button Primary**
+    * [cite_start]Background: `Accent Primary` [cite: 4, 7]
+    * [cite_start]Hover Background: `Accent Primary Hover` [cite: 4, 7]
+    * [cite_start]Text: `Text On Accent Primary` [cite: 4, 7]
+    * [cite_start]Border: `transparent` [cite: 4, 7]
+    * [cite_start]Hover Border: `transparent` [cite: 4, 7]
+* **Button Secondary**
+    * [cite_start]Background: `transparent` [cite: 4, 7]
+    * [cite_start]Hover Background: `transparent` [cite: 4, 7]
+    * [cite_start]Text: `Text Primary` [cite: 4, 7]
+    * [cite_start]Border: `transparent` [cite: 4, 7]
+    * [cite_start]Hover Border: `transparent` [cite: 4, 7]
+
+#### [cite_start]B. Input [cite: 4, 7]
+
+* [cite_start]Input Radius: `0.25rem` [cite: 4, 7]
+* [cite_start]Input Padding Ve (Vertical): `1x` [cite: 4, 7]
+* [cite_start]Input Padding Ho (Horizontal): `1x` [cite: 4, 7]
+* **Input Primary**
+    * [cite_start]Background: `transparent` [cite: 4, 7]
+    * [cite_start]Border: `transparent` [cite: 4, 7]
+    * [cite_start]Text: `Text Primary` [cite: 4, 7]
+    * [cite_start]Placehol... (Placeholder): `Neutral Inverse A20` [cite: 4, 7]
+    * [cite_start]Border Foc... (Border Focus): `Text Primary` [cite: 4, 7]
+    * [cite_start]Text Foc... (Text Focus): `Text Primary` [cite: 4, 7]
+* **Input Inverse**
+    * [cite_start]Background: `transparent` [cite: 4, 7]
+    * [cite_start]Border: `transparent` [cite: 4, 7]
+    * [cite_start]Text: `Text Inverse Primary` [cite: 4, 7]
+    * [cite_start]Placehol... (Placeholder): `Neutral Primary A20` [cite: 4, 7]
+    * [cite_start]Border Foc... (Border Focus): `Text Inverse Primary` [cite: 4, 7]
+    * [cite_start]Text Foc... (Text Focus): `Text Inverse Primary` [cite: 4, 7]
+* **Input Control**
+    * [cite_start]Border: `Accent Primary` [cite: 7]
+    * [cite_start]Background: `Accent Primary` [cite: 7]
+
+#### [cite_start]C. Card [cite: 2]
+
+* [cite_start]Card Radius: `0.5rem` [cite: 2]
+* [cite_start]Card Padding: `3x` [cite: 2]
+* [cite_start]Card Padding [Ta...]: `2x` [cite: 2]
+* [cite_start]Card Padding [M...]: `1.5x` [cite: 2]
+* [cite_start]Card Padding [M...]: `1.5x` [cite: 2]
+* **Card Primary**
+    * [cite_start]Background: `BG Primary` [cite: 2]
+    * [cite_start]Border: `BG Primary` [cite: 2]
+    * [cite_start]Text: `Text Primary` [cite: 2]
+    * [cite_start]Border Ho... (Hover): `Border Secondary` [cite: 2]
+* **Card Secondary**
+    * [cite_start]Background: `BG Secondary` [cite: 2]
+    * [cite_start]Border: `BG Secondary` [cite: 2]
+    * [cite_start]Text: `Text Primary` [cite: 2]
+    * [cite_start]Border Ho... (Hover): `Border Secondary` [cite: 2]
+* **Card Accent Primary**
+    * [cite_start]Background: `BG Accent Primary` [cite: 2]
+    * [cite_start]Border: `BG Accent Primary` [cite: 2]
+    * [cite_start]Text: `white` [cite: 2]
+    * [cite_start]Border Ho... (Hover): `transparent` [cite: 2]
+* **Card Accent Secondary**
+    * [cite_start]Background: `BG Accent Secondary` [cite: 2]
+    * [cite_start]Border: `BG Accent Secondary` [cite: 2]
+    * [cite_start]Text: `white` [cite: 2]
+    * [cite_start]Border Ho... (Hover): `transparent` [cite: 2]
+* **Card Accent Tertiary**
+    * [cite_start]Background: `BG Accent Tertiary` [cite: 2]
+    * [cite_start]Border: `BG Accent Tertiary` [cite: 2]
+    * [cite_start]Text: `transparent` [cite: 2]
+    * [cite_start]Border Ho... (Hover): `transparent` [cite: 2]
+* **Card Inverse**
+    * [cite_start]Background: `BG Inverse` [cite: 2]
+    * [cite_start]Border: `BG Inverse` [cite: 2]
+    * [cite_start]Text: `Text Inverse Primary` [cite: 2]
+    * [cite_start]Border Ho... (Hover): `transparent` [cite: 2]
+
+#### [cite_start]D. Container [cite: 2]
+
+* [cite_start]Container Width: `1280px` [cite: 2]
+* [cite_start]Container SM Wi (Small Width): `1000px` [cite: 2]
+* [cite_start]Container LG Width: `1440px` [cite: 2]
+* [cite_start]Container Padd... (Padding): `1x` [cite: 2]
