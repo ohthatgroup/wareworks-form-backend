@@ -1,7 +1,7 @@
 [build]
-  base = "apps/form-app"
+  base = "/apps/form-app"
   command = "npm run build"
-  publish = "apps/form-app/.next"
+  publish = "/apps/form-app/.next"
 
 [functions]
   directory = "netlify/functions"
