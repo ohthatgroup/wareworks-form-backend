@@ -75,52 +75,72 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
         
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
             {[
-              { key: 'availabilitySunday', label: 'Sunday', description: 'Available hours for Sunday' },
-              { key: 'availabilityMonday', label: 'Monday', description: 'Available hours for Monday' },
-              { key: 'availabilityTuesday', label: 'Tuesday', description: 'Available hours for Tuesday' },
-              { key: 'availabilityWednesday', label: 'Wednesday', description: 'Available hours for Wednesday' },
-              { key: 'availabilityThursday', label: 'Thursday', description: 'Available hours for Thursday' },
-              { key: 'availabilityFriday', label: 'Friday', description: 'Available hours for Friday' },
-              { key: 'availabilitySaturday', label: 'Saturday', description: 'Available hours for Saturday' }
+              { key: 'availabilitySunday', label: 'Sunday', description: 'Available on Sunday' },
+              { key: 'availabilityMonday', label: 'Monday', description: 'Available on Monday' },
+              { key: 'availabilityTuesday', label: 'Tuesday', description: 'Available on Tuesday' },
+              { key: 'availabilityWednesday', label: 'Wednesday', description: 'Available on Wednesday' },
+              { key: 'availabilityThursday', label: 'Thursday', description: 'Available on Thursday' },
+              { key: 'availabilityFriday', label: 'Friday', description: 'Available on Friday' },
+              { key: 'availabilitySaturday', label: 'Saturday', description: 'Available on Saturday' }
             ].map((day) => {
               const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
-              const hasValue = currentValue && currentValue.trim() !== ''
+              const isSelected = Boolean(currentValue && currentValue.trim() !== '')
               
               return (
                 <div 
                   key={day.key}
                   className={`border rounded-lg p-4 transition-all ${
-                    hasValue 
+                    isSelected 
                       ? 'border-primary bg-primary/5 shadow-sm' 
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <div className="space-y-3">
-                    <div>
+                  <div className="flex items-start space-x-3">
+                    <input
+                      type="checkbox"
+                      id={`${day.key}_checkbox`}
+                      checked={isSelected}
+                      onChange={(e) => {
+                        if (!e.target.checked) {
+                          setValue(day.key as keyof ValidatedApplicationData, '')
+                        } else {
+                          // Set a default value to show the time input field
+                          setValue(day.key as keyof ValidatedApplicationData, ' ')
+                        }
+                      }}
+                      className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
+                    />
+                    <div className="flex-1 min-w-0">
                       <label 
-                        htmlFor={day.key}
-                        className="block text-sm font-medium text-gray-900"
+                        htmlFor={`${day.key}_checkbox`}
+                        className="block text-sm font-medium text-gray-900 cursor-pointer"
                       >
                         {day.label}
                       </label>
                       <p className="text-xs text-gray-600 mt-1">
                         {day.description}
                       </p>
+                      
+                      {/* Availability Time Input */}
+                      {isSelected && (
+                        <div className="mt-3 space-y-1">
+                          <label className="block text-xs font-medium text-gray-700">
+                            Available Hours
+                          </label>
+                          <input
+                            {...register(day.key as keyof ValidatedApplicationData)}
+                            type="text"
+                            className="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:ring-primary focus:border-primary"
+                            placeholder="e.g., 8AM-5PM or Flexible"
+                          />
+                          {errors[day.key as keyof ValidatedApplicationData] && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {errors[day.key as keyof ValidatedApplicationData]?.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    
-                    <input
-                      id={day.key}
-                      {...register(day.key as keyof ValidatedApplicationData)}
-                      type="text"
-                      className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
-                      placeholder="e.g., 8AM-5PM or Not Available"
-                    />
-                    
-                    {errors[day.key as keyof ValidatedApplicationData] && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {errors[day.key as keyof ValidatedApplicationData]?.message}
-                      </p>
-                    )}
                   </div>
                 </div>
               )

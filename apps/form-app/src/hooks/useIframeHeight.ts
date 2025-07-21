@@ -1,16 +1,33 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function useIframeHeight() {
+  const lastHeightRef = useRef<number>(0)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
-    // Function to send height to parent window
+    // Debounced function to send height to parent window
     const sendHeightToParent = () => {
       if (window.parent && window.parent !== window) {
         const height = document.body.scrollHeight
-        window.parent.postMessage({
-          type: 'resize',
-          height: height
-        }, '*')
+        
+        // Only send if height has changed significantly (at least 5px difference)
+        if (Math.abs(height - lastHeightRef.current) > 5) {
+          lastHeightRef.current = height
+          window.parent.postMessage({
+            type: 'resize',
+            height: height
+          }, '*')
+          console.log('Iframe height adjusted to:', height + 'px')
+        }
       }
+    }
+
+    // Debounced version to prevent excessive calls
+    const debouncedSendHeight = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+      timeoutRef.current = setTimeout(sendHeightToParent, 200)
     }
 
     // Send height immediately
@@ -18,27 +35,26 @@ export function useIframeHeight() {
 
     // Send height on window resize
     const handleResize = () => {
-      setTimeout(sendHeightToParent, 100) // Small delay to ensure DOM is updated
+      debouncedSendHeight()
     }
 
     window.addEventListener('resize', handleResize)
 
     // Use ResizeObserver to detect content changes
     const resizeObserver = new ResizeObserver(() => {
-      setTimeout(sendHeightToParent, 100)
+      debouncedSendHeight()
     })
 
     // Observe the document body
     resizeObserver.observe(document.body)
 
-    // Send height periodically to catch any missed changes
-    const interval = setInterval(sendHeightToParent, 1000)
-
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize)
       resizeObserver.disconnect()
-      clearInterval(interval)
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
     }
   }, [])
 }

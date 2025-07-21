@@ -17,13 +17,9 @@ const CITIZENSHIP_OPTIONS = [
 ]
 
 const DOCUMENT_TYPE_OPTIONS = [
-  { value: 'i766', label: 'Form I-766 (Employment Authorization Document)' },
-  { value: 'i94_with_photo', label: 'Form I-94 with photograph' },
-  { value: 'foreign_passport_i551', label: 'Foreign passport with I-551 stamp' },
-  { value: 'foreign_passport_i94', label: 'Foreign passport with I-94 with endorsed stamp' },
-  { value: 'i327', label: 'Form I-327 (Reentry Permit)' },
-  { value: 'i571', label: 'Form I-571 (Refugee Travel Document)' },
-  { value: 'other', label: 'Other acceptable I-9 document' }
+  { value: 'i766', label: 'Employment Authorization Document (Form I-766)' },
+  { value: 'foreign_passport_i94', label: 'Foreign passport with I-94 or I-94A' },
+  { value: 'drivers_license_i94', label: 'Driver\'s license with I-94 or I-94A' }
 ]
 
 export function CitizenshipStep({ form }: CitizenshipStepProps) {

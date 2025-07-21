@@ -161,25 +161,45 @@ export default function ApplicationForm() {
     setIsSubmitting(true)
     
     try {
+      // Add timestamp and submission ID
+      const submissionData = {
+        ...data,
+        submittedAt: new Date().toISOString(),
+        submissionId: `APP-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+      }
+
+      console.log('Submitting application data:', {
+        fields: Object.keys(submissionData).length,
+        submissionId: submissionData.submissionId
+      })
+
       const response = await fetch('/api/submit-application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(submissionData)
       })
 
-      const result = await response.json()
-      
-      if (response.ok) {
-        setSubmissionResult(result)
-        setCurrentStep(STEPS.length) // Go to success step
-      } else {
-        throw new Error(result.error || 'Submission failed')
+      console.log('Response status:', response.status)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('Server response error:', errorText)
+        throw new Error(`Server responded with ${response.status}: ${errorText}`)
       }
+
+      const result = await response.json()
+      console.log('Submission successful:', result)
+      
+      setSubmissionResult(result)
+      setCurrentStep(STEPS.length) // Go to success step
+      
     } catch (error) {
-      console.error('Submission error:', error)
-      alert('Failed to submit application. Please try again.')
+      console.error('Submission error details:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      alert(`Failed to submit application: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }
