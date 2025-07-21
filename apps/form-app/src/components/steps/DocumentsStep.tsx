@@ -13,7 +13,20 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File[]}>({})
   const documents = watch('documents') || []
 
-  const handleFileUpload = (type: string, files: FileList) => {
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result as string
+        const base64 = result.split(',')[1] // Remove data URL prefix
+        resolve(base64)
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const handleFileUpload = async (type: string, files: FileList) => {
     const fileArray = Array.from(files)
     const newFiles = { ...uploadedFiles }
     
@@ -24,12 +37,27 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     newFiles[type] = [...newFiles[type], ...fileArray]
     setUploadedFiles(newFiles)
     
-    // Update form with all documents
-    const allDocuments = Object.values(newFiles).flat()
-    setValue('documents', allDocuments)
+    // Convert all files to schema format
+    const allFiles = Object.values(newFiles).flat()
+    const convertedDocuments = await Promise.all(
+      allFiles.map(async (file) => {
+        const base64Data = await fileToBase64(file)
+        return {
+          type: Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'id' ? 'identification' as const :
+                Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'resume' ? 'resume' as const :
+                'certification' as const,
+          name: file.name,
+          size: file.size,
+          mimeType: file.type,
+          data: base64Data
+        }
+      })
+    )
+    
+    setValue('documents', convertedDocuments)
   }
 
-  const removeFile = (type: string, index: number) => {
+  const removeFile = async (type: string, index: number) => {
     const newFiles = { ...uploadedFiles }
     newFiles[type].splice(index, 1)
     
@@ -39,9 +67,24 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     
     setUploadedFiles(newFiles)
     
-    // Update form with remaining documents
-    const allDocuments = Object.values(newFiles).flat()
-    setValue('documents', allDocuments)
+    // Convert remaining files to schema format
+    const allFiles = Object.values(newFiles).flat()
+    const convertedDocuments = await Promise.all(
+      allFiles.map(async (file) => {
+        const base64Data = await fileToBase64(file)
+        return {
+          type: Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'id' ? 'identification' as const :
+                Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'resume' ? 'resume' as const :
+                'certification' as const,
+          name: file.name,
+          size: file.size,
+          mimeType: file.type,
+          data: base64Data
+        }
+      })
+    )
+    
+    setValue('documents', convertedDocuments)
   }
 
   const previewFile = (file: File) => {
