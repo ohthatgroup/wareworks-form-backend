@@ -30,6 +30,10 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     { key: 'equipmentRidingJack', value: equipmentRidingJack, label: 'Riding Jack' }
   ].filter(equipment => equipment.value === 'certified')
 
+  // Watch for certified skills (this would need to be implemented in the skills component)
+  // For now, this is placeholder for when skills certification is implemented
+  const certifiedSkills: { key: string; value: string; label: string }[] = []
+
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -216,46 +220,21 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           {uploadedFiles['resume'] && renderFileList('resume', uploadedFiles['resume'])}
         </div>
 
-        {/* Certifications */}
-        <div>
-          <label className="form-label">
-            Certifications & Licenses <span className="text-red-500">*</span>
-          </label>
-          <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
-            <Upload className="mx-auto h-12 w-12 text-gray-400" />
-            <div className="mt-4">
-              <label htmlFor="cert-upload" className="cursor-pointer">
-                <span className="btn-primary inline-block">Choose Files</span>
-                <input
-                  id="cert-upload"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  multiple
-                  className="sr-only"
-                  onChange={(e) => e.target.files && handleFileUpload('certifications', e.target.files)}
-                />
-              </label>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Professional certifications, licenses, or training certificates
-            </p>
-          </div>
-          {uploadedFiles['certifications'] && renderFileList('certifications', uploadedFiles['certifications'])}
-        </div>
 
-        {/* Equipment Certifications - Dynamic based on selections */}
-        {certifiedEquipment.length > 0 && (
+        {/* Certifications - Dynamic based on selections */}
+        {(certifiedEquipment.length > 0 || certifiedSkills.length > 0) && (
           <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-primary mb-4">Equipment Certifications</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              You indicated you have certifications for the following equipment. Please upload your certification documents:
+            <h3 className="text-lg font-medium text-primary mb-4">Certifications & Documentation</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              You indicated you have certifications. Please upload your certification documents:
             </p>
             
             <div className="space-y-6">
+              {/* Equipment Certifications */}
               {certifiedEquipment.map((equipment) => (
                 <div key={equipment.key}>
                   <label className="form-label">
-                    {equipment.label} Certification <span className="text-red-500">*</span>
+                    {equipment.label} Certification
                   </label>
                   <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
                     <Upload className="mx-auto h-12 w-12 text-primary" />
@@ -277,6 +256,35 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                     </p>
                   </div>
                   {uploadedFiles[`${equipment.key}-cert`] && renderFileList(`${equipment.key}-cert`, uploadedFiles[`${equipment.key}-cert`])}
+                </div>
+              ))}
+
+              {/* Skills Certifications */}
+              {certifiedSkills.map((skill) => (
+                <div key={skill.key}>
+                  <label className="form-label">
+                    {skill.label} Certification
+                  </label>
+                  <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
+                    <Upload className="mx-auto h-12 w-12 text-primary" />
+                    <div className="mt-4">
+                      <label htmlFor={`${skill.key}-cert-upload`} className="cursor-pointer">
+                        <span className="btn-primary inline-block">Upload Certification</span>
+                        <input
+                          id={`${skill.key}-cert-upload`}
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          multiple
+                          className="sr-only"
+                          onChange={(e) => e.target.files && handleFileUpload(`${skill.key}-cert`, e.target.files)}
+                        />
+                      </label>
+                    </div>
+                    <p className="mt-2 text-sm text-primary">
+                      Documentation for {skill.label}
+                    </p>
+                  </div>
+                  {uploadedFiles[`${skill.key}-cert`] && renderFileList(`${skill.key}-cert`, uploadedFiles[`${skill.key}-cert`])}
                 </div>
               ))}
             </div>

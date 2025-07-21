@@ -25,13 +25,19 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to load translations:', error)
       setIsLoaded(true) // Still set loaded to true to prevent infinite loading
     })
+  }, [])
 
-    // Load saved language preference from localStorage
-    const savedLanguage = localStorage.getItem('preferred-language') as 'en' | 'es'
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
-      setLanguage(savedLanguage)
+  useEffect(() => {
+    // Load saved language preference from localStorage after hydration
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('preferred-language') as 'en' | 'es'
+      if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+        setLanguage(savedLanguage)
+      }
     }
+  }, [])
 
+  useEffect(() => {
     // Listen for language changes from parent window (embed)
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'language_change') {

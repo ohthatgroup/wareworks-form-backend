@@ -13,10 +13,16 @@ export function useIframeHeight() {
         // Only send if height has changed significantly (at least 5px difference)
         if (Math.abs(height - lastHeightRef.current) > 5) {
           lastHeightRef.current = height
+          
+          // Use proper target origin instead of '*' for security
+          const targetOrigin = window.location.origin.includes('localhost') 
+            ? 'http://localhost:3000' 
+            : window.location.origin
+          
           window.parent.postMessage({
             type: 'resize',
             height: height
-          }, '*')
+          }, targetOrigin)
           console.log('Iframe height adjusted to:', height + 'px')
         }
       }

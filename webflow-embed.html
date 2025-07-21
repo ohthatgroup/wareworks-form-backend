@@ -176,24 +176,38 @@ Copy this code into your Webflow embed element
     text-align: center; 
     padding: 3rem;
     font-family: 'Figtree', sans-serif;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin: 0 auto;
+    max-width: 50rem;
   ">
     <div style="
-      width: 2.5rem; 
-      height: 2.5rem; 
-      border: 0.25rem solid #eff1f7; 
-      border-top: 0.25rem solid #131f5b; 
+      width: 3rem; 
+      height: 3rem; 
+      border: 0.25rem solid #e5e7eb; 
+      border-top: 0.25rem solid #2563eb; 
       border-radius: 50%; 
       animation: spin 1s linear infinite; 
-      margin: 0 auto 1rem;
+      margin: 0 auto 1.5rem;
     "></div>
-    <p style="
-      color: #666; 
-      font-size: 1rem;
+    <h3 style="
+      color: #111827; 
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
       font-family: 'Figtree', sans-serif;
-      line-height: 1.6em;
+    ">
+      Loading Application
+    </h3>
+    <p style="
+      color: #6b7280; 
+      font-size: 0.875rem;
+      font-family: 'Figtree', sans-serif;
+      line-height: 1.5;
       margin: 0;
     ">
-      Loading application...
+      Please wait while we prepare your application form...
     </p>
   </div>
 
@@ -352,6 +366,9 @@ Copy this code into your Webflow embed element
     
     // After a brief moment, show progress bar and load the iframe
     setTimeout(() => {
+      // Scroll to top for consistent experience
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
       loading.style.display = 'none';
       
       // Show and initialize progress bar
@@ -387,21 +404,44 @@ Copy this code into your Webflow embed element
       
       // Handle iframe messages for height adjustment and progress updates
       window.addEventListener('message', function(event) {
-        if (event.origin === new URL(CONFIG.FORM_APP_URL).origin) {
-          if (event.data.type === 'resize') {
-            const newHeight = event.data.height;
+        // Validate origin for security
+        const allowedOrigins = [
+          new URL(CONFIG.FORM_APP_URL).origin,
+          'http://localhost:3000',
+          'https://wareworks-backend.netlify.app'
+        ];
+        
+        if (!allowedOrigins.includes(event.origin)) {
+          console.warn('Rejected message from unauthorized origin:', event.origin);
+          return;
+        }
+
+        // Validate message structure
+        if (!event.data || typeof event.data.type !== 'string') {
+          console.warn('Invalid message format received');
+          return;
+        }
+
+        if (event.data.type === 'resize') {
+          const newHeight = event.data.height;
+          if (typeof newHeight === 'number' && newHeight > 0 && newHeight < 10000) {
             iframe.style.height = newHeight + 'px';
             console.log('Iframe height adjusted to:', newHeight + 'px');
           }
-          if (event.data.type === 'step_change') {
-            currentState.currentStep = event.data.currentStep;
-            currentState.completedSteps = event.data.completedSteps || [];
+        }
+        if (event.data.type === 'step_change') {
+          const stepData = event.data;
+          if (typeof stepData.currentStep === 'number' && 
+              stepData.currentStep >= 0 && 
+              stepData.currentStep < currentState.totalSteps) {
+            currentState.currentStep = stepData.currentStep;
+            currentState.completedSteps = Array.isArray(stepData.completedSteps) ? stepData.completedSteps : [];
             updateProgressBar();
-            console.log('Step changed to:', event.data.currentStep);
+            console.log('Step changed to:', stepData.currentStep);
           }
-          if (event.data.type === 'application_complete') {
-            trackEvent('application_complete', event.data.details);
-          }
+        }
+        if (event.data.type === 'application_complete') {
+          trackEvent('application_complete', event.data.details);
         }
       });
       
@@ -433,20 +473,8 @@ Copy this code into your Webflow embed element
         <!-- Header with Language Selector -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <div style="
-              width: 2rem; 
-              height: 2rem; 
-              background: linear-gradient(to right, #2563eb, #1d4ed8); 
-              border-radius: 0.5rem; 
-              display: flex; 
-              align-items: center; 
-              justify-content: center;
-            ">
-              <span style="color: white; font-weight: bold; font-size: 0.875rem;">W</span>
-            </div>
             <div>
-              <h3 style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;">WareWorks Application</h3>
-              <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+              <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
                 Step ${currentState.currentStep + 1} of ${currentState.totalSteps} • ${currentState.steps[currentState.currentStep]}
               </p>
             </div>
@@ -555,6 +583,9 @@ Copy this code into your Webflow embed element
   // Navigate to specific step
   window.navigateToStep = function(stepIndex) {
     console.log('Navigating to step:', stepIndex);
+    
+    // Scroll to top for consistent experience
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Send message to iframe to change step
     const iframe = document.querySelector('#application-container iframe');

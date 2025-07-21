@@ -7,7 +7,8 @@
       "Bash(grep:*)",
       "Bash(mkdir:*)",
       "Bash(rm:*)",
-      "Bash(pdftotext:*)"
+      "Bash(pdftotext:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }

@@ -3,7 +3,7 @@ import { z } from 'zod'
 const baseSchema = z.object({
   submissionId: z.string(),
   
-  // Personal Information
+  // Personal Information - REQUIRED: Name, SSN
   legalFirstName: z.string().min(1, 'First name is required'),
   middleInitial: z.string().optional(),
   legalLastName: z.string().min(1, 'Last name is required'),
@@ -11,24 +11,24 @@ const baseSchema = z.object({
   dateOfBirth: z.string().optional(),
   socialSecurityNumber: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, 'Invalid SSN format'),
   
-  // Contact Information
+  // Contact Information - REQUIRED: Address, Cell Number
   streetAddress: z.string().min(1, 'Street address is required'),
   aptNumber: z.string().optional(),
-  city: z.string().min(1, 'City is required'),
-  state: z.string().length(2, 'State must be 2 characters'),
-  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
-  phoneNumber: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid phone format'),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
+  phoneNumber: z.string().optional(),
   homePhone: z.string().optional(),
-  cellPhone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
+  cellPhone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Cell phone number is required'),
+  email: z.string().optional(),
   
-  // Emergency Contact
-  emergencyName: z.string().min(1, 'Emergency contact name is required'),
-  emergencyPhone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid emergency contact phone format'),
-  emergencyRelationship: z.string().min(1, 'Emergency contact relationship is required'),
+  // Emergency Contact - NOT REQUIRED
+  emergencyName: z.string().optional(),
+  emergencyPhone: z.string().optional(),
+  emergencyRelationship: z.string().optional(),
   
-  // Work Authorization
-  citizenshipStatus: z.string().min(1, 'Citizenship status is required'),
+  // Work Authorization - NOT REQUIRED
+  citizenshipStatus: z.string().optional(),
   workAuthorization: z.string().optional(),
   uscisANumber: z.string().optional(),
   workAuthExpiration: z.string().optional(),
@@ -36,15 +36,15 @@ const baseSchema = z.object({
   alienDocumentNumber: z.string().optional(),
   documentCountry: z.string().optional(),
   
-  // Basic Eligibility
-  age18: z.string().min(1, 'Age verification is required'),
-  transportation: z.string().min(1, 'Transportation question is required'),
-  workAuthorizationConfirm: z.string().min(1, 'Work authorization confirmation is required'),
+  // Basic Eligibility - NOT REQUIRED
+  age18: z.string().optional(),
+  transportation: z.string().optional(),
+  workAuthorizationConfirm: z.string().optional(),
   
-  // Position & Experience
-  positionApplied: z.string().min(1, 'Position applied for is required'),
+  // Position & Experience - NOT REQUIRED
+  positionApplied: z.string().optional(),
   expectedSalary: z.string().optional(),
-  jobDiscovery: z.string().min(1, 'How you discovered this job is required'),
+  jobDiscovery: z.string().optional(),
   
   // Equipment Experience
   equipmentSD: z.string().optional(),

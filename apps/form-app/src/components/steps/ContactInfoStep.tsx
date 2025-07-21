@@ -101,12 +101,11 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           label="City"
           registration={register('city')}
           error={errors.city?.message}
-          required
         />
         
         <div>
           <label className="form-label">
-            State <span className="text-red-500">*</span>
+            State
           </label>
           <select
             className={`form-input ${errors.state ? 'border-red-500 focus:border-red-500' : ''}`}
@@ -129,7 +128,6 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           registration={register('zipCode')}
           error={errors.zipCode?.message}
           placeholder="12345 or 12345-6789"
-          required
         />
       </div>
 
@@ -137,7 +135,6 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         <div className="space-y-2">
           <label className="form-label">
             Primary Phone Number
-            <span className="text-red-500 ml-1">*</span>
           </label>
           <input
             type="tel"
@@ -174,7 +171,10 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         </div>
         
         <div className="space-y-2">
-          <label className="form-label">Cell Phone</label>
+          <label className="form-label">
+            Cell Phone
+            <span className="text-red-500 ml-1">*</span>
+          </label>
           <input
             type="tel"
             className={`form-input ${errors.cellPhone ? 'border-red-500 focus:border-red-500' : ''}`}
@@ -208,13 +208,11 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             label="Emergency Contact Name"
             registration={register('emergencyName')}
             error={errors.emergencyName?.message}
-            required
           />
           
           <div className="space-y-2">
             <label className="form-label">
               Emergency Contact Phone
-              <span className="text-red-500 ml-1">*</span>
             </label>
             <input
               type="tel"
@@ -237,7 +235,6 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             registration={register('emergencyRelationship')}
             error={errors.emergencyRelationship?.message}
             placeholder="e.g., Spouse, Parent, Sibling"
-            required
           />
         </div>
       </div>

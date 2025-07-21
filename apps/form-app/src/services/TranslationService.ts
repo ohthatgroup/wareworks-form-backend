@@ -47,13 +47,44 @@ class TranslationService {
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`
     
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error(`Google Sheets API error: ${response.status}`)
-    }
+    // Add timeout and error handling
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
-    const data = await response.json()
-    this.parseCSVData(data.values)
+    try {
+      const response = await fetch(url, { signal: controller.signal })
+      clearTimeout(timeoutId)
+      
+      if (!response.ok) {
+        let errorMessage = `Google Sheets API error (${response.status})`
+        
+        if (response.status === 400) {
+          errorMessage = 'Invalid Google Sheets configuration'
+        } else if (response.status === 403) {
+          errorMessage = 'Google Sheets API key invalid or quota exceeded'
+        } else if (response.status === 404) {
+          errorMessage = 'Google Sheets document not found'
+        } else if (response.status === 429) {
+          errorMessage = 'Google Sheets API rate limit exceeded'
+        }
+        
+        throw new Error(errorMessage)
+      }
+
+      const data = await response.json()
+      
+      if (!data.values || !Array.isArray(data.values)) {
+        throw new Error('Invalid Google Sheets response format')
+      }
+      
+      this.parseCSVData(data.values)
+    } catch (error) {
+      clearTimeout(timeoutId)
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Google Sheets request timed out')
+      }
+      throw error
+    }
   }
 
   private async loadFromLocalCSV(): Promise<void> {
@@ -64,13 +95,52 @@ class TranslationService {
     }
 
     const csvText = await response.text()
-    const rows = csvText.split('\n').map(row => {
-      // Simple CSV parsing (for production, use a proper CSV parser)
-      const cols = row.split(',')
-      return cols.map(col => col.replace(/^"(.*)"$/, '$1')) // Remove quotes
-    })
-
+    const rows = this.parseCSVText(csvText)
     this.parseCSVData(rows)
+  }
+
+  private parseCSVText(csvText: string): string[][] {
+    const rows: string[][] = []
+    const lines = csvText.split('\n')
+    
+    for (const line of lines) {
+      if (line.trim() === '') continue
+      
+      const columns: string[] = []
+      let current = ''
+      let inQuotes = false
+      let i = 0
+      
+      while (i < line.length) {
+        const char = line[i]
+        
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            // Escaped quote
+            current += '"'
+            i += 2
+          } else {
+            // Toggle quote state
+            inQuotes = !inQuotes
+            i++
+          }
+        } else if (char === ',' && !inQuotes) {
+          // End of column
+          columns.push(current.trim())
+          current = ''
+          i++
+        } else {
+          current += char
+          i++
+        }
+      }
+      
+      // Add the last column
+      columns.push(current.trim())
+      rows.push(columns)
+    }
+    
+    return rows
   }
 
   private parseCSVData(rows: string[][]): void {
@@ -168,37 +238,6 @@ class TranslationService {
 // Create singleton instance
 export const translationService = new TranslationService()
 
-// React hook for using translations
-export function useTranslation() {
-  const [isReady, setIsReady] = React.useState(translationService.isReady())
-  const [language, setLanguage] = React.useState(translationService.getLanguage())
-
-  React.useEffect(() => {
-    translationService.loadTranslations().then(() => {
-      setIsReady(true)
-    })
-  }, [])
-
-  const changeLanguage = (newLanguage: 'en' | 'es') => {
-    translationService.setLanguage(newLanguage)
-    setLanguage(newLanguage)
-  }
-
-  const t = (key: string, fallback?: string) => {
-    return translationService.t(key, fallback)
-  }
-
-  const translate = (key: string, params?: Record<string, string | number>, fallback?: string) => {
-    return translationService.translate(key, params, fallback)
-  }
-
-  return {
-    t,
-    translate,
-    language,
-    changeLanguage,
-    isReady
-  }
-}
+// Removed duplicate hook - use LanguageContext instead
 
 export default translationService

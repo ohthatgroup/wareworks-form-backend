@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -35,120 +35,18 @@ const STEPS = [
 function ApplicationFormContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submissionResult, setSubmissionResult] = useState<any>(null)
+  interface SubmissionResult {
+    success: boolean
+    submissionId: string
+    message?: string
+    timestamp: string
+  }
+
+  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const { t } = useLanguage()
 
-  // Check if we're in an embedded context
-  const isEmbedded = typeof window !== 'undefined' && window.parent !== window
-
-  // Handle iframe height communication
-  useIframeHeight()
-
-  // Send progress updates to parent window (embed)
-  const sendProgressUpdate = () => {
-    if (isEmbedded) {
-      window.parent.postMessage({
-        type: 'step_change',
-        currentStep: currentStep,
-        completedSteps: completedSteps,
-        totalSteps: STEPS.length
-      }, '*')
-    }
-  }
-
-  // Listen for navigation messages from parent
-  React.useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'navigate_to_step') {
-        const stepIndex = event.data.stepIndex
-        if (stepIndex >= 0 && stepIndex < STEPS.length) {
-          setCurrentStep(stepIndex)
-        }
-      }
-      if (event.data.type === 'language_change') {
-        // Language changes are handled by the LanguageContext
-        const newLanguage = event.data.language
-        // The LanguageContext should handle this automatically
-      }
-    }
-
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
-  }, [])
-
-  // Send progress update when step or completion changes
-  React.useEffect(() => {
-    sendProgressUpdate()
-  }, [currentStep, completedSteps])
-
-  // Define required fields for each step
-  const getStepRequiredFields = (stepIndex: number): (keyof ValidatedApplicationData)[] => {
-    switch (stepIndex) {
-      case 0: // Personal Information
-        return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
-      case 1: // Contact Details
-        return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'emergencyName', 'emergencyPhone', 'emergencyRelationship']
-      case 2: // Work Authorization
-        const baseFields: (keyof ValidatedApplicationData)[] = ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
-        const currentCitizenship = form.watch('citizenshipStatus')
-        
-        if (currentCitizenship === 'lawful_permanent') {
-          return [...baseFields, 'uscisANumber']
-        } else if (currentCitizenship === 'alien_authorized') {
-          return [...baseFields, 'workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry']
-        }
-        return baseFields
-      case 3: // Position & Experience
-        return ['positionApplied', 'jobDiscovery']
-      case 4: // Availability
-        return ['fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied']
-      case 5: // Education & Employment
-        return [] // Optional sections
-      case 6: // Documents
-        return [] // Optional for now
-      case 7: // Review
-        return [] // Final review step
-      default:
-        return []
-    }
-  }
-
-  // Check if current step is valid
-  const isCurrentStepValid = () => {
-    const requiredFields = getStepRequiredFields(currentStep)
-    const formValues = form.watch() // Use watch to make it reactive
-    const formState = form.formState
-    
-    // Check that all required fields are filled AND don't have validation errors
-    return requiredFields.every(field => {
-      const value = formValues[field]
-      const hasValue = value !== undefined && value !== null && value !== ''
-      const hasNoError = !formState.errors[field]
-      return hasValue && hasNoError
-    })
-  }
-
-  // Check if all required fields across all steps are valid for submission
-  const isFormReadyForSubmission = () => {
-    const formValues = form.watch()
-    const formState = form.formState
-    
-    // Get all required fields from all steps
-    const allRequiredFields: (keyof ValidatedApplicationData)[] = []
-    for (let i = 0; i < STEPS.length - 1; i++) { // Exclude review step
-      allRequiredFields.push(...getStepRequiredFields(i))
-    }
-    
-    // Check that all core required fields are filled and valid
-    return allRequiredFields.every(field => {
-      const value = formValues[field]
-      const hasValue = value !== undefined && value !== null && value !== ''
-      const hasNoError = !formState.errors[field]
-      return hasValue && hasNoError
-    })
-  }
-
+  // Initialize form first
   const form = useForm<ValidatedApplicationData>({
     resolver: zodResolver(applicationSchema),
     mode: 'onChange',
@@ -190,28 +88,169 @@ function ApplicationFormContent() {
     }
   })
 
-  const nextStep = () => {
+  // Check if we're in an embedded context
+  const isEmbedded = typeof window !== 'undefined' && window.parent !== window
+
+  // Handle iframe height communication
+  useIframeHeight()
+
+  // Send progress updates to parent window (embed)
+  const sendProgressUpdate = useCallback(() => {
+    if (isEmbedded) {
+      // Use proper target origin instead of '*' for security
+      const targetOrigin = window.location.origin.includes('localhost') 
+        ? 'http://localhost:3000' 
+        : window.location.origin
+      
+      window.parent.postMessage({
+        type: 'step_change',
+        currentStep: currentStep,
+        completedSteps: completedSteps,
+        totalSteps: STEPS.length
+      }, targetOrigin)
+    }
+  }, [isEmbedded, currentStep, completedSteps])
+
+  // Listen for navigation messages from parent
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Validate origin for security
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'https://wareworks-backend.netlify.app',
+        window.location.origin
+      ]
+      
+      if (!allowedOrigins.includes(event.origin)) {
+        console.warn('Rejected message from unauthorized origin:', event.origin)
+        return
+      }
+
+      if (event.data.type === 'navigate_to_step') {
+        const stepIndex = event.data.stepIndex
+        if (typeof stepIndex === 'number' && stepIndex >= 0 && stepIndex < STEPS.length) {
+          setCurrentStep(stepIndex)
+        }
+      }
+      if (event.data.type === 'language_change') {
+        // Language changes are handled by the LanguageContext
+        const newLanguage = event.data.language
+        if (newLanguage === 'en' || newLanguage === 'es') {
+          // The LanguageContext should handle this automatically
+        }
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
+
+  // Send progress update when step or completion changes
+  useEffect(() => {
+    sendProgressUpdate()
+  }, [sendProgressUpdate])
+
+  // Memoized function to get required fields for each step
+  // Only require: Name, SSN, Address, Cell Number, ID
+  const getStepRequiredFields = useMemo(() => {
+    return (stepIndex: number): (keyof ValidatedApplicationData)[] => {
+      switch (stepIndex) {
+        case 0: // Personal Information - Name, SSN
+          return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
+        case 1: // Contact Details - Address, Cell Number
+          return ['streetAddress', 'cellPhone']
+        case 2: // Work Authorization - NOT REQUIRED
+          return []
+        case 3: // Position & Experience - NOT REQUIRED
+          return []
+        case 4: // Availability - NOT REQUIRED
+          return []
+        case 5: // Education & Employment - NOT REQUIRED
+          return []
+        case 6: // Documents - ID Required
+          return [] // Will check for ID document separately
+        case 7: // Review - NOT REQUIRED
+          return []
+        default:
+          return []
+      }
+    }
+  }, [])
+
+  // Memoized validation for current step
+  const formValues = form.watch()
+  const formState = form.formState
+  
+  const isCurrentStepValid = useMemo(() => {
+    const requiredFields = getStepRequiredFields(currentStep)
+    
+    // Check that all required fields are filled AND don't have validation errors
+    const fieldsValid = requiredFields.every(field => {
+      const value = formValues[field]
+      const hasValue = value !== undefined && value !== null && value !== ''
+      const hasNoError = !formState.errors[field]
+      return hasValue && hasNoError
+    })
+    
+    // Special validation for documents step - require ID
+    if (currentStep === 6) {
+      const documents = formValues.documents || []
+      const hasIDDocument = documents.some((doc: any) => doc.type === 'identification')
+      return fieldsValid && hasIDDocument
+    }
+    
+    return fieldsValid
+  }, [currentStep, formValues, formState.errors, getStepRequiredFields])
+
+  // Memoized validation for form submission readiness
+  const isFormReadyForSubmission = useMemo(() => {
+    // Check all required fields: Name, SSN, Address, Cell Number, ID
+    const requiredFieldsValid = [
+      'legalFirstName',
+      'legalLastName', 
+      'socialSecurityNumber',
+      'streetAddress',
+      'cellPhone'
+    ].every(field => {
+      const value = formValues[field as keyof ValidatedApplicationData]
+      const hasValue = value !== undefined && value !== null && value !== ''
+      const hasNoError = !formState.errors[field as keyof ValidatedApplicationData]
+      return hasValue && hasNoError
+    })
+    
+    // Check for ID document
+    const documents = formValues.documents || []
+    const hasIDDocument = documents.some((doc: any) => doc.type === 'identification')
+    
+    return requiredFieldsValid && hasIDDocument
+  }, [formValues, formState.errors])
+
+  const nextStep = useCallback(() => {
     if (currentStep < STEPS.length - 1) {
       // Mark current step as completed when moving forward
-      if (isCurrentStepValid() && !completedSteps.includes(currentStep)) {
-        setCompletedSteps(prev => [...prev, currentStep])
+      if (isCurrentStepValid) {
+        setCompletedSteps(prev => {
+          // Prevent duplicates using Set
+          const uniqueSteps = new Set([...prev, currentStep])
+          return Array.from(uniqueSteps).sort((a, b) => a - b)
+        })
       }
       setCurrentStep(currentStep + 1)
     }
-  }
+  }, [currentStep, isCurrentStepValid])
 
-  const prevStep = () => {
+  const prevStep = useCallback(() => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
     }
-  }
+  }, [currentStep])
 
-  const handleStepClick = (stepIndex: number) => {
+  const handleStepClick = useCallback((stepIndex: number) => {
     // Allow navigation to completed steps or previous steps
     if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       setCurrentStep(stepIndex)
     }
-  }
+  }, [currentStep, completedSteps])
 
   const onSubmit = async (data: ValidatedApplicationData) => {
     setIsSubmitting(true)
@@ -229,21 +268,48 @@ function ApplicationFormContent() {
         submissionId: submissionData.submissionId
       })
 
+      // Create AbortController for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
       const response = await fetch('/api/submit-application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submissionData)
+        body: JSON.stringify(submissionData),
+        signal: controller.signal
       })
+
+      clearTimeout(timeoutId)
 
       console.log('Response status:', response.status)
       console.log('Response headers:', Object.fromEntries(response.headers.entries()))
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('Server response error:', errorText)
-        throw new Error(`Server responded with ${response.status}: ${errorText}`)
+        let errorMessage = `Server error (${response.status})`
+        
+        try {
+          const errorText = await response.text()
+          console.error('Server response error:', errorText)
+          
+          // Parse different error types
+          if (response.status === 429) {
+            errorMessage = 'Too many requests. Please try again in a few minutes.'
+          } else if (response.status === 503) {
+            errorMessage = 'Service temporarily unavailable. Please try again later.'
+          } else if (response.status >= 500) {
+            errorMessage = 'Server error. Please try again later.'
+          } else if (response.status === 413) {
+            errorMessage = 'Application data too large. Please check your uploaded files.'
+          } else {
+            errorMessage = errorText || errorMessage
+          }
+        } catch {
+          // If error response is not readable, use generic message
+        }
+        
+        throw new Error(errorMessage)
       }
 
       const result = await response.json()
@@ -254,8 +320,20 @@ function ApplicationFormContent() {
       
     } catch (error) {
       console.error('Submission error details:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      alert(t('system.submission_failed', `Failed to submit application: ${errorMessage}`))
+      
+      let userFriendlyMessage = 'Failed to submit application. Please try again.'
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          userFriendlyMessage = 'Request timed out. Please check your connection and try again.'
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          userFriendlyMessage = 'Network error. Please check your internet connection and try again.'
+        } else {
+          userFriendlyMessage = error.message
+        }
+      }
+      
+      alert(t('system.submission_failed', userFriendlyMessage))
     } finally {
       setIsSubmitting(false)
     }
@@ -274,22 +352,11 @@ function ApplicationFormContent() {
 
   return (
     <div className="mx-auto px-4 py-4 max-w-4xl">
-      {/* Only show internal progress bar and language selector when NOT embedded */}
+      {/* Only show language selector when NOT embedded - no internal progress bar */}
       {!isEmbedded && (
-        <>
-          {/* Language Selector */}
-          <div className="mb-4 flex justify-end">
-            <LanguageSelector variant="compact" />
-          </div>
-
-          <ProgressBar 
-            currentStep={currentStep} 
-            totalSteps={STEPS.length}
-            steps={STEPS.map(s => t(s.titleKey, s.titleKey))}
-            onStepClick={handleStepClick}
-            completedSteps={completedSteps}
-          />
-        </>
+        <div className="mb-4 flex justify-end">
+          <LanguageSelector variant="compact" />
+        </div>
       )}
 
       <FormStep title={t(STEPS[currentStep].titleKey, STEPS[currentStep].titleKey)}>
@@ -307,7 +374,7 @@ function ApplicationFormContent() {
             onPrevious={prevStep}
             onSubmit={form.handleSubmit(onSubmit)}
             isSubmitting={isSubmitting}
-            canProceed={currentStep === STEPS.length - 1 ? isFormReadyForSubmission() : isCurrentStepValid()}
+            canProceed={currentStep === STEPS.length - 1 ? isFormReadyForSubmission : isCurrentStepValid}
           />
         </form>
       </FormStep>
