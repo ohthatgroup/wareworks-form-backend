@@ -73,56 +73,65 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             Since you indicated limited availability for standard shifts, please specify your availability for each day:
           </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Sunday"
-            registration={register('availabilitySunday')}
-            error={errors.availabilitySunday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
+            {[
+              { key: 'availabilitySunday', label: 'Sunday', description: 'Available hours for Sunday' },
+              { key: 'availabilityMonday', label: 'Monday', description: 'Available hours for Monday' },
+              { key: 'availabilityTuesday', label: 'Tuesday', description: 'Available hours for Tuesday' },
+              { key: 'availabilityWednesday', label: 'Wednesday', description: 'Available hours for Wednesday' },
+              { key: 'availabilityThursday', label: 'Thursday', description: 'Available hours for Thursday' },
+              { key: 'availabilityFriday', label: 'Friday', description: 'Available hours for Friday' },
+              { key: 'availabilitySaturday', label: 'Saturday', description: 'Available hours for Saturday' }
+            ].map((day) => {
+              const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
+              const hasValue = currentValue && currentValue.trim() !== ''
+              
+              return (
+                <div 
+                  key={day.key}
+                  className={`border rounded-lg p-4 transition-all ${
+                    hasValue 
+                      ? 'border-primary bg-primary/5 shadow-sm' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="space-y-3">
+                    <div>
+                      <label 
+                        htmlFor={day.key}
+                        className="block text-sm font-medium text-gray-900"
+                      >
+                        {day.label}
+                      </label>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {day.description}
+                      </p>
+                    </div>
+                    
+                    <input
+                      id={day.key}
+                      {...register(day.key as keyof ValidatedApplicationData)}
+                      type="text"
+                      className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
+                      placeholder="e.g., 8AM-5PM or Not Available"
+                    />
+                    
+                    {errors[day.key as keyof ValidatedApplicationData] && (
+                      <p className="text-xs text-red-500 mt-1">
+                        {errors[day.key as keyof ValidatedApplicationData]?.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
           
-          <Input
-            label="Monday"
-            registration={register('availabilityMonday')}
-            error={errors.availabilityMonday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
-          
-          <Input
-            label="Tuesday"
-            registration={register('availabilityTuesday')}
-            error={errors.availabilityTuesday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
-          
-          <Input
-            label="Wednesday"
-            registration={register('availabilityWednesday')}
-            error={errors.availabilityWednesday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
-          
-          <Input
-            label="Thursday"
-            registration={register('availabilityThursday')}
-            error={errors.availabilityThursday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
-          
-          <Input
-            label="Friday"
-            registration={register('availabilityFriday')}
-            error={errors.availabilityFriday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
-          
-          <Input
-            label="Saturday"
-            registration={register('availabilitySaturday')}
-            error={errors.availabilitySaturday?.message}
-            placeholder="e.g., 8AM-5PM or Not Available"
-          />
-        </div>
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> Enter your available hours for each day (e.g., "8AM-5PM", "6PM-11PM") or write "Not Available" if you cannot work that day.
+            </p>
+          </div>
         </div>
       )}
 
