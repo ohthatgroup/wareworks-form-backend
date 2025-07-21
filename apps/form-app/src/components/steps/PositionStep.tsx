@@ -1,20 +1,13 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
-import { Select } from '../ui/Select'
+import { EquipmentExperience } from '../ui/EquipmentExperience'
 
 interface PositionStepProps {
   form: UseFormReturn<ValidatedApplicationData>
   isSubmitting: boolean
 }
 
-const EXPERIENCE_LEVELS = [
-  { value: 'none', label: 'None' },
-  { value: 'basic', label: 'Basic' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'advanced', label: 'Advanced' },
-  { value: 'expert', label: 'Expert' }
-]
 
 export function PositionStep({ form }: PositionStepProps) {
   const { register, formState: { errors } } = form
@@ -50,58 +43,10 @@ export function PositionStep({ form }: PositionStepProps) {
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-primary mb-4">Equipment Experience</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Please rate your experience level with the following warehouse equipment:
+          Select the warehouse equipment you have experience with and choose your experience level:
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select
-            label="SD (Sit Down Forklift)"
-            registration={register('equipmentSD')}
-            error={errors.equipmentSD?.message}
-            options={EXPERIENCE_LEVELS}
-            placeholder="Select experience level"
-          />
-          
-          <Select
-            label="SU (Stand Up Forklift)"
-            registration={register('equipmentSU')}
-            error={errors.equipmentSU?.message}
-            options={EXPERIENCE_LEVELS}
-            placeholder="Select experience level"
-          />
-          
-          <Select
-            label="SUR (Stand Up Reach)"
-            registration={register('equipmentSUR')}
-            error={errors.equipmentSUR?.message}
-            options={EXPERIENCE_LEVELS}
-            placeholder="Select experience level"
-          />
-          
-          <Select
-            label="CP (Cherry Picker)"
-            registration={register('equipmentCP')}
-            error={errors.equipmentCP?.message}
-            options={EXPERIENCE_LEVELS}
-            placeholder="Select experience level"
-          />
-          
-          <Select
-            label="CL (Clamps)"
-            registration={register('equipmentCL')}
-            error={errors.equipmentCL?.message}
-            options={EXPERIENCE_LEVELS}
-            placeholder="Select experience level"
-          />
-          
-          <Select
-            label="Riding Jack"
-            registration={register('equipmentRidingJack')}
-            error={errors.equipmentRidingJack?.message}
-            options={EXPERIENCE_LEVELS}
-            placeholder="Select experience level"
-          />
-        </div>
+        <EquipmentExperience form={form} />
       </div>
 
       <div className="border-t pt-6">

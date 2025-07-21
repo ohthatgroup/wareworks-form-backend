@@ -12,6 +12,23 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const { register, formState: { errors }, setValue, watch } = form
   const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File[]}>({})
   const documents = watch('documents') || []
+  
+  // Watch for certified equipment
+  const equipmentSD = watch('equipmentSD')
+  const equipmentSU = watch('equipmentSU') 
+  const equipmentSUR = watch('equipmentSUR')
+  const equipmentCP = watch('equipmentCP')
+  const equipmentCL = watch('equipmentCL')
+  const equipmentRidingJack = watch('equipmentRidingJack')
+  
+  const certifiedEquipment = [
+    { key: 'equipmentSD', value: equipmentSD, label: 'SD - Sit Down Forklift' },
+    { key: 'equipmentSU', value: equipmentSU, label: 'SU - Stand Up Forklift' },
+    { key: 'equipmentSUR', value: equipmentSUR, label: 'SUR - Stand Up Reach' },
+    { key: 'equipmentCP', value: equipmentCP, label: 'CP - Cherry Picker' },
+    { key: 'equipmentCL', value: equipmentCL, label: 'CL - Clamps' },
+    { key: 'equipmentRidingJack', value: equipmentRidingJack, label: 'Riding Jack' }
+  ].filter(equipment => equipment.value === 'certified')
 
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -225,6 +242,46 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           </div>
           {uploadedFiles['certifications'] && renderFileList('certifications', uploadedFiles['certifications'])}
         </div>
+
+        {/* Equipment Certifications - Dynamic based on selections */}
+        {certifiedEquipment.length > 0 && (
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium text-primary mb-4">Equipment Certifications</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              You indicated you have certifications for the following equipment. Please upload your certification documents:
+            </p>
+            
+            <div className="space-y-6">
+              {certifiedEquipment.map((equipment) => (
+                <div key={equipment.key}>
+                  <label className="form-label">
+                    {equipment.label} Certification <span className="text-red-500">*</span>
+                  </label>
+                  <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
+                    <Upload className="mx-auto h-12 w-12 text-primary" />
+                    <div className="mt-4">
+                      <label htmlFor={`${equipment.key}-cert-upload`} className="cursor-pointer">
+                        <span className="btn-primary inline-block">Upload Certification</span>
+                        <input
+                          id={`${equipment.key}-cert-upload`}
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          multiple
+                          className="sr-only"
+                          onChange={(e) => e.target.files && handleFileUpload(`${equipment.key}-cert`, e.target.files)}
+                        />
+                      </label>
+                    </div>
+                    <p className="mt-2 text-sm text-primary">
+                      Official certification for {equipment.label.split(' - ')[1]}
+                    </p>
+                  </div>
+                  {uploadedFiles[`${equipment.key}-cert`] && renderFileList(`${equipment.key}-cert`, uploadedFiles[`${equipment.key}-cert`])}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
     </div>
