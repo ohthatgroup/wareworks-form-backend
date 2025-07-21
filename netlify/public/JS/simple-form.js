@@ -728,7 +728,105 @@ function setupReviewPage() {
         console.log('Navigation submit button configured');
     }
     
+    // Populate review data
+    populateReviewData();
+    
     console.log('Review page setup complete');
+}
+
+function populateReviewData() {
+    console.log('Populating review data...');
+    
+    // Get saved form data
+    const saved = localStorage.getItem('wareWorksFormData');
+    if (!saved) {
+        console.log('No saved form data found');
+        return;
+    }
+    
+    const data = JSON.parse(saved);
+    console.log('Form data to review:', data);
+    
+    // Personal Information
+    const personalInfo = document.getElementById('personalInfoReview');
+    if (personalInfo) {
+        personalInfo.innerHTML = `
+            <div class="review-item">
+                <span class="review-label">Name:</span>
+                <span class="review-value">${data.legalFirstName || '--'} ${data.middleInitial || ''} ${data.legalLastName || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Address:</span>
+                <span class="review-value">${data.streetAddress || '--'}, ${data.city || '--'}, ${data.state || '--'} ${data.zipCode || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Phone:</span>
+                <span class="review-value">${data.phoneNumber || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Email:</span>
+                <span class="review-value">${data.email || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Date of Birth:</span>
+                <span class="review-value">${data.dateOfBirth || '--'}</span>
+            </div>
+        `;
+    }
+    
+    // Contact Information
+    const contactInfo = document.getElementById('contactInfoReview');
+    if (contactInfo) {
+        contactInfo.innerHTML = `
+            <div class="review-item">
+                <span class="review-label">Home Phone:</span>
+                <span class="review-value">${data.homePhone || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Cell Phone:</span>
+                <span class="review-value">${data.cellPhone || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Emergency Contact:</span>
+                <span class="review-value">${data.emergencyContactName || '--'} (${data.emergencyContactPhone || '--'})</span>
+            </div>
+        `;
+    }
+    
+    // Citizenship Status
+    const citizenshipInfo = document.getElementById('citizenshipReview');
+    if (citizenshipInfo) {
+        citizenshipInfo.innerHTML = `
+            <div class="review-item">
+                <span class="review-label">Citizenship Status:</span>
+                <span class="review-value">${data.citizenshipStatus || '--'}</span>
+            </div>
+            <div class="review-item">
+                <span class="review-label">Work Authorization:</span>
+                <span class="review-value">${data.workAuthorization || '--'}</span>
+            </div>
+        `;
+    }
+    
+    // Update statistics
+    const completionRate = document.getElementById('completionRate');
+    if (completionRate) {
+        const totalFields = Object.keys(data).length;
+        const filledFields = Object.values(data).filter(value => value && value.trim() !== '').length;
+        const percentage = totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
+        completionRate.textContent = percentage + '%';
+    }
+    
+    const documentsCount = document.getElementById('documentsCount');
+    if (documentsCount) {
+        let docCount = 0;
+        if (data.idDocument) docCount++;
+        if (data.resume) docCount++;
+        if (data.certifications) docCount++;
+        documentsCount.textContent = docCount;
+    }
+    
+    console.log('Review data populated');
 }
 
 function saveFormData() {
