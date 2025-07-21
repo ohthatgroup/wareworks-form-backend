@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
@@ -28,6 +29,32 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
     control,
     name: 'employment',
   })
+
+  // Initialize with 1 education and 1 employment entry if empty
+  useEffect(() => {
+    if (educationFields.length === 0) {
+      appendEducation({
+        schoolName: '',
+        graduationYear: '',
+        fieldOfStudy: '',
+        degreeReceived: ''
+      })
+    }
+    if (employmentFields.length === 0) {
+      appendEmployment({
+        companyName: '',
+        startDate: '',
+        endDate: '',
+        startingPosition: '',
+        endingPosition: '',
+        supervisorName: '',
+        supervisorPhone: '',
+        responsibilities: '',
+        reasonForLeaving: '',
+        mayContact: ''
+      })
+    }
+  }, [educationFields.length, employmentFields.length, appendEducation, appendEmployment])
 
   const addEducation = () => {
     if (educationFields.length < 3) {
@@ -75,18 +102,6 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
           </button>
         </div>
 
-        {educationFields.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <p>No education entries added yet.</p>
-            <button
-              type="button"
-              onClick={addEducation}
-              className="btn-primary mt-2"
-            >
-              Add Your First Education Entry
-            </button>
-          </div>
-        )}
 
         {educationFields.map((field, index) => (
           <div key={field.id} className="bg-gray-50 rounded-lg p-6 mb-4">
@@ -166,18 +181,6 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
           </button>
         </div>
 
-        {employmentFields.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <p>No employment entries added yet.</p>
-            <button
-              type="button"
-              onClick={addEmployment}
-              className="btn-primary mt-2"
-            >
-              Add Your First Employment Entry
-            </button>
-          </div>
-        )}
 
         {employmentFields.map((field, index) => (
           <div key={field.id} className="bg-gray-50 rounded-lg p-6 mb-4">

@@ -57,7 +57,7 @@ export default function ApplicationForm() {
       case 3: // Position & Experience
         return ['positionApplied', 'jobDiscovery']
       case 4: // Availability
-        return ['fullTimeEmployment', 'previouslyApplied']
+        return ['fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied']
       case 5: // Education & Employment
         return [] // Optional sections
       case 6: // Documents
@@ -77,6 +77,26 @@ export default function ApplicationForm() {
     
     // Check that all required fields are filled AND don't have validation errors
     return requiredFields.every(field => {
+      const value = formValues[field]
+      const hasValue = value !== undefined && value !== null && value !== ''
+      const hasNoError = !formState.errors[field]
+      return hasValue && hasNoError
+    })
+  }
+
+  // Check if all required fields across all steps are valid for submission
+  const isFormReadyForSubmission = () => {
+    const formValues = form.watch()
+    const formState = form.formState
+    
+    // Get all required fields from all steps
+    const allRequiredFields: (keyof ValidatedApplicationData)[] = []
+    for (let i = 0; i < STEPS.length - 1; i++) { // Exclude review step
+      allRequiredFields.push(...getStepRequiredFields(i))
+    }
+    
+    // Check that all core required fields are filled and valid
+    return allRequiredFields.every(field => {
       const value = formValues[field]
       const hasValue = value !== undefined && value !== null && value !== ''
       const hasNoError = !formState.errors[field]
@@ -199,7 +219,7 @@ export default function ApplicationForm() {
             onPrevious={prevStep}
             onSubmit={form.handleSubmit(onSubmit)}
             isSubmitting={isSubmitting}
-            canProceed={currentStep === STEPS.length - 1 ? form.formState.isValid : isCurrentStepValid()}
+            canProceed={currentStep === STEPS.length - 1 ? isFormReadyForSubmission() : isCurrentStepValid()}
           />
         </form>
       </FormStep>

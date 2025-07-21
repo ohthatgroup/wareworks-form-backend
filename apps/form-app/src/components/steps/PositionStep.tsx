@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { EquipmentExperience } from '../ui/EquipmentExperience'
+import { SkillsQualifications } from '../ui/SkillsQualifications'
 
 interface PositionStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -52,31 +53,10 @@ export function PositionStep({ form }: PositionStepProps) {
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-primary mb-4">Skills & Qualifications</h3>
         <p className="text-sm text-gray-600 mb-4">
-          List any relevant skills, certifications, or qualifications:
+          Add your relevant skills, certifications, or qualifications. Check the certification box if you have documentation to upload:
         </p>
         
-        <div className="space-y-4">
-          <Input
-            label="Skill/Qualification 1"
-            registration={register('skills1')}
-            error={errors.skills1?.message}
-            placeholder="e.g., Forklift certification, OSHA training"
-          />
-          
-          <Input
-            label="Skill/Qualification 2"
-            registration={register('skills2')}
-            error={errors.skills2?.message}
-            placeholder="e.g., RF Scanner experience, Inventory management"
-          />
-          
-          <Input
-            label="Skill/Qualification 3"
-            registration={register('skills3')}
-            error={errors.skills3?.message}
-            placeholder="e.g., Team leadership, Safety training"
-          />
-        </div>
+        <SkillsQualifications form={form} />
       </div>
     </div>
   )

@@ -11,6 +11,15 @@ interface AvailabilityStepProps {
 export function AvailabilityStep({ form }: AvailabilityStepProps) {
   const { register, watch, formState: { errors } } = form
   const previouslyApplied = watch('previouslyApplied')
+  
+  // Check if weekly availability should be shown
+  const fullTimeEmployment = watch('fullTimeEmployment')
+  const swingShifts = watch('swingShifts')
+  const graveyardShifts = watch('graveyardShifts')
+  
+  const showWeeklyAvailability = fullTimeEmployment === 'no' || 
+                                swingShifts === 'no' || 
+                                graveyardShifts === 'no'
 
   return (
     <div className="space-y-6">
@@ -57,11 +66,12 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
         </div>
       </div>
 
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">Weekly Availability</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Please specify your availability for each day of the week (e.g., "8AM-5PM", "6PM-2AM", or "Not Available"):
-        </p>
+      {showWeeklyAvailability && (
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-primary mb-4">Weekly Availability</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Since you indicated limited availability for standard shifts, please specify your availability for each day:
+          </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
@@ -113,7 +123,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             placeholder="e.g., 8AM-5PM or Not Available"
           />
         </div>
-      </div>
+        </div>
+      )}
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-primary mb-4">Previous Application History</h3>
