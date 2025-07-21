@@ -831,14 +831,17 @@ function populateReviewData() {
 
 function saveFormData() {
     const inputs = document.querySelectorAll('input, select, textarea');
+    let savedCount = 0;
     inputs.forEach(input => {
-        if (input.name) {
+        if (input.name && input.value) {
             formData[input.name] = input.value;
+            savedCount++;
         }
     });
     
     // Save to localStorage
     localStorage.setItem('wareWorksFormData', JSON.stringify(formData));
+    console.log(`Saved ${savedCount} form fields:`, Object.keys(formData));
 }
 
 function restoreFormData() {
