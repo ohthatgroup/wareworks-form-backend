@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { applicationSchema, type ValidatedApplicationData } from '../shared/validation/schemas'
@@ -17,25 +18,69 @@ import { EducationEmploymentStep } from '../components/steps/EducationEmployment
 import { DocumentsStep } from '../components/steps/DocumentsStep'
 import { ReviewStep } from '../components/steps/ReviewStep'
 import { SuccessStep } from '../components/steps/SuccessStep'
+import { LanguageProvider, useLanguage } from '../contexts/LanguageContext'
+import { LanguageSelector } from '../components/ui/LanguageSelector'
 
 const STEPS = [
-  { id: 'personal', title: 'Personal Information', component: PersonalInfoStep },
-  { id: 'contact', title: 'Contact Details', component: ContactInfoStep },
-  { id: 'citizenship', title: 'Work Authorization', component: CitizenshipStep },
-  { id: 'position', title: 'Position & Experience', component: PositionStep },
-  { id: 'availability', title: 'Availability & Preferences', component: AvailabilityStep },
-  { id: 'education', title: 'Education & Employment', component: EducationEmploymentStep },
-  { id: 'documents', title: 'Documents', component: DocumentsStep },
-  { id: 'review', title: 'Review & Submit', component: ReviewStep },
+  { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
+  { id: 'contact', titleKey: 'steps.contact.title', component: ContactInfoStep },
+  { id: 'citizenship', titleKey: 'steps.citizenship.title', component: CitizenshipStep },
+  { id: 'position', titleKey: 'steps.position.title', component: PositionStep },
+  { id: 'availability', titleKey: 'steps.availability.title', component: AvailabilityStep },
+  { id: 'education', titleKey: 'steps.education_employment.title', component: EducationEmploymentStep },
+  { id: 'documents', titleKey: 'steps.documents.title', component: DocumentsStep },
+  { id: 'review', titleKey: 'steps.review.title', component: ReviewStep },
 ]
 
-export default function ApplicationForm() {
+function ApplicationFormContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submissionResult, setSubmissionResult] = useState<any>(null)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const { t } = useLanguage()
+
+  // Check if we're in an embedded context
+  const isEmbedded = typeof window !== 'undefined' && window.parent !== window
 
   // Handle iframe height communication
   useIframeHeight()
+
+  // Send progress updates to parent window (embed)
+  const sendProgressUpdate = () => {
+    if (isEmbedded) {
+      window.parent.postMessage({
+        type: 'step_change',
+        currentStep: currentStep,
+        completedSteps: completedSteps,
+        totalSteps: STEPS.length
+      }, '*')
+    }
+  }
+
+  // Listen for navigation messages from parent
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'navigate_to_step') {
+        const stepIndex = event.data.stepIndex
+        if (stepIndex >= 0 && stepIndex < STEPS.length) {
+          setCurrentStep(stepIndex)
+        }
+      }
+      if (event.data.type === 'language_change') {
+        // Language changes are handled by the LanguageContext
+        const newLanguage = event.data.language
+        // The LanguageContext should handle this automatically
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
+
+  // Send progress update when step or completion changes
+  React.useEffect(() => {
+    sendProgressUpdate()
+  }, [currentStep, completedSteps])
 
   // Define required fields for each step
   const getStepRequiredFields = (stepIndex: number): (keyof ValidatedApplicationData)[] => {
@@ -147,6 +192,10 @@ export default function ApplicationForm() {
 
   const nextStep = () => {
     if (currentStep < STEPS.length - 1) {
+      // Mark current step as completed when moving forward
+      if (isCurrentStepValid() && !completedSteps.includes(currentStep)) {
+        setCompletedSteps(prev => [...prev, currentStep])
+      }
       setCurrentStep(currentStep + 1)
     }
   }
@@ -154,6 +203,13 @@ export default function ApplicationForm() {
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handleStepClick = (stepIndex: number) => {
+    // Allow navigation to completed steps or previous steps
+    if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
+      setCurrentStep(stepIndex)
     }
   }
 
@@ -199,7 +255,7 @@ export default function ApplicationForm() {
     } catch (error) {
       console.error('Submission error details:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      alert(`Failed to submit application: ${errorMessage}`)
+      alert(t('system.submission_failed', `Failed to submit application: ${errorMessage}`))
     } finally {
       setIsSubmitting(false)
     }
@@ -218,13 +274,25 @@ export default function ApplicationForm() {
 
   return (
     <div className="mx-auto px-4 py-4 max-w-4xl">
-      <ProgressBar 
-        currentStep={currentStep} 
-        totalSteps={STEPS.length}
-        steps={STEPS.map(s => s.title)}
-      />
+      {/* Only show internal progress bar and language selector when NOT embedded */}
+      {!isEmbedded && (
+        <>
+          {/* Language Selector */}
+          <div className="mb-4 flex justify-end">
+            <LanguageSelector variant="compact" />
+          </div>
 
-      <FormStep title={STEPS[currentStep].title}>
+          <ProgressBar 
+            currentStep={currentStep} 
+            totalSteps={STEPS.length}
+            steps={STEPS.map(s => t(s.titleKey, s.titleKey))}
+            onStepClick={handleStepClick}
+            completedSteps={completedSteps}
+          />
+        </>
+      )}
+
+      <FormStep title={t(STEPS[currentStep].titleKey, STEPS[currentStep].titleKey)}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <CurrentStepComponent 
             form={form}
@@ -244,5 +312,13 @@ export default function ApplicationForm() {
         </form>
       </FormStep>
     </div>
+  )
+}
+
+export default function ApplicationForm() {
+  return (
+    <LanguageProvider>
+      <ApplicationFormContent />
+    </LanguageProvider>
   )
 }

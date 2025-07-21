@@ -84,7 +84,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
               { key: 'availabilitySaturday', label: 'Saturday', description: 'Available on Saturday' }
             ].map((day) => {
               const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
-              const isSelected = Boolean(currentValue && currentValue.trim() !== '')
+              const isSelected = Boolean(currentValue && currentValue !== '')
               
               return (
                 <div 
@@ -104,41 +104,47 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                         if (!e.target.checked) {
                           setValue(day.key as keyof ValidatedApplicationData, '')
                         } else {
-                          // Set a placeholder value to show the time input field
-                          setValue(day.key as keyof ValidatedApplicationData, 'available')
+                          // Set a placeholder value to show the time input field (empty but checked)
+                          setValue(day.key as keyof ValidatedApplicationData, ' ')
                         }
                       }}
                       className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <label 
-                        htmlFor={`${day.key}_checkbox`}
-                        className="block text-sm font-medium text-gray-900 cursor-pointer"
-                      >
-                        {day.label}
-                      </label>
+                      <div className="flex items-center justify-between">
+                        <label 
+                          htmlFor={`${day.key}_checkbox`}
+                          className="text-sm font-medium text-gray-900 cursor-pointer"
+                        >
+                          {day.label}
+                        </label>
+                        
+                        {/* Availability Time Input - to the right of label */}
+                        {isSelected && (
+                          <input
+                            {...register(day.key as keyof ValidatedApplicationData)}
+                            type="text"
+                            className="ml-3 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
+                            placeholder="e.g., 8AM-5PM"
+                            onFocus={(e) => {
+                              // Clear the placeholder space on focus if it's just a space
+                              if (e.target.value.trim() === '') {
+                                setValue(day.key as keyof ValidatedApplicationData, '')
+                              }
+                            }}
+                          />
+                        )}
+                      </div>
+                      
                       <p className="text-xs text-gray-600 mt-1">
                         {day.description}
                       </p>
                       
-                      {/* Availability Time Input */}
-                      {isSelected && (
-                        <div className="mt-3 space-y-1">
-                          <label className="block text-xs font-medium text-gray-700">
-                            Available Hours
-                          </label>
-                          <input
-                            {...register(day.key as keyof ValidatedApplicationData)}
-                            type="text"
-                            className="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:ring-primary focus:border-primary"
-                            placeholder="e.g., 8AM-5PM or Flexible"
-                          />
-                          {errors[day.key as keyof ValidatedApplicationData] && (
-                            <p className="text-xs text-red-500 mt-1">
-                              {errors[day.key as keyof ValidatedApplicationData]?.message}
-                            </p>
-                          )}
-                        </div>
+                      {/* Error display */}
+                      {isSelected && errors[day.key as keyof ValidatedApplicationData] && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {errors[day.key as keyof ValidatedApplicationData]?.message}
+                        </p>
                       )}
                     </div>
                   </div>

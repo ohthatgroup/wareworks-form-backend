@@ -197,6 +197,11 @@ Copy this code into your Webflow embed element
     </p>
   </div>
 
+  <!-- Progress Bar Container (shown after language selection) -->
+  <div id="progress-bar-container" style="display: none; width: 100%;">
+    <!-- Progress bar will be injected here -->
+  </div>
+
   <!-- Application Container -->
   <div id="application-container" style="display: none; width: 100%;">
     <!-- The standalone application will be loaded here -->
@@ -305,6 +310,24 @@ Copy this code into your Webflow embed element
     }, 500);
   };
 
+  // State management for application
+  let currentState = {
+    language: 'en',
+    currentStep: 0,
+    totalSteps: 8,
+    completedSteps: [],
+    steps: [
+      'Personal Information',
+      'Contact Details', 
+      'Work Authorization',
+      'Position & Experience',
+      'Availability & Preferences',
+      'Education & Employment',
+      'Documents',
+      'Review & Submit'
+    ]
+  };
+
   // Load application in iframe (embedded approach)
   window.loadApplicationEmbed = function(language = 'en') {
     console.log('Loading WareWorks application in iframe, language:', language);
@@ -316,17 +339,25 @@ Copy this code into your Webflow embed element
       mode: 'embedded'
     });
     
+    currentState.language = language;
+    
     const container = document.getElementById('application-container');
     const loading = document.getElementById('application-loading');
     const disclaimer = document.getElementById('language-disclaimer');
+    const progressContainer = document.getElementById('progress-bar-container');
     
     // Show loading first
     disclaimer.style.display = 'none';
     loading.style.display = 'block';
     
-    // After a brief moment, load the iframe
+    // After a brief moment, show progress bar and load the iframe
     setTimeout(() => {
       loading.style.display = 'none';
+      
+      // Show and initialize progress bar
+      progressContainer.style.display = 'block';
+      updateProgressBar();
+      
       container.style.display = 'block';
     
       // Build application URL with parameters
@@ -354,13 +385,19 @@ Copy this code into your Webflow embed element
       iframe.style.overflow = 'hidden';
       iframe.style.transition = 'height 0.3s ease';
       
-      // Handle iframe messages for height adjustment
+      // Handle iframe messages for height adjustment and progress updates
       window.addEventListener('message', function(event) {
         if (event.origin === new URL(CONFIG.FORM_APP_URL).origin) {
           if (event.data.type === 'resize') {
             const newHeight = event.data.height;
             iframe.style.height = newHeight + 'px';
             console.log('Iframe height adjusted to:', newHeight + 'px');
+          }
+          if (event.data.type === 'step_change') {
+            currentState.currentStep = event.data.currentStep;
+            currentState.completedSteps = event.data.completedSteps || [];
+            updateProgressBar();
+            console.log('Step changed to:', event.data.currentStep);
           }
           if (event.data.type === 'application_complete') {
             trackEvent('application_complete', event.data.details);
@@ -376,6 +413,174 @@ Copy this code into your Webflow embed element
       
       container.appendChild(iframe);
     }, 500);
+  };
+
+  // Update progress bar HTML
+  function updateProgressBar() {
+    const progressContainer = document.getElementById('progress-bar-container');
+    if (!progressContainer) return;
+    
+    const progress = ((currentState.currentStep + 1) / currentState.totalSteps) * 100;
+    
+    progressContainer.innerHTML = `
+      <div style="
+        background: white; 
+        border-bottom: 1px solid #e5e7eb; 
+        padding: 1rem; 
+        margin-bottom: 1rem;
+        font-family: 'Figtree', sans-serif;
+      ">
+        <!-- Header with Language Selector -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div style="
+              width: 2rem; 
+              height: 2rem; 
+              background: linear-gradient(to right, #2563eb, #1d4ed8); 
+              border-radius: 0.5rem; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+            ">
+              <span style="color: white; font-weight: bold; font-size: 0.875rem;">W</span>
+            </div>
+            <div>
+              <h3 style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0;">WareWorks Application</h3>
+              <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">
+                Step ${currentState.currentStep + 1} of ${currentState.totalSteps} • ${currentState.steps[currentState.currentStep]}
+              </p>
+            </div>
+          </div>
+          
+          <!-- Language Selector -->
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg style="width: 1rem; height: 1rem; color: #6b7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+            <select id="language-selector" onchange="changeLanguage(this.value)" style="
+              font-size: 0.75rem; 
+              border: 1px solid #d1d5db; 
+              border-radius: 0.25rem; 
+              padding: 0.25rem 0.5rem;
+              background: white;
+            ">
+              <option value="en" ${currentState.language === 'en' ? 'selected' : ''}>English</option>
+              <option value="es" ${currentState.language === 'es' ? 'selected' : ''}>Español</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div style="
+          width: 100%; 
+          background: #e5e7eb; 
+          border-radius: 9999px; 
+          height: 0.5rem; 
+          margin-bottom: 1rem;
+        ">
+          <div style="
+            background: linear-gradient(to right, #2563eb, #1d4ed8); 
+            height: 0.5rem; 
+            border-radius: 9999px; 
+            transition: all 0.3s ease-out;
+            width: ${progress}%;
+          "></div>
+        </div>
+        
+        <!-- Step Indicators -->
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          ${currentState.steps.map((step, index) => {
+            const isCompleted = currentState.completedSteps.includes(index);
+            const isCurrent = index === currentState.currentStep;
+            const isClickable = index <= currentState.currentStep || isCompleted;
+            
+            return `
+              <div style="
+                display: flex; 
+                flex-direction: column; 
+                align-items: center; 
+                flex: 1; 
+                min-width: 60px;
+                ${isClickable ? 'cursor: pointer;' : ''}
+              " onclick="${isClickable ? `navigateToStep(${index})` : ''}" title="${step}">
+                <div style="
+                  width: 1.5rem; 
+                  height: 1.5rem; 
+                  border-radius: 50%; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center; 
+                  font-size: 0.75rem; 
+                  font-weight: 500; 
+                  margin-bottom: 0.25rem; 
+                  transition: all 0.2s;
+                  ${isCurrent 
+                    ? 'background: #2563eb; color: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);' 
+                    : isCompleted
+                    ? 'background: #10b981; color: white;'
+                    : index < currentState.currentStep
+                    ? 'background: #2563eb; color: white;'
+                    : 'background: #e5e7eb; color: #6b7280;'
+                  }
+                  ${isClickable ? 'transform: scale(1); transition: transform 0.2s;' : ''}
+                " onmouseover="${isClickable ? 'this.style.transform=\'scale(1.1)\'' : ''}" 
+                   onmouseout="${isClickable ? 'this.style.transform=\'scale(1)\'' : ''}">
+                  ${isCompleted ? '✓' : index + 1}
+                </div>
+                <span style="
+                  font-size: 0.625rem; 
+                  text-align: center; 
+                  line-height: 1.2; 
+                  max-width: 100%; 
+                  overflow: hidden; 
+                  text-overflow: ellipsis; 
+                  white-space: nowrap;
+                  ${isCurrent || isCompleted
+                    ? 'color: #2563eb; font-weight: 500;' 
+                    : index < currentState.currentStep
+                    ? 'color: #374151;'
+                    : 'color: #9ca3af;'
+                  }
+                ">
+                  ${step}
+                </span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Navigate to specific step
+  window.navigateToStep = function(stepIndex) {
+    console.log('Navigating to step:', stepIndex);
+    
+    // Send message to iframe to change step
+    const iframe = document.querySelector('#application-container iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({
+        type: 'navigate_to_step',
+        stepIndex: stepIndex
+      }, '*');
+    }
+  };
+
+  // Change language
+  window.changeLanguage = function(newLanguage) {
+    console.log('Changing language to:', newLanguage);
+    
+    currentState.language = newLanguage;
+    updateProgressBar();
+    
+    // Send message to iframe to change language
+    const iframe = document.querySelector('#application-container iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({
+        type: 'language_change',
+        language: newLanguage
+      }, '*');
+    }
   };
 
   // Initialize when DOM is ready

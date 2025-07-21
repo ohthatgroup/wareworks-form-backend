@@ -74,25 +74,19 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                   className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <label 
-                    htmlFor={equipment.key}
-                    className="block text-sm font-medium text-gray-900 cursor-pointer"
-                  >
-                    {equipment.label}
-                  </label>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {equipment.description}
-                  </p>
-                  
-                  {/* Experience Level Dropdown */}
-                  {isSelected && (
-                    <div className="mt-3 space-y-1">
-                      <label className="block text-xs font-medium text-gray-700">
-                        Experience Level
-                      </label>
+                  <div className="flex items-center justify-between">
+                    <label 
+                      htmlFor={equipment.key}
+                      className="text-sm font-medium text-gray-900 cursor-pointer"
+                    >
+                      {equipment.label}
+                    </label>
+                    
+                    {/* Experience Level Dropdown - to the right of label */}
+                    {isSelected && (
                       <select
                         {...register(equipment.key)}
-                        className="w-full text-sm border border-gray-300 rounded-md px-2 py-1.5 focus:ring-primary focus:border-primary"
+                        className="ml-3 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
                         defaultValue={currentValue || ''}
                       >
                         <option value="">Select level...</option>
@@ -102,12 +96,18 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                           </option>
                         ))}
                       </select>
-                      {errors[equipment.key] && (
-                        <p className="text-xs text-red-500 mt-1">
-                          {errors[equipment.key]?.message}
-                        </p>
-                      )}
-                    </div>
+                    )}
+                  </div>
+                  
+                  <p className="text-xs text-gray-600 mt-1">
+                    {equipment.description}
+                  </p>
+                  
+                  {/* Error display */}
+                  {isSelected && errors[equipment.key] && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors[equipment.key]?.message}
+                    </p>
                   )}
                 </div>
               </div>
