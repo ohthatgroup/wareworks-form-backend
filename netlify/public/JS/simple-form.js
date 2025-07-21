@@ -2,6 +2,7 @@
 let currentPage = 1;
 const totalPages = 8;
 let formData = {};
+let allPagesHTML = null; // Cache for the full HTML content
 
 // Page URLs
 const pageUrls = {
@@ -44,17 +45,17 @@ function acceptDisclaimer(language) {
         mainContainer.style.display = 'block';
     }
     
-    // Load all pages content first, then show page 1
-    loadAllPagesContent().then(() => {
-        loadPage(1);
-    }).catch(() => {
-        // Fallback to original multi-page mode
-        loadPage(1);
-    });
+    // Load the single file content and show page 1
+    loadPage(1);
 }
 
-async function loadAllPagesContent() {
-    console.log('Loading all pages content...');
+async function loadAllPagesContentOnce() {
+    console.log('Loading all pages content for caching...');
+    
+    if (allPagesHTML) {
+        console.log('All pages content already cached');
+        return allPagesHTML;
+    }
     
     try {
         const response = await fetch('https://wareworks-backend.netlify.app/form-pages/all-pages-content.html');
@@ -62,19 +63,38 @@ async function loadAllPagesContent() {
             throw new Error('Failed to load all pages content');
         }
         
-        const html = await response.text();
-        
-        // Insert all pages into the container
-        const container = document.getElementById('pageContentContainer');
-        if (container) {
-            container.innerHTML = html;
-            console.log('All pages content loaded successfully');
-        }
-        
-        return true;
+        allPagesHTML = await response.text();
+        console.log('All pages content cached successfully');
+        return allPagesHTML;
     } catch (error) {
         console.error('Error loading all pages content:', error);
         throw error;
+    }
+}
+
+function extractPageSection(pageNum) {
+    console.log('Extracting page section:', pageNum);
+    
+    if (!allPagesHTML) {
+        console.error('All pages HTML not loaded yet');
+        return null;
+    }
+    
+    // Create a temporary DOM parser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(allPagesHTML, 'text/html');
+    
+    // Extract the specific page section
+    const pageSection = doc.getElementById(`page${pageNum}`);
+    
+    if (pageSection) {
+        // Get the page HTML including its container
+        const pageHTML = pageSection.outerHTML;
+        console.log(`Successfully extracted page ${pageNum} section`);
+        return pageHTML;
+    } else {
+        console.error(`Page ${pageNum} section not found in cached HTML`);
+        return null;
     }
 }
 
@@ -85,50 +105,31 @@ async function loadPage(pageNum) {
         // Show loading
         showLoading(true);
         
-        // Check if we're in single-page mode (all pages already loaded)
-        const allPagesContainer = document.getElementById('allFormPages');
-        const targetPage = document.getElementById(`page${pageNum}`);
+        // Save current form data before switching pages
+        saveFormData();
         
-        if (allPagesContainer && targetPage) {
-            // Single-page mode: just show/hide pages
-            console.log('Single-page mode: switching to page', pageNum);
+        // Load all pages content if not already cached
+        await loadAllPagesContentOnce();
+        
+        // Extract the specific page section
+        const pageHTML = extractPageSection(pageNum);
+        
+        if (!pageHTML) {
+            throw new Error(`Failed to extract page ${pageNum} section`);
+        }
+        
+        // Update page container with only the requested page
+        const container = document.getElementById('pageContentContainer');
+        if (container) {
+            container.innerHTML = pageHTML;
+            console.log(`Page ${pageNum} section loaded into container`);
             
-            // Hide all pages
-            document.querySelectorAll('.form-page').forEach(page => {
-                page.classList.remove('active');
-                page.style.display = 'none';
-            });
-            
-            // Show target page
-            targetPage.classList.add('active');
-            targetPage.style.display = 'block';
+            // Hide any style tags that might be visible
+            const styleTags = container.querySelectorAll('style');
+            styleTags.forEach(style => style.style.display = 'none');
             
             // Initialize page-specific functionality
             initializePage(pageNum);
-        } else {
-            // Original multi-page mode: fetch content
-            console.log('Multi-page mode: fetching page', pageNum);
-            
-            // Get page content
-            const response = await fetch(pageUrls[pageNum]);
-            if (!response.ok) {
-                throw new Error(`Failed to load page ${pageNum}`);
-            }
-            
-            const html = await response.text();
-            
-            // Insert into container
-            const container = document.getElementById('pageContentContainer');
-            if (container) {
-                container.innerHTML = html;
-                
-                // Hide any style tags that might be visible
-                const styleTags = container.querySelectorAll('style');
-                styleTags.forEach(style => style.style.display = 'none');
-                
-                // Initialize page-specific functionality
-                initializePage(pageNum);
-            }
         }
         
         // Update UI

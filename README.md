@@ -36,69 +36,26 @@ The WareWorks Application Form System is a comprehensive web-based employment ap
 
 #### `JS/simple-form.js`
 **Purpose**: Main frontend application logic
-- **Page Navigation**: Handles 8-page form progression with validation
+- **Page Navigation**: Handles 8-page form progression with client-side navigation
+- **Single-Page Application**: Loads all form content once and shows/hides pages dynamically
 - **Address Autocomplete**: Integrates Google Maps JavaScript API for address suggestions
 - **Input Formatting**: Automatic formatting for phone numbers and SSN
 - **Document Upload**: Manages file uploads and converts to base64 for transmission
 - **Form Submission**: Three-step process: upload documents → process data → submit application
 - **Data Persistence**: Saves form data to localStorage and restores on page reload
 
-#### `form-pages/page1-personal-info.html`
-**Purpose**: Personal information collection
-- Legal name fields (first, middle, last, other names)
-- Address information with Google Maps autocomplete
-- Contact information (phone, email)
-- Date of birth and Social Security Number
-
-#### `form-pages/page2-contact.html`
-**Purpose**: Extended contact and emergency information
-- Home and cell phone numbers
-- Emergency contact details (name, phone, relationship)
-- Additional contact preferences
-
-#### `form-pages/page3-citizenship.html`
-**Purpose**: Citizenship and work authorization
-- Citizenship status selection
-- USCIS A-Number for non-citizens
-- Work authorization expiration dates
-- Document type and number fields
-
-#### `form-pages/page4-documents.html`
-**Purpose**: Document upload interface
-- **Required**: Government-issued ID (JPEG, PNG, PDF up to 10MB)
-- **Optional**: Resume (PDF, DOC, DOCX up to 10MB)
-- **Optional**: Certifications (Multiple files, JPEG, PNG, PDF up to 10MB each)
-- Real-time file validation and preview
-
-#### `form-pages/page5-application-questions.html`
-**Purpose**: Employment-specific questions
-- Age verification (18+)
-- Transportation availability
-- Work authorization confirmation
-- Full-time employment preference
-- Shift availability (swing shifts, graveyard shifts)
-- Weekly availability schedule (Sunday-Saturday)
-- Position applied for and salary expectations
-- Job discovery source
-- Previous WareWorks application history
-
-#### `form-pages/page6-education-history.html`
-**Purpose**: Educational background
-- School information (name, location, years attended)
-- Graduation status and degrees
-- Multiple education entries supported
-
-#### `form-pages/page7-employment-history.html`
-**Purpose**: Work experience collection
-- Previous employers (company, position, dates)
-- Job responsibilities and experience
-- Multiple employment entries supported
-
-#### `form-pages/page8-review-submit.html`
-**Purpose**: Final review and submission
-- Summary of all entered information
-- Document upload confirmation
-- Final submission trigger
+#### `form-pages/all-pages-content.html`
+**Purpose**: Consolidated single-file form containing all 8 pages
+- **Page 1**: Personal information collection (legal name, address with Google Maps autocomplete, contact info, DOB, SSN)
+- **Page 2**: Extended contact and emergency information (phone numbers, emergency contacts)
+- **Page 3**: Citizenship and work authorization (status, USCIS A-Number, document details)
+- **Page 4**: Document upload interface (government ID, resume, certifications with validation)
+- **Page 5**: Employment questions (age verification, transportation, availability, position preferences)
+- **Page 6**: Educational background (school information, degrees, graduation status)
+- **Page 7**: Employment history (previous employers, positions, experience)
+- **Page 8**: Final review and submission (summary, document confirmation, submission trigger)
+- **Optimized CSS**: Clean styling with pagination controls and responsive design
+- **Client-Side Navigation**: JavaScript-controlled page switching without server requests
 
 #### `External Files/simple-webflow-embed.html`
 **Purpose**: Webflow integration code
@@ -198,9 +155,9 @@ The WareWorks Application Form System is a comprehensive web-based employment ap
 
 ### 1. Form Submission Process
 ```
-User fills form → Frontend validation → Document upload to Blobs → 
-Data submission → Backend validation → Google Sheets storage → 
-PDF generation → Email delivery → Success confirmation
+User loads single-page form → Client-side page navigation → Form validation → 
+Document upload to Blobs → Data submission → Backend validation → 
+Google Sheets storage → PDF generation → Email delivery → Success confirmation
 ```
 
 ### 2. Document Processing
@@ -265,7 +222,8 @@ Final PDF creation → Email attachment
 - **User Feedback**: Clear error messages for form validation issues
 
 ### Performance Optimization
-- **Lazy Loading**: Form pages loaded on demand
+- **Single-Page Loading**: All form content loaded once for fast navigation
+- **Client-Side Routing**: No server requests for page transitions
 - **Debounced Autocomplete**: Prevents excessive API calls
 - **Efficient PDF Generation**: Optimized template processing
 
