@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 
@@ -32,23 +31,17 @@ const EXPERIENCE_LEVELS = [
 
 export function EquipmentExperience({ form }: EquipmentExperienceProps) {
   const { register, watch, setValue, formState: { errors } } = form
-  const [selectedEquipment, setSelectedEquipment] = useState<Set<string>>(new Set())
-
-  const toggleEquipment = (equipmentKey: string, checked: boolean) => {
-    const newSelected = new Set(selectedEquipment)
-    if (checked) {
-      newSelected.add(equipmentKey)
-    } else {
-      newSelected.delete(equipmentKey)
-      // Clear the experience level when unchecking
-      setValue(equipmentKey as keyof ValidatedApplicationData, '')
-    }
-    setSelectedEquipment(newSelected)
-  }
 
   const isEquipmentSelected = (equipmentKey: string): boolean => {
     const value = watch(equipmentKey as keyof ValidatedApplicationData)
     return Boolean(value && value !== '' && value !== 'none')
+  }
+
+  const toggleEquipment = (equipmentKey: string, checked: boolean) => {
+    if (!checked) {
+      // Clear the experience level when unchecking
+      setValue(equipmentKey as keyof ValidatedApplicationData, '')
+    }
   }
 
   return (
