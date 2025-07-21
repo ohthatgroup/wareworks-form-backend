@@ -9,7 +9,7 @@ interface AvailabilityStepProps {
 }
 
 export function AvailabilityStep({ form }: AvailabilityStepProps) {
-  const { register, watch, formState: { errors } } = form
+  const { register, watch, setValue, formState: { errors } } = form
   const previouslyApplied = watch('previouslyApplied')
   
   // Check if weekly availability should be shown
