@@ -74,7 +74,7 @@ Copy this code into your Webflow embed element
   </div>
 
   <!-- Application Container -->
-  <div id="application-container" style="display: none; width: 100%; min-height: 600px;">
+  <div id="application-container" style="display: none; width: 100%;">
     <!-- The standalone application will be loaded here -->
   </div>
 </div>
@@ -190,21 +190,31 @@ Copy this code into your Webflow embed element
       const iframe = document.createElement('iframe');
       iframe.src = url.toString();
       iframe.style.width = '100%';
-      iframe.style.minHeight = '600px';
+      iframe.style.height = '600px'; // Initial height, will be adjusted
       iframe.style.border = 'none';
       iframe.style.borderRadius = '8px';
+      iframe.style.overflow = 'hidden';
+      iframe.style.transition = 'height 0.3s ease';
       
       // Handle iframe messages for height adjustment
       window.addEventListener('message', function(event) {
         if (event.origin === new URL(CONFIG.FORM_APP_URL).origin) {
           if (event.data.type === 'resize') {
-            iframe.style.height = event.data.height + 'px';
+            const newHeight = event.data.height;
+            iframe.style.height = newHeight + 'px';
+            console.log('Iframe height adjusted to:', newHeight + 'px');
           }
           if (event.data.type === 'application_complete') {
             trackEvent('application_complete', event.data.details);
           }
         }
       });
+      
+      // Add onload event to request initial height
+      iframe.onload = function() {
+        console.log('Iframe loaded, requesting height adjustment');
+        iframe.contentWindow.postMessage({ type: 'requestHeight' }, '*');
+      };
       
       container.appendChild(iframe);
     }, 500);
