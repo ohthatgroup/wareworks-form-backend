@@ -37,6 +37,41 @@ export default function ApplicationForm() {
   // Handle iframe height communication
   useIframeHeight()
 
+  // Define required fields for each step
+  const getStepRequiredFields = (stepIndex: number): (keyof ValidatedApplicationData)[] => {
+    switch (stepIndex) {
+      case 0: // Personal Information
+        return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
+      case 1: // Contact Details
+        return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
+      case 2: // Work Authorization
+        return ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
+      case 3: // Position & Experience
+        return ['positionApplied', 'jobDiscovery']
+      case 4: // Availability
+        return ['fullTimeEmployment', 'previouslyApplied']
+      case 5: // Education & Employment
+        return [] // Optional sections
+      case 6: // Documents
+        return [] // Optional for now
+      case 7: // Review
+        return [] // Final review step
+      default:
+        return []
+    }
+  }
+
+  // Check if current step is valid
+  const isCurrentStepValid = () => {
+    const requiredFields = getStepRequiredFields(currentStep)
+    const formValues = form.watch() // Use watch to make it reactive
+    
+    return requiredFields.every(field => {
+      const value = formValues[field]
+      return value !== undefined && value !== null && value !== ''
+    })
+  }
+
   const form = useForm<ValidatedApplicationData>({
     resolver: zodResolver(applicationSchema),
     mode: 'onChange',
@@ -152,7 +187,7 @@ export default function ApplicationForm() {
             onPrevious={prevStep}
             onSubmit={form.handleSubmit(onSubmit)}
             isSubmitting={isSubmitting}
-            canProceed={form.formState.isValid}
+            canProceed={currentStep === STEPS.length - 1 ? form.formState.isValid : isCurrentStepValid()}
           />
         </form>
       </FormStep>

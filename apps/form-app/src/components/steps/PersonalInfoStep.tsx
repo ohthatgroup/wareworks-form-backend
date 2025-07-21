@@ -8,7 +8,22 @@ interface PersonalInfoStepProps {
 }
 
 export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
-  const { register, formState: { errors } } = form
+  const { register, formState: { errors }, setValue, watch } = form
+  
+  const formatSSN = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '')
+    
+    // Format as XXX-XX-XXXX
+    if (digits.length <= 3) {
+      return digits
+    } else if (digits.length <= 5) {
+      return `${digits.slice(0, 3)}-${digits.slice(3)}`
+    } else {
+      return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 9)}`
+    }
+  }
+
 
   return (
     <div className="space-y-6">
@@ -51,13 +66,25 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
           error={errors.dateOfBirth?.message}
         />
         
-        <Input
-          label="Social Security Number"
-          registration={register('socialSecurityNumber')}
-          error={errors.socialSecurityNumber?.message}
-          placeholder="XXX-XX-XXXX"
-          required
-        />
+        <div className="space-y-2">
+          <label className="form-label">
+            Social Security Number
+            <span className="text-red-500 ml-1">*</span>
+          </label>
+          <input
+            className={`form-input ${errors.socialSecurityNumber ? 'border-red-500 focus:border-red-500' : ''}`}
+            {...register('socialSecurityNumber')}
+            onChange={(e) => {
+              const formatted = formatSSN(e.target.value)
+              setValue('socialSecurityNumber', formatted)
+            }}
+            placeholder="XXX-XX-XXXX"
+            maxLength={11}
+          />
+          {errors.socialSecurityNumber && (
+            <p className="form-error">{errors.socialSecurityNumber.message}</p>
+          )}
+        </div>
       </div>
     </div>
   )
