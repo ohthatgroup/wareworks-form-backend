@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { CheckCircle, AlertCircle, Edit, Eye, Download } from 'lucide-react'
 
 interface ReviewStepProps {
@@ -20,13 +20,19 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     }
   }
 
-  const previewDocument = (file: File) => {
-    if (file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file)
+  const previewDocument = (doc: any) => {
+    try {
+      const byteCharacters = atob(doc.data)
+      const byteNumbers = new Array(byteCharacters.length)
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: doc.mimeType })
+      const url = URL.createObjectURL(blob)
       window.open(url, '_blank')
-    } else if (file.type === 'application/pdf') {
-      const url = URL.createObjectURL(file)
-      window.open(url, '_blank')
+    } catch (error) {
+      console.error('Error previewing document:', error)
     }
   }
 
@@ -247,14 +253,34 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                     >
                       <Eye size={16} />
                     </button>
-                    <a
-                      href={URL.createObjectURL(doc)}
-                      download={doc.name}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          const byteCharacters = atob(doc.data)
+                          const byteNumbers = new Array(byteCharacters.length)
+                          for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i)
+                          }
+                          const byteArray = new Uint8Array(byteNumbers)
+                          const blob = new Blob([byteArray], { type: doc.mimeType })
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = doc.name
+                          document.body.appendChild(a)
+                          a.click()
+                          document.body.removeChild(a)
+                          URL.revokeObjectURL(url)
+                        } catch (error) {
+                          console.error('Error downloading document:', error)
+                        }
+                      }}
                       className="text-primary hover:text-primary-dark p-1"
                       title="Download"
                     >
                       <Download size={16} />
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}

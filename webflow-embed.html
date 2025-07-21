@@ -27,7 +27,7 @@ Copy this code into your Webflow embed element
     </p>
     
     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <button onclick="startApplication('en')" style="
+      <button onclick="loadApplicationEmbed('en')" style="
         background: #131f5b;
         color: white;
         border: none;
@@ -40,7 +40,7 @@ Copy this code into your Webflow embed element
         🇺🇸 English
       </button>
       
-      <button onclick="startApplication('es')" style="
+      <button onclick="loadApplicationEmbed('es')" style="
         background: #131f5b;
         color: white;
         border: none;
@@ -147,38 +147,67 @@ Copy this code into your Webflow embed element
     }, 500);
   };
 
-  // Alternative: Load application in iframe (if you prefer embedded approach)
+  // Load application in iframe (embedded approach)
   window.loadApplicationEmbed = function(language = 'en') {
+    console.log('Loading WareWorks application in iframe, language:', language);
+    
+    // Track application start
+    trackEvent('application_start', {
+      language: language,
+      referrer: CONFIG.WEBFLOW_DOMAIN,
+      mode: 'embedded'
+    });
+    
     const container = document.getElementById('application-container');
     const loading = document.getElementById('application-loading');
     const disclaimer = document.getElementById('language-disclaimer');
     
-    // Hide disclaimer and loading, show container
+    // Show loading first
     disclaimer.style.display = 'none';
-    loading.style.display = 'none';
-    container.style.display = 'block';
+    loading.style.display = 'block';
     
-    // Create iframe
-    const iframe = document.createElement('iframe');
-    iframe.src = `${CONFIG.FORM_APP_URL}?lang=${language}&embed=true&source=webflow`;
-    iframe.style.width = '100%';
-    iframe.style.minHeight = '600px';
-    iframe.style.border = 'none';
-    iframe.style.borderRadius = '8px';
+    // After a brief moment, load the iframe
+    setTimeout(() => {
+      loading.style.display = 'none';
+      container.style.display = 'block';
     
-    // Handle iframe messages for height adjustment
-    window.addEventListener('message', function(event) {
-      if (event.origin === new URL(CONFIG.FORM_APP_URL).origin) {
-        if (event.data.type === 'resize') {
-          iframe.style.height = event.data.height + 'px';
+      // Build application URL with parameters
+      const url = new URL(CONFIG.FORM_APP_URL);
+      url.searchParams.set('lang', language);
+      url.searchParams.set('embed', 'true');
+      url.searchParams.set('source', 'webflow');
+      url.searchParams.set('referrer', CONFIG.WEBFLOW_DOMAIN);
+      
+      // Add UTM parameters if present
+      const urlParams = new URLSearchParams(window.location.search);
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(param => {
+        if (urlParams.has(param)) {
+          url.searchParams.set(param, urlParams.get(param));
         }
-        if (event.data.type === 'application_complete') {
-          trackEvent('application_complete', event.data.details);
-        }
-      }
-    });
+      });
     
-    container.appendChild(iframe);
+      // Create iframe
+      const iframe = document.createElement('iframe');
+      iframe.src = url.toString();
+      iframe.style.width = '100%';
+      iframe.style.minHeight = '600px';
+      iframe.style.border = 'none';
+      iframe.style.borderRadius = '8px';
+      
+      // Handle iframe messages for height adjustment
+      window.addEventListener('message', function(event) {
+        if (event.origin === new URL(CONFIG.FORM_APP_URL).origin) {
+          if (event.data.type === 'resize') {
+            iframe.style.height = event.data.height + 'px';
+          }
+          if (event.data.type === 'application_complete') {
+            trackEvent('application_complete', event.data.details);
+          }
+        }
+      });
+      
+      container.appendChild(iframe);
+    }, 500);
   };
 
   // Initialize when DOM is ready

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { applicationSchema, type ValidatedApplicationData } from '../../../shared/validation/schemas'
+import { applicationSchema, type ValidatedApplicationData } from '../shared/validation/schemas'
 import { FormStep } from '../components/FormStep'
 import { ProgressBar } from '../components/ProgressBar'
 import { FormNavigation } from '../components/FormNavigation'
