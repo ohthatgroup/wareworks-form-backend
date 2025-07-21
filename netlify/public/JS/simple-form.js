@@ -45,7 +45,7 @@ function acceptDisclaimer(language) {
         mainContainer.style.display = 'block';
     }
     
-    // Load the single file content and show page 1
+    // Load page 1 using the new section-based approach
     loadPage(1);
 }
 
@@ -88,8 +88,18 @@ function extractPageSection(pageNum) {
     const pageSection = doc.getElementById(`page${pageNum}`);
     
     if (pageSection) {
-        // Get the page HTML including its container
-        const pageHTML = pageSection.outerHTML;
+        // Clone the section and ensure it's visible
+        const clonedSection = pageSection.cloneNode(true);
+        
+        // Remove hidden classes and add active class
+        clonedSection.classList.remove('form-page');
+        clonedSection.classList.add('active');
+        clonedSection.style.display = 'block';
+        clonedSection.style.maxWidth = '800px';
+        clonedSection.style.margin = '0 auto';
+        clonedSection.style.padding = '2rem 1rem';
+        
+        const pageHTML = clonedSection.outerHTML;
         console.log(`Successfully extracted page ${pageNum} section`);
         return pageHTML;
     } else {
@@ -121,12 +131,21 @@ async function loadPage(pageNum) {
         // Update page container with only the requested page
         const container = document.getElementById('pageContentContainer');
         if (container) {
+            // Extract CSS from cached HTML if not already added
+            if (!document.getElementById('form-pages-css')) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(allPagesHTML, 'text/html');
+                const styleTag = doc.querySelector('style');
+                if (styleTag) {
+                    const newStyle = document.createElement('style');
+                    newStyle.id = 'form-pages-css';
+                    newStyle.textContent = styleTag.textContent;
+                    document.head.appendChild(newStyle);
+                }
+            }
+            
             container.innerHTML = pageHTML;
             console.log(`Page ${pageNum} section loaded into container`);
-            
-            // Hide any style tags that might be visible
-            const styleTags = container.querySelectorAll('style');
-            styleTags.forEach(style => style.style.display = 'none');
             
             // Initialize page-specific functionality
             initializePage(pageNum);
