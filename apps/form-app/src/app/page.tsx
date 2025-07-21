@@ -43,7 +43,7 @@ export default function ApplicationForm() {
       case 0: // Personal Information
         return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
       case 1: // Contact Details
-        return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
+        return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'emergencyName', 'emergencyPhone', 'emergencyRelationship']
       case 2: // Work Authorization
         const baseFields: (keyof ValidatedApplicationData)[] = ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
         const currentCitizenship = form.watch('citizenshipStatus')
