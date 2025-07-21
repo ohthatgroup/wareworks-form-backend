@@ -145,12 +145,6 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <h3 className="font-medium text-green-900 mb-2">Required Documents</h3>
-        <p className="text-sm text-green-800">
-          Please upload the following documents to complete your application. All files must be in PDF, JPG, or PNG format and under 10MB.
-        </p>
-      </div>
 
       <div className="space-y-6">
         {/* Government ID */}
@@ -233,15 +227,6 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
         </div>
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <h3 className="font-medium text-gray-900 mb-2">File Requirements</h3>
-        <ul className="text-sm text-gray-700 space-y-1">
-          <li>• Accepted formats: PDF, JPG, JPEG, PNG</li>
-          <li>• Maximum file size: 10MB per file</li>
-          <li>• Documents must be clear and legible</li>
-          <li>• Personal information must be visible</li>
-        </ul>
-      </div>
     </div>
   )
 }

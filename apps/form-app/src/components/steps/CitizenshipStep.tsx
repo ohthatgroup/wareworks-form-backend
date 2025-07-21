@@ -29,12 +29,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-medium text-blue-900 mb-2">Employment Eligibility</h3>
-        <p className="text-sm text-blue-800">
-          All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process.
-        </p>
-      </div>
 
       <Select
         label="Citizenship Status"
@@ -133,13 +127,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
             required
           />
         </div>
-      </div>
-
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="font-medium text-yellow-900 mb-2">Important Notice</h3>
-        <p className="text-sm text-yellow-800">
-          Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.
-        </p>
       </div>
     </div>
   )

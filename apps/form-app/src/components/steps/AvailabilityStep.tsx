@@ -14,12 +14,6 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-medium text-blue-900 mb-2">Work Preferences & Availability</h3>
-        <p className="text-sm text-blue-800">
-          Help us understand your availability and work preferences to find the best fit.
-        </p>
-      </div>
 
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-primary mb-4">Work Preferences</h3>

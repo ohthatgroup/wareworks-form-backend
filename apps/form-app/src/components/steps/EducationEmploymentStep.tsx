@@ -59,12 +59,6 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
   return (
     <div className="space-y-8">
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-        <h3 className="font-medium text-purple-900 mb-2">Education & Employment History</h3>
-        <p className="text-sm text-purple-800">
-          Provide your educational background and work experience. This information helps us understand your qualifications.
-        </p>
-      </div>
 
       {/* Education Section */}
       <div className="border-t pt-6">
@@ -307,12 +301,6 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
         ))}
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <h3 className="font-medium text-gray-900 mb-2">Information Notice</h3>
-        <p className="text-sm text-gray-700">
-          All information provided will be verified during the background check process. Please ensure accuracy of all employment dates, supervisor information, and job responsibilities.
-        </p>
-      </div>
     </div>
   )
 }
