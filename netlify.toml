@@ -1,7 +1,7 @@
 [build]
-  base = "/apps/form-app"
+  base = "apps/form-app"
   command = "npm run build"
-  publish = "/apps/form-app/.next"
+  publish = ".next"
 
 [functions]
   directory = "netlify/functions"
@@ -10,27 +10,29 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Modern API routes
+# Clean API route redirect for V2 functions
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/v2/:splat"
   status = 200
 
-# Legacy compatibility
+# Optional: direct alias for submit-application
 [[redirects]]
-  from = "/.netlify/functions/submit-application"
-  to = "/.netlify/functions/legacy/submit-application"
+  from = "/api/submit-application"
+  to = "/.netlify/functions/v2/submit-application"
   status = 200
 
-# Form app routing
+# Catch-all redirect for SPA fallback (optional)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
+# Environment variables for production
 [context.production.environment]
   NODE_ENV = "production"
   NEXT_PUBLIC_API_URL = "https://wareworks-backend.netlify.app"
 
+# Environment variables for deploy preview
 [context.deploy-preview.environment]
   NODE_ENV = "development"
