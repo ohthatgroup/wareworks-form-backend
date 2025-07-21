@@ -8,7 +8,7 @@ export const applicationSchema = z.object({
   middleInitial: z.string().optional(),
   legalLastName: z.string().min(1, 'Last name is required'),
   otherLastNames: z.string().optional(),
-  dateOfBirth: z.string().min(1, 'Date of birth is required'),
+  dateOfBirth: z.string().optional(),
   socialSecurityNumber: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, 'Invalid SSN format'),
   
   // Contact Information

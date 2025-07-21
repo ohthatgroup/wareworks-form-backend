@@ -49,7 +49,6 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
           type="date"
           registration={register('dateOfBirth')}
           error={errors.dateOfBirth?.message}
-          required
         />
         
         <Input
