@@ -59,12 +59,14 @@ async function loadAllPagesContentOnce() {
     
     try {
         const response = await fetch('https://wareworks-backend.netlify.app/form-pages/all-pages-content.html');
+        console.log('Fetch response status:', response.status, response.statusText);
         if (!response.ok) {
-            throw new Error('Failed to load all pages content');
+            throw new Error(`Failed to load all pages content: ${response.status} ${response.statusText}`);
         }
         
         allPagesHTML = await response.text();
-        console.log('All pages content cached successfully');
+        console.log('All pages content cached successfully, length:', allPagesHTML.length);
+        console.log('Content preview:', allPagesHTML.substring(0, 500));
         return allPagesHTML;
     } catch (error) {
         console.error('Error loading all pages content:', error);
@@ -123,8 +125,12 @@ async function loadPage(pageNum) {
         
         // Extract the specific page section
         const pageHTML = extractPageSection(pageNum);
+        console.log('Extracted HTML length:', pageHTML ? pageHTML.length : 'null');
         
         if (!pageHTML) {
+            console.error('Available page IDs in cached HTML:', 
+                allPagesHTML ? Array.from(new DOMParser().parseFromString(allPagesHTML, 'text/html').querySelectorAll('[id*="page"]')).map(el => el.id) : 'No cached HTML'
+            );
             throw new Error(`Failed to extract page ${pageNum} section`);
         }
         
@@ -756,14 +762,17 @@ function nextPage() {
     console.log('Next page clicked');
     
     if (currentPage < totalPages) {
-        // Check if required fields are filled
-        if (checkRequiredFields()) {
-            // Save current page data before moving
-            saveFormData();
-            loadPage(currentPage + 1);
-        } else {
-            showMessage('Please fill in all required fields before continuing.', 'error');
-        }
+        // Save current page data before moving
+        saveFormData();
+        loadPage(currentPage + 1);
+        
+        // TODO: Re-enable required field validation once pagination is working
+        // if (checkRequiredFields()) {
+        //     saveFormData();
+        //     loadPage(currentPage + 1);
+        // } else {
+        //     showMessage('Please fill in all required fields before continuing.', 'error');
+        // }
     } else {
         // On last page, submit the form
         submitApplication();
