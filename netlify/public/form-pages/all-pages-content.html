@@ -314,6 +314,20 @@ select.field-input {
     justify-content: center;
 }
 
+/* Equipment Grid */
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .equipment-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Conditional Sections */
 .conditional-section {
     display: none;
@@ -1397,6 +1411,136 @@ select.field-input {
                 placeholder="e.g. Indeed, Company Website, Referral, Job Fair"
             >
             <div class="field-error" id="error-jobDiscovery"></div>
+        </div>
+
+        <!-- Equipment Experience -->
+        <div class="question-card">
+            <div class="question-title">
+                <span class="question-icon"></span>
+                <span>Equipment Experience</span>
+            </div>
+            <p class="question-description">Please indicate your experience level with warehouse equipment:</p>
+            
+            <div class="equipment-grid">
+                <div class="field-wrapper">
+                    <label for="equipmentSD" class="field-label">SD (Sit Down Forklift)</label>
+                    <select id="equipmentSD" name="equipmentSD" data-name="SD Sit Down" class="field-input">
+                        <option value="">Select Experience</option>
+                        <option value="none">No Experience</option>
+                        <option value="basic">Basic (< 1 year)</option>
+                        <option value="intermediate">Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                        <option value="certified">Certified</option>
+                    </select>
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="equipmentSU" class="field-label">SU (Stand Up Forklift)</label>
+                    <select id="equipmentSU" name="equipmentSU" data-name="SU Stand Up" class="field-input">
+                        <option value="">Select Experience</option>
+                        <option value="none">No Experience</option>
+                        <option value="basic">Basic (< 1 year)</option>
+                        <option value="intermediate">Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                        <option value="certified">Certified</option>
+                    </select>
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="equipmentSUR" class="field-label">SUR (Stand Up Reach)</label>
+                    <select id="equipmentSUR" name="equipmentSUR" data-name="SUR Stand Up Reach" class="field-input">
+                        <option value="">Select Experience</option>
+                        <option value="none">No Experience</option>
+                        <option value="basic">Basic (< 1 year)</option>
+                        <option value="intermediate">Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                        <option value="certified">Certified</option>
+                    </select>
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="equipmentCP" class="field-label">CP (Cherry Picker)</label>
+                    <select id="equipmentCP" name="equipmentCP" data-name="CP Cherry Picker" class="field-input">
+                        <option value="">Select Experience</option>
+                        <option value="none">No Experience</option>
+                        <option value="basic">Basic (< 1 year)</option>
+                        <option value="intermediate">Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                        <option value="certified">Certified</option>
+                    </select>
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="equipmentCL" class="field-label">CL (Clamps)</label>
+                    <select id="equipmentCL" name="equipmentCL" data-name="CL Clamps" class="field-input">
+                        <option value="">Select Experience</option>
+                        <option value="none">No Experience</option>
+                        <option value="basic">Basic (< 1 year)</option>
+                        <option value="intermediate">Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                        <option value="certified">Certified</option>
+                    </select>
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="equipmentRJ" class="field-label">Riding Jack</label>
+                    <select id="equipmentRJ" name="equipmentRJ" data-name="Riding Jack" class="field-input">
+                        <option value="">Select Experience</option>
+                        <option value="none">No Experience</option>
+                        <option value="basic">Basic (< 1 year)</option>
+                        <option value="intermediate">Intermediate (1-3 years)</option>
+                        <option value="advanced">Advanced (3+ years)</option>
+                        <option value="certified">Certified</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills and Qualifications -->
+        <div class="question-card">
+            <div class="question-title">
+                <span class="question-icon"></span>
+                <span>Additional Skills & Qualifications</span>
+            </div>
+            <p class="question-description">List any additional skills, qualifications, or certifications:</p>
+            
+            <div class="form-grid">
+                <div class="field-wrapper">
+                    <label for="skill1" class="field-label">Skill/Qualification 1</label>
+                    <input 
+                        type="text" 
+                        class="field-input" 
+                        maxlength="256" 
+                        name="skill1" 
+                        data-name="Applicable Skills Qualifications 1" 
+                        id="skill1" 
+                        placeholder="e.g., Inventory Management">
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="skill2" class="field-label">Skill/Qualification 2</label>
+                    <input 
+                        type="text" 
+                        class="field-input" 
+                        maxlength="256" 
+                        name="skill2" 
+                        data-name="Applicable Skills Qualifications 2" 
+                        id="skill2" 
+                        placeholder="e.g., OSHA Certification">
+                </div>
+                
+                <div class="field-wrapper">
+                    <label for="skill3" class="field-label">Skill/Qualification 3</label>
+                    <input 
+                        type="text" 
+                        class="field-input" 
+                        maxlength="256" 
+                        name="skill3" 
+                        data-name="Applicable Skills Qualifications 3" 
+                        id="skill3" 
+                        placeholder="e.g., Bilingual (Spanish/English)">
+                </div>
+            </div>
         </div>
 
         <!-- Full-time Employment -->
