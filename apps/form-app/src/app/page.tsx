@@ -45,7 +45,15 @@ export default function ApplicationForm() {
       case 1: // Contact Details
         return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
       case 2: // Work Authorization
-        return ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
+        const baseFields: (keyof ValidatedApplicationData)[] = ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
+        const currentCitizenship = form.watch('citizenshipStatus')
+        
+        if (currentCitizenship === 'lawful_permanent') {
+          return [...baseFields, 'uscisANumber']
+        } else if (currentCitizenship === 'alien_authorized') {
+          return [...baseFields, 'workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry']
+        }
+        return baseFields
       case 3: // Position & Experience
         return ['positionApplied', 'jobDiscovery']
       case 4: // Availability
@@ -65,10 +73,14 @@ export default function ApplicationForm() {
   const isCurrentStepValid = () => {
     const requiredFields = getStepRequiredFields(currentStep)
     const formValues = form.watch() // Use watch to make it reactive
+    const formState = form.formState
     
+    // Check that all required fields are filled AND don't have validation errors
     return requiredFields.every(field => {
       const value = formValues[field]
-      return value !== undefined && value !== null && value !== ''
+      const hasValue = value !== undefined && value !== null && value !== ''
+      const hasNoError = !formState.errors[field]
+      return hasValue && hasNoError
     })
   }
 

@@ -61,7 +61,21 @@ const US_STATES = [
 ]
 
 export function ContactInfoStep({ form }: ContactInfoStepProps) {
-  const { register, formState: { errors } } = form
+  const { register, formState: { errors }, setValue } = form
+  
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '')
+    
+    // Format as (XXX) XXX-XXXX
+    if (digits.length <= 3) {
+      return digits
+    } else if (digits.length <= 6) {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    } else {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -120,30 +134,62 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Input
-          label="Primary Phone Number"
-          type="tel"
-          registration={register('phoneNumber')}
-          error={errors.phoneNumber?.message}
-          placeholder="(555) 123-4567"
-          required
-        />
+        <div className="space-y-2">
+          <label className="form-label">
+            Primary Phone Number
+            <span className="text-red-500 ml-1">*</span>
+          </label>
+          <input
+            type="tel"
+            className={`form-input ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''}`}
+            {...register('phoneNumber')}
+            onChange={(e) => {
+              const formatted = formatPhoneNumber(e.target.value)
+              setValue('phoneNumber', formatted)
+            }}
+            placeholder="(555) 123-4567"
+            maxLength={14}
+          />
+          {errors.phoneNumber && (
+            <p className="form-error">{errors.phoneNumber.message}</p>
+          )}
+        </div>
         
-        <Input
-          label="Home Phone"
-          type="tel"
-          registration={register('homePhone')}
-          error={errors.homePhone?.message}
-          placeholder="(555) 123-4567"
-        />
+        <div className="space-y-2">
+          <label className="form-label">Home Phone</label>
+          <input
+            type="tel"
+            className={`form-input ${errors.homePhone ? 'border-red-500 focus:border-red-500' : ''}`}
+            {...register('homePhone')}
+            onChange={(e) => {
+              const formatted = formatPhoneNumber(e.target.value)
+              setValue('homePhone', formatted)
+            }}
+            placeholder="(555) 123-4567"
+            maxLength={14}
+          />
+          {errors.homePhone && (
+            <p className="form-error">{errors.homePhone.message}</p>
+          )}
+        </div>
         
-        <Input
-          label="Cell Phone"
-          type="tel"
-          registration={register('cellPhone')}
-          error={errors.cellPhone?.message}
-          placeholder="(555) 123-4567"
-        />
+        <div className="space-y-2">
+          <label className="form-label">Cell Phone</label>
+          <input
+            type="tel"
+            className={`form-input ${errors.cellPhone ? 'border-red-500 focus:border-red-500' : ''}`}
+            {...register('cellPhone')}
+            onChange={(e) => {
+              const formatted = formatPhoneNumber(e.target.value)
+              setValue('cellPhone', formatted)
+            }}
+            placeholder="(555) 123-4567"
+            maxLength={14}
+          />
+          {errors.cellPhone && (
+            <p className="form-error">{errors.cellPhone.message}</p>
+          )}
+        </div>
       </div>
 
       <Input
@@ -165,14 +211,26 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             required
           />
           
-          <Input
-            label="Emergency Contact Phone"
-            type="tel"
-            registration={register('emergencyPhone')}
-            error={errors.emergencyPhone?.message}
-            placeholder="(555) 123-4567"
-            required
-          />
+          <div className="space-y-2">
+            <label className="form-label">
+              Emergency Contact Phone
+              <span className="text-red-500 ml-1">*</span>
+            </label>
+            <input
+              type="tel"
+              className={`form-input ${errors.emergencyPhone ? 'border-red-500 focus:border-red-500' : ''}`}
+              {...register('emergencyPhone')}
+              onChange={(e) => {
+                const formatted = formatPhoneNumber(e.target.value)
+                setValue('emergencyPhone', formatted)
+              }}
+              placeholder="(555) 123-4567"
+              maxLength={14}
+            />
+            {errors.emergencyPhone && (
+              <p className="form-error">{errors.emergencyPhone.message}</p>
+            )}
+          </div>
           
           <Input
             label="Relationship"

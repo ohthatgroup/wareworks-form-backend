@@ -1,6 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
+import { RadioGroup } from '../ui/RadioGroup'
 
 interface AvailabilityStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -23,93 +24,42 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-primary mb-4">Work Preferences</h3>
         
-        <div className="space-y-4">
-          <div>
-            <label className="form-label">
-              Are you interested in full-time employment? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('fullTimeEmployment')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('fullTimeEmployment')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.fullTimeEmployment && (
-              <p className="form-error">{errors.fullTimeEmployment.message}</p>
-            )}
-          </div>
+        <div className="space-y-6">
+          <RadioGroup
+            label="Are you interested in full-time employment?"
+            name="fullTimeEmployment"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('fullTimeEmployment')}
+            error={errors.fullTimeEmployment?.message}
+            required
+          />
 
-          <div>
-            <label className="form-label">
-              Are you available for swing shifts (3PM-11PM)? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('swingShifts')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('swingShifts')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.swingShifts && (
-              <p className="form-error">{errors.swingShifts.message}</p>
-            )}
-          </div>
+          <RadioGroup
+            label="Are you available for swing shifts (3PM-11PM)?"
+            name="swingShifts"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('swingShifts')}
+            error={errors.swingShifts?.message}
+            required
+          />
 
-          <div>
-            <label className="form-label">
-              Are you available for graveyard shifts (11PM-7AM)? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('graveyardShifts')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('graveyardShifts')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.graveyardShifts && (
-              <p className="form-error">{errors.graveyardShifts.message}</p>
-            )}
-          </div>
+          <RadioGroup
+            label="Are you available for graveyard shifts (11PM-7AM)?"
+            name="graveyardShifts"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('graveyardShifts')}
+            error={errors.graveyardShifts?.message}
+            required
+          />
         </div>
       </div>
 
@@ -175,34 +125,17 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
         <h3 className="text-lg font-medium text-primary mb-4">Previous Application History</h3>
         
         <div className="space-y-4">
-          <div>
-            <label className="form-label">
-              Have you previously applied at WareWorks? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('previouslyApplied')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('previouslyApplied')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.previouslyApplied && (
-              <p className="form-error">{errors.previouslyApplied.message}</p>
-            )}
-          </div>
+          <RadioGroup
+            label="Have you previously applied at WareWorks?"
+            name="previouslyApplied"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('previouslyApplied')}
+            error={errors.previouslyApplied?.message}
+            required
+          />
 
           {previouslyApplied === 'yes' && (
             <Input

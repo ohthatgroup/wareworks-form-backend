@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Select } from '../ui/Select'
 import { Input } from '../ui/Input'
+import { RadioGroup } from '../ui/RadioGroup'
 
 interface CitizenshipStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -95,93 +96,42 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium text-primary mb-4">Basic Eligibility Questions</h3>
         
-        <div className="space-y-4">
-          <div>
-            <label className="form-label">
-              Are you 18 years or older? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('age18')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('age18')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.age18 && (
-              <p className="form-error">{errors.age18.message}</p>
-            )}
-          </div>
+        <div className="space-y-6">
+          <RadioGroup
+            label="Are you 18 years or older?"
+            name="age18"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('age18')}
+            error={errors.age18?.message}
+            required
+          />
 
-          <div>
-            <label className="form-label">
-              Do you have reliable transportation to work? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('transportation')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('transportation')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.transportation && (
-              <p className="form-error">{errors.transportation.message}</p>
-            )}
-          </div>
+          <RadioGroup
+            label="Do you have reliable transportation to work?"
+            name="transportation"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('transportation')}
+            error={errors.transportation?.message}
+            required
+          />
 
-          <div>
-            <label className="form-label">
-              Are you legally authorized to work in the United States? <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-4 mt-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="yes"
-                  {...register('workAuthorizationConfirm')}
-                  className="mr-2"
-                />
-                Yes
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="no"
-                  {...register('workAuthorizationConfirm')}
-                  className="mr-2"
-                />
-                No
-              </label>
-            </div>
-            {errors.workAuthorizationConfirm && (
-              <p className="form-error">{errors.workAuthorizationConfirm.message}</p>
-            )}
-          </div>
+          <RadioGroup
+            label="Are you legally authorized to work in the United States?"
+            name="workAuthorizationConfirm"
+            options={[
+              { value: 'yes', label: 'Yes' },
+              { value: 'no', label: 'No' }
+            ]}
+            registration={register('workAuthorizationConfirm')}
+            error={errors.workAuthorizationConfirm?.message}
+            required
+          />
         </div>
       </div>
 

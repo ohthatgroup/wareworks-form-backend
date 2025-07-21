@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const applicationSchema = z.object({
+const baseSchema = z.object({
   submissionId: z.string(),
   
   // Personal Information
@@ -115,7 +115,34 @@ export const applicationSchema = z.object({
   submittedAt: z.string()
 })
 
-export type ValidatedApplicationData = z.infer<typeof applicationSchema>
+export const applicationSchema = baseSchema.refine((data) => {
+  // If lawful permanent resident, USCIS A-Number is required
+  if (data.citizenshipStatus === 'lawful_permanent') {
+    return data.uscisANumber && data.uscisANumber.length > 0
+  }
+  return true
+}, {
+  message: "USCIS A-Number is required for lawful permanent residents",
+  path: ["uscisANumber"]
+}).refine((data) => {
+  // If alien authorized to work, additional fields are required
+  if (data.citizenshipStatus === 'alien_authorized') {
+    return data.workAuthExpiration && 
+           data.alienDocumentType && 
+           data.alienDocumentNumber && 
+           data.documentCountry &&
+           data.workAuthExpiration.length > 0 &&
+           data.alienDocumentType.length > 0 &&
+           data.alienDocumentNumber.length > 0 &&
+           data.documentCountry.length > 0
+  }
+  return true
+}, {
+  message: "All work authorization fields are required for alien authorized to work",
+  path: ["alienDocumentType"]
+})
+
+export type ValidatedApplicationData = z.infer<typeof baseSchema>
 
 export function validateApplication(data: unknown) {
   return applicationSchema.safeParse(data)
