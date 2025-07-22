@@ -124,7 +124,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           <input
                             {...register(day.key as keyof ValidatedApplicationData)}
                             type="text"
-                            className="ml-3 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
+                            className="ml-3 flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
                             placeholder="e.g., 8AM-5PM"
                             onFocus={(e) => {
                               // Clear the placeholder space on focus if it's just a space

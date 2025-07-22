@@ -86,7 +86,7 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                     {isSelected && (
                       <select
                         {...register(equipment.key)}
-                        className="ml-3 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
+                        className="ml-3 flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
                         defaultValue={currentValue || ''}
                       >
                         <option value="">Select level...</option>

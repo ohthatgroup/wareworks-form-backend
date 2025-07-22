@@ -7,6 +7,22 @@
 @layer base {
   html {
     font-family: 'Figtree', sans-serif;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+  }
+  
+  body {
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+  }
+  
+  /* Ensure iframe fills container properly */
+  body.embedded {
+    overflow: hidden;
+    height: auto;
+    min-height: auto;
   }
   
   h1, h2, h3, h4, h5, h6 {

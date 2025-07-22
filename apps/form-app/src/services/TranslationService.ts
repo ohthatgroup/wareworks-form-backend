@@ -163,18 +163,31 @@ class TranslationService {
             }
           }
 
-          // Determine language from key suffix or content
-          if (key.endsWith('.en') || !key.endsWith('.es')) {
+          // Determine language from key suffix
+          if (key.endsWith('.en')) {
             this.translations[baseKey].en = english_text
-          }
-          if (key.endsWith('.es') && spanish_text) {
-            this.translations[baseKey].es = spanish_text
+          } else if (key.endsWith('.es')) {
+            this.translations[baseKey].es = spanish_text || english_text // Fallback to English if Spanish is empty
+          } else {
+            // Key without language suffix - use as English and set Spanish if provided
+            this.translations[baseKey].en = english_text
+            if (spanish_text && spanish_text.trim()) {
+              this.translations[baseKey].es = spanish_text
+            } else {
+              this.translations[baseKey].es = english_text // Fallback to English
+            }
           }
         }
       }
     })
 
     console.log(`Loaded ${Object.keys(this.translations).length} translation entries`)
+    
+    // Debug: log some key translations
+    console.log('Sample translations:', {
+      'steps.contact.title': this.translations['steps.contact.title'],
+      'steps.personal_info.title': this.translations['steps.personal_info.title']
+    })
   }
 
   setLanguage(language: 'en' | 'es'): void {

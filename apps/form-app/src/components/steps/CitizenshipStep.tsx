@@ -35,7 +35,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
         error={errors.citizenshipStatus?.message}
         options={CITIZENSHIP_OPTIONS}
         placeholder="Please select your citizenship status"
-        required
       />
 
       {/* Conditional fields based on citizenship status */}
@@ -45,7 +44,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
           registration={register('uscisANumber')}
           error={errors.uscisANumber?.message}
           placeholder="A12345678"
-          required
         />
       )}
 
@@ -56,7 +54,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
             type="date"
             registration={register('workAuthExpiration')}
             error={errors.workAuthExpiration?.message}
-            required
           />
           
           <Select
@@ -65,7 +62,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
             error={errors.alienDocumentType?.message}
             options={ALIEN_WORK_AUTH_OPTIONS}
             placeholder="Select which information you will provide"
-            required
           />
           
           {watch('alienDocumentType') === 'uscis_a_number' && (
@@ -74,7 +70,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
               registration={register('alienDocumentNumber')}
               error={errors.alienDocumentNumber?.message}
               placeholder="A12345678"
-              required
             />
           )}
           
@@ -84,7 +79,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
               registration={register('alienDocumentNumber')}
               error={errors.alienDocumentNumber?.message}
               placeholder="I-94 admission number"
-              required
             />
           )}
           
@@ -95,14 +89,12 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
                 registration={register('alienDocumentNumber')}
                 error={errors.alienDocumentNumber?.message}
                 placeholder="Passport number"
-                required
               />
               <Input
                 label="Country of Issuance"
                 registration={register('documentCountry')}
                 error={errors.documentCountry?.message}
                 placeholder="Country that issued the passport"
-                required
               />
             </div>
           )}

@@ -101,11 +101,13 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           label="City"
           registration={register('city')}
           error={errors.city?.message}
+          required
         />
         
         <div>
           <label className="form-label">
             State
+            <span className="text-red-500 ml-1">*</span>
           </label>
           <select
             className={`form-input ${errors.state ? 'border-red-500 focus:border-red-500' : ''}`}
@@ -128,66 +130,67 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           registration={register('zipCode')}
           error={errors.zipCode?.message}
           placeholder="12345 or 12345-6789"
+          required
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="form-label">
-            Primary Phone Number
+            Phone Number 1
+            <span className="text-red-500 ml-1">*</span>
           </label>
-          <input
-            type="tel"
-            className={`form-input ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''}`}
-            {...register('phoneNumber')}
-            onChange={(e) => {
-              const formatted = formatPhoneNumber(e.target.value)
-              setValue('phoneNumber', formatted)
-            }}
-            placeholder="(555) 123-4567"
-            maxLength={14}
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="tel"
+              className={`form-input ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''}`}
+              {...register('phoneNumber')}
+              onChange={(e) => {
+                const formatted = formatPhoneNumber(e.target.value)
+                setValue('phoneNumber', formatted)
+              }}
+              placeholder="(555) 123-4567"
+              maxLength={14}
+            />
+            <label className="flex items-center text-sm whitespace-nowrap">
+              <input
+                type="checkbox"
+                {...register('primaryPhoneNumber1')}
+                className="mr-1"
+              />
+              Primary
+            </label>
+          </div>
           {errors.phoneNumber && (
             <p className="form-error">{errors.phoneNumber.message}</p>
           )}
         </div>
         
         <div className="space-y-2">
-          <label className="form-label">Home Phone</label>
-          <input
-            type="tel"
-            className={`form-input ${errors.homePhone ? 'border-red-500 focus:border-red-500' : ''}`}
-            {...register('homePhone')}
-            onChange={(e) => {
-              const formatted = formatPhoneNumber(e.target.value)
-              setValue('homePhone', formatted)
-            }}
-            placeholder="(555) 123-4567"
-            maxLength={14}
-          />
+          <label className="form-label">Phone Number 2</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="tel"
+              className={`form-input ${errors.homePhone ? 'border-red-500 focus:border-red-500' : ''}`}
+              {...register('homePhone')}
+              onChange={(e) => {
+                const formatted = formatPhoneNumber(e.target.value)
+                setValue('homePhone', formatted)
+              }}
+              placeholder="(555) 123-4567"
+              maxLength={14}
+            />
+            <label className="flex items-center text-sm whitespace-nowrap">
+              <input
+                type="checkbox"
+                {...register('primaryPhoneNumber2')}
+                className="mr-1"
+              />
+              Primary
+            </label>
+          </div>
           {errors.homePhone && (
             <p className="form-error">{errors.homePhone.message}</p>
-          )}
-        </div>
-        
-        <div className="space-y-2">
-          <label className="form-label">
-            Cell Phone
-            <span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            type="tel"
-            className={`form-input ${errors.cellPhone ? 'border-red-500 focus:border-red-500' : ''}`}
-            {...register('cellPhone')}
-            onChange={(e) => {
-              const formatted = formatPhoneNumber(e.target.value)
-              setValue('cellPhone', formatted)
-            }}
-            placeholder="(555) 123-4567"
-            maxLength={14}
-          />
-          {errors.cellPhone && (
-            <p className="form-error">{errors.cellPhone.message}</p>
           )}
         </div>
       </div>

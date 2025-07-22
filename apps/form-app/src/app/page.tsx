@@ -92,6 +92,18 @@ function ApplicationFormContent() {
 
   // Handle iframe height communication
   useIframeHeight()
+  
+  // Add embedded class to body when in iframe
+  useEffect(() => {
+    if (isEmbedded && typeof document !== 'undefined') {
+      document.body.classList.add('embedded')
+    }
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.body.classList.remove('embedded')
+      }
+    }
+  }, [isEmbedded])
 
   // Send progress updates to parent window (embed)
   const sendProgressUpdate = useCallback(() => {
@@ -149,27 +161,26 @@ function ApplicationFormContent() {
     sendProgressUpdate()
   }, [sendProgressUpdate])
 
-  // Memoized function to get required fields for each step
-  // Only require: Name, SSN, Address, Cell Number, ID
+  // Memoized function to get required fields for each step based on schema validation
   const getStepRequiredFields = useMemo(() => {
     return (stepIndex: number): (keyof ValidatedApplicationData)[] => {
       switch (stepIndex) {
-        case 0: // Personal Information - Name, SSN
-          return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
-        case 1: // Contact Details - Address, Cell Number
-          return ['streetAddress', 'cellPhone']
-        case 2: // Work Authorization - NOT REQUIRED
-          return []
-        case 3: // Position & Experience - NOT REQUIRED
-          return []
-        case 4: // Availability - NOT REQUIRED
-          return []
-        case 5: // Education & Employment - NOT REQUIRED
-          return []
-        case 6: // Documents - ID Required
+        case 0: // Personal Information
+          return ['legalFirstName', 'legalLastName', 'dateOfBirth', 'socialSecurityNumber']
+        case 1: // Contact Details
+          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'emergencyName', 'emergencyPhone', 'emergencyRelationship']
+        case 2: // Work Authorization
+          return ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
+        case 3: // Position & Experience
+          return ['positionApplied', 'jobDiscovery']
+        case 4: // Availability
+          return ['fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied']
+        case 5: // Education & Employment
+          return [] // Optional sections
+        case 6: // Documents
           return [] // Will check for ID document separately
-        case 7: // Review - NOT REQUIRED
-          return []
+        case 7: // Review
+          return [] // Review step doesn't have new required fields
         default:
           return []
       }
@@ -203,25 +214,28 @@ function ApplicationFormContent() {
 
   // Memoized validation for form submission readiness
   const isFormReadyForSubmission = useMemo(() => {
-    // Check all required fields: Name, SSN, Address, Cell Number, ID
-    const requiredFieldsValid = [
-      'legalFirstName',
-      'legalLastName', 
-      'socialSecurityNumber',
-      'streetAddress',
-      'cellPhone'
-    ].every(field => {
+    // Check all required fields across all steps
+    const allRequiredFields = [
+      'legalFirstName', 'legalLastName', 'dateOfBirth', 'socialSecurityNumber',
+      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 
+      'emergencyName', 'emergencyPhone', 'emergencyRelationship',
+      'citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm',
+      'positionApplied', 'jobDiscovery',
+      'fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied'
+    ]
+    
+    const requiredFieldsValid = allRequiredFields.every(field => {
       const value = formValues[field as keyof ValidatedApplicationData]
       const hasValue = value !== undefined && value !== null && value !== ''
       const hasNoError = !formState.errors[field as keyof ValidatedApplicationData]
       return hasValue && hasNoError
     })
     
-    // Check for ID document
-    const documents = formValues.documents || []
-    const hasIDDocument = documents.some((doc: any) => doc.type === 'identification')
+    // Check for ID document - not strictly required for submission
+    // const documents = formValues.documents || []
+    // const hasIDDocument = documents.some((doc: any) => doc.type === 'identification')
     
-    return requiredFieldsValid && hasIDDocument
+    return requiredFieldsValid // && hasIDDocument
   }, [formValues, formState.errors])
 
   const nextStep = useCallback(() => {
@@ -341,7 +355,7 @@ function ApplicationFormContent() {
   // Success step
   if (currentStep >= STEPS.length) {
     return (
-      <div className="mx-auto px-4 py-4 max-w-4xl">
+      <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
         <SuccessStep result={submissionResult} />
       </div>
     )
@@ -350,7 +364,7 @@ function ApplicationFormContent() {
   const CurrentStepComponent = STEPS[currentStep].component
 
   return (
-    <div className="mx-auto px-4 py-4 max-w-4xl">
+    <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
       {/* Only show language selector when NOT embedded - no internal progress bar */}
       {!isEmbedded && (
         <div className="mb-4 flex justify-end">
