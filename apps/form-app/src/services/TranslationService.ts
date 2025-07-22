@@ -43,15 +43,25 @@ class TranslationService {
         return
       }
 
-      // Try Google Sheets with timeout and retry
+      // Try local CSV first for faster loading, then Google Sheets as enhancement
       try {
-        await this.loadFromGoogleSheetsWithRetry()
-        await this.saveToCache() // Cache successful load
-      } catch (error) {
-        console.warn('Failed to load from Google Sheets, falling back to local CSV:', error)
-        // Fallback to local CSV
         await this.loadFromLocalCSV()
-        await this.saveToCache() // Cache fallback load
+        console.log('✅ Loaded translations from local CSV')
+        await this.saveToCache()
+        
+        // Try Google Sheets in background for updates (non-blocking)
+        this.loadFromGoogleSheetsWithRetry().then(() => {
+          console.log('✅ Updated translations from Google Sheets')
+          this.saveToCache()
+        }).catch(error => {
+          console.log('ℹ️ Google Sheets not available, using local CSV:', error.message)
+        })
+        
+      } catch (error) {
+        console.warn('Failed to load local CSV, trying Google Sheets:', error)
+        // Fallback to Google Sheets if local CSV fails
+        await this.loadFromGoogleSheetsWithRetry()
+        await this.saveToCache()
       }
 
       this.isLoaded = true
