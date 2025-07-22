@@ -3,8 +3,9 @@ import './globals.css'
 
 // Dynamic metadata based on language parameter
 export async function generateMetadata({
-  searchParams
+  searchParams,
 }: {
+  params: { [key: string]: string | string[] | undefined }
   searchParams: { [key: string]: string | string[] | undefined }
 }): Promise<Metadata> {
   const lang = searchParams?.lang === 'es' ? 'es' : 'en'
