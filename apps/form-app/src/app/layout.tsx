@@ -5,8 +5,7 @@ import './globals.css'
 export async function generateMetadata({
   searchParams,
 }: {
-  params: { [key: string]: string | string[] | undefined }
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }): Promise<Metadata> {
   const lang = searchParams?.lang === 'es' ? 'es' : 'en'
   
@@ -19,7 +18,7 @@ export async function generateMetadata({
       title: 'Formulario de Aplicación WareWorks',
       description: 'Únete al equipo WareWorks - envía tu solicitud de empleo',
     }
-  }
+  } as const
 
   return {
     title: metadata[lang].title,
