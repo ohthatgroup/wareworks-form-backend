@@ -20,6 +20,45 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     }
   }
 
+  // Map field names to their respective steps for better error reporting
+  const fieldToStep: Record<string, { stepIndex: number, stepName: string }> = {
+    legalFirstName: { stepIndex: 0, stepName: 'Personal Information' },
+    legalLastName: { stepIndex: 0, stepName: 'Personal Information' },
+    middleInitial: { stepIndex: 0, stepName: 'Personal Information' },
+    otherLastNames: { stepIndex: 0, stepName: 'Personal Information' },
+    dateOfBirth: { stepIndex: 0, stepName: 'Personal Information' },
+    socialSecurityNumber: { stepIndex: 0, stepName: 'Personal Information' },
+    streetAddress: { stepIndex: 1, stepName: 'Contact Details' },
+    city: { stepIndex: 1, stepName: 'Contact Details' },
+    state: { stepIndex: 1, stepName: 'Contact Details' },
+    zipCode: { stepIndex: 1, stepName: 'Contact Details' },
+    phoneNumber: { stepIndex: 1, stepName: 'Contact Details' },
+    cellPhone: { stepIndex: 1, stepName: 'Contact Details' },
+    emergencyName: { stepIndex: 1, stepName: 'Contact Details' },
+    emergencyPhone: { stepIndex: 1, stepName: 'Contact Details' },
+    citizenshipStatus: { stepIndex: 2, stepName: 'Work Authorization' },
+    age18: { stepIndex: 2, stepName: 'Work Authorization' },
+    transportation: { stepIndex: 2, stepName: 'Work Authorization' },
+    workAuthorizationConfirm: { stepIndex: 2, stepName: 'Work Authorization' },
+    positionApplied: { stepIndex: 3, stepName: 'Position & Experience' },
+    jobDiscovery: { stepIndex: 3, stepName: 'Position & Experience' },
+    fullTimeEmployment: { stepIndex: 4, stepName: 'Availability' },
+    swingShifts: { stepIndex: 4, stepName: 'Availability' },
+    graveyardShifts: { stepIndex: 4, stepName: 'Availability' },
+    previouslyApplied: { stepIndex: 4, stepName: 'Availability' },
+  }
+
+  // Get specific error details for display
+  const errorDetails = Object.entries(errors).map(([fieldName, error]) => {
+    const stepInfo = fieldToStep[fieldName] || { stepIndex: -1, stepName: 'Unknown Section' }
+    return {
+      fieldName,
+      message: error.message || 'This field is required',
+      stepIndex: stepInfo.stepIndex,
+      stepName: stepInfo.stepName
+    }
+  })
+
   const previewDocument = (doc: any) => {
     try {
       const byteCharacters = atob(doc.data)
@@ -57,10 +96,32 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           hasErrors ? 'text-red-800' : 'text-green-800'
         }`}>
           {hasErrors 
-            ? 'Please go back and complete all required fields before submitting.'
+            ? 'Please review and fix the following issues before submitting:'
             : 'All required information has been provided. Review your details below and submit when ready.'
           }
         </p>
+        
+        {/* Show specific validation errors */}
+        {hasErrors && errorDetails.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {errorDetails.map(({ fieldName, message, stepIndex, stepName }) => (
+              <div key={fieldName} className="flex items-center justify-between bg-red-100 rounded-md p-2">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-red-900">{stepName}</p>
+                  <p className="text-xs text-red-700">{message}</p>
+                </div>
+                {stepIndex >= 0 && (
+                  <button
+                    onClick={() => handleEdit(stepIndex)}
+                    className="ml-3 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
+                  >
+                    Fix
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Personal Information */}

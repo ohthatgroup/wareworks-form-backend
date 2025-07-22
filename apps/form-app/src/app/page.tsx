@@ -172,14 +172,14 @@ function ApplicationFormContent() {
   const getStepRequiredFields = useMemo(() => {
     return (stepIndex: number): (keyof ValidatedApplicationData)[] => {
       switch (stepIndex) {
-        case 0: // Personal Information
-          return ['legalFirstName', 'legalLastName', 'dateOfBirth', 'socialSecurityNumber']
-        case 1: // Contact Details
-          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'emergencyName', 'emergencyPhone', 'emergencyRelationship']
-        case 2: // Work Authorization
-          return ['citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm']
-        case 3: // Position & Experience
-          return ['positionApplied', 'jobDiscovery']
+        case 0: // Personal Information - Only truly required fields per schema
+          return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
+        case 1: // Contact Details - Only address and cell phone required per schema
+          return ['streetAddress', 'cellPhone']
+        case 2: // Work Authorization - All are optional per schema
+          return []
+        case 3: // Position & Experience - All are optional per schema
+          return []
         case 4: // Availability
           return ['fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied']
         case 5: // Education & Employment

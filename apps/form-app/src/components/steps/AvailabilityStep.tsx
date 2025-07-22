@@ -84,7 +84,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
               { key: 'availabilitySaturday', label: 'Saturday', description: 'Available on Saturday' }
             ].map((day) => {
               const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
-              const isSelected = Boolean(currentValue && currentValue !== '')
+              // Consider the day selected if it has any value (including just spaces) or actual text
+              const isSelected = Boolean(currentValue !== undefined && currentValue !== null && currentValue !== '')
               
               return (
                 <div 
@@ -105,7 +106,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           setValue(day.key as keyof ValidatedApplicationData, '')
                         } else {
                           // Set a placeholder value to show the time input field (empty but checked)
-                          setValue(day.key as keyof ValidatedApplicationData, ' ')
+                          setValue(day.key as keyof ValidatedApplicationData, 'SELECTED')
                         }
                       }}
                       className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
@@ -127,8 +128,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                             className="ml-3 flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
                             placeholder="e.g., 8AM-5PM"
                             onFocus={(e) => {
-                              // Clear the placeholder space on focus if it's just a space
-                              if (e.target.value.trim() === '') {
+                              // Clear the placeholder value on focus if it's the default
+                              if (e.target.value === 'SELECTED') {
                                 setValue(day.key as keyof ValidatedApplicationData, '')
                               }
                             }}
