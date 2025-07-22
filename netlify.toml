@@ -1,6 +1,6 @@
 [build]
   base = "apps/form-app"
-  command = "npm install --include=dev && npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
 
 # Functions handled by Next.js App Router

@@ -2,6 +2,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { RadioGroup } from '../ui/RadioGroup'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface AvailabilityStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -10,6 +11,7 @@ interface AvailabilityStepProps {
 
 export function AvailabilityStep({ form }: AvailabilityStepProps) {
   const { register, watch, setValue, formState: { errors } } = form
+  const { t } = useLanguage()
   const previouslyApplied = watch('previouslyApplied')
   
   // Check if weekly availability should be shown
@@ -21,44 +23,40 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                                 swingShifts === 'no' || 
                                 graveyardShifts === 'no'
 
+  const yesNoOptions = [
+    { value: 'yes', label: t('common.yes') },
+    { value: 'no', label: t('common.no') }
+  ]
+
   return (
     <div className="space-y-6">
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">Work Preferences</h3>
+        <h3 className="text-lg font-medium text-primary mb-4">{t('availability.work_preferences_title')}</h3>
         
         <div className="space-y-6">
           <RadioGroup
-            label="Are you interested in full-time employment?"
+            label={t('availability.full_time_question')}
             name="fullTimeEmployment"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('fullTimeEmployment')}
             error={errors.fullTimeEmployment?.message}
             required
           />
 
           <RadioGroup
-            label="Are you available for swing shifts (3PM-11PM)?"
+            label={t('availability.swing_shifts_question')}
             name="swingShifts"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('swingShifts')}
             error={errors.swingShifts?.message}
             required
           />
 
           <RadioGroup
-            label="Are you available for graveyard shifts (11PM-7AM)?"
+            label={t('availability.graveyard_shifts_question')}
             name="graveyardShifts"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('graveyardShifts')}
             error={errors.graveyardShifts?.message}
             required
@@ -75,13 +73,13 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
         
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
             {[
-              { key: 'availabilitySunday', label: 'Sunday', description: 'Available on Sunday' },
-              { key: 'availabilityMonday', label: 'Monday', description: 'Available on Monday' },
-              { key: 'availabilityTuesday', label: 'Tuesday', description: 'Available on Tuesday' },
-              { key: 'availabilityWednesday', label: 'Wednesday', description: 'Available on Wednesday' },
-              { key: 'availabilityThursday', label: 'Thursday', description: 'Available on Thursday' },
-              { key: 'availabilityFriday', label: 'Friday', description: 'Available on Friday' },
-              { key: 'availabilitySaturday', label: 'Saturday', description: 'Available on Saturday' }
+              { key: 'availabilitySunday', labelKey: 'availability.sunday', descriptionKey: 'availability.sunday_description' },
+              { key: 'availabilityMonday', labelKey: 'availability.monday', descriptionKey: 'availability.monday_description' },
+              { key: 'availabilityTuesday', labelKey: 'availability.tuesday', descriptionKey: 'availability.tuesday_description' },
+              { key: 'availabilityWednesday', labelKey: 'availability.wednesday', descriptionKey: 'availability.wednesday_description' },
+              { key: 'availabilityThursday', labelKey: 'availability.thursday', descriptionKey: 'availability.thursday_description' },
+              { key: 'availabilityFriday', labelKey: 'availability.friday', descriptionKey: 'availability.friday_description' },
+              { key: 'availabilitySaturday', labelKey: 'availability.saturday', descriptionKey: 'availability.saturday_description' }
             ].map((day) => {
               const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
               // Consider the day selected if it has any value (including just spaces) or actual text
@@ -117,7 +115,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           htmlFor={`${day.key}_checkbox`}
                           className="text-sm font-medium text-gray-900 cursor-pointer"
                         >
-                          {day.label}
+                          {t(day.labelKey)}
                         </label>
                         
                         {/* Availability Time Input - to the right of label */}
@@ -126,7 +124,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                             {...register(day.key as keyof ValidatedApplicationData)}
                             type="text"
                             className="ml-3 flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
-                            placeholder="e.g., 8AM-5PM"
+                            placeholder={t('availability.time_placeholder')}
                             onFocus={(e) => {
                               // Clear the placeholder value on focus if it's the default
                               if (e.target.value === 'SELECTED') {
@@ -138,7 +136,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                       </div>
                       
                       <p className="text-xs text-gray-600 mt-1">
-                        {day.description}
+                        {t(day.descriptionKey)}
                       </p>
                       
                       {/* Error display */}
@@ -156,23 +154,20 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
           
           <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>Note:</strong> Enter your available hours for each day (e.g., "8AM-5PM", "6PM-11PM") or write "Not Available" if you cannot work that day.
+              <strong>{t('availability.note_title')}</strong> {t('availability.note_message')}
             </p>
           </div>
         </div>
       )}
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">Previous Application History</h3>
+        <h3 className="text-lg font-medium text-primary mb-4">{t('availability.previous_application_title')}</h3>
         
         <div className="space-y-4">
           <RadioGroup
-            label="Have you previously applied at WareWorks?"
+            label={t('availability.previously_applied_question')}
             name="previouslyApplied"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('previouslyApplied')}
             error={errors.previouslyApplied?.message}
             required
@@ -180,10 +175,10 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
 
           {previouslyApplied === 'yes' && (
             <Input
-              label="If yes, please specify when and where"
+              label={t('availability.when_where_label')}
               registration={register('previousApplicationWhen')}
               error={errors.previousApplicationWhen?.message}
-              placeholder="e.g., 2022, San Diego location"
+              placeholder={t('availability.when_where_placeholder')}
               required
             />
           )}

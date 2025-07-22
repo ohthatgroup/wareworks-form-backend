@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Plus, X } from 'lucide-react'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface SkillsQualificationsProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -15,6 +16,7 @@ interface Skill {
 
 export function SkillsQualifications({ form }: SkillsQualificationsProps) {
   const { watch, setValue } = form
+  const { t } = useLanguage()
   
   // Initialize with existing skills or one empty skill
   const [skills, setSkills] = useState<Skill[]>(() => {
@@ -84,14 +86,14 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-3">
                 <label className="form-label">
-                  Skill/Qualification {index + 1}
+                  {t('skills.skill_qualification')} {index + 1}
                 </label>
                 {skills.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeSkill(skill.id)}
                     className="text-red-500 hover:text-red-700 p-1"
-                    title="Remove skill"
+                    title={t('skills.remove_skill')}
                   >
                     <X size={16} />
                   </button>
@@ -102,7 +104,7 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
                 type="text"
                 value={skill.value}
                 onChange={(e) => updateSkill(skill.id, 'value', e.target.value)}
-                placeholder="e.g., Forklift certification, OSHA training, RF Scanner experience"
+                placeholder={t('skills.skill_placeholder')}
                 className="form-input w-full mb-3"
               />
               
@@ -118,13 +120,13 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
                   htmlFor={`${skill.id}-certified`}
                   className="text-sm font-medium text-gray-700 cursor-pointer"
                 >
-                  I have certification/documentation for this skill
+                  {t('skills.certification_checkbox')}
                 </label>
               </div>
               
               {skill.isCertified && skill.value.trim() && (
                 <div className="mt-2 p-2 bg-primary/10 border border-primary/30 rounded text-xs text-primary">
-                  📄 You'll be able to upload certification documents in the Documents section
+                  {t('skills.document_note')}
                 </div>
               )}
             </div>
@@ -139,14 +141,14 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
           className="flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-primary hover:text-primary transition-colors w-full justify-center"
         >
           <Plus size={16} />
-          Add Another Skill/Qualification
+          {t('skills.add_skill')}
         </button>
       )}
       
       {certifiedSkills.length > 0 && (
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-800">
-            <strong>Certified Skills ({certifiedSkills.length}):</strong> You'll be prompted to upload certification documents for these skills in the Documents section.
+            <strong>{t('skills.certified_skills')} ({certifiedSkills.length}):</strong> {t('skills.certification_note')}
           </p>
           <ul className="mt-2 text-sm text-blue-700">
             {certifiedSkills.map((skill, index) => (

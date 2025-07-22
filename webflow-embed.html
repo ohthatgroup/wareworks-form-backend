@@ -23,7 +23,8 @@
       text-align: center;
       font-family: 'Bricolage Grotesque', sans-serif;
     ">
-      Welcome to WareWorks
+      <span id="title-en">Welcome to WareWorks</span>
+      <span id="title-es" style="display: none;">Bienvenido a WareWorks</span>
     </h2>
     
     <!-- Employment Eligibility Requirements -->
@@ -34,14 +35,16 @@
         color: #131f5b; 
         margin: 0 0 0.75rem 0;
       ">
-        Employment Eligibility Requirements
+        <span id="requirements-title-en">Employment Eligibility Requirements</span>
+        <span id="requirements-title-es" style="display: none;">Requisitos de Elegibilidad para el Empleo</span>
       </h3>
       <p style="
         color: #374151; 
         line-height: 1.6; 
         margin: 0 0 1rem 0;
       ">
-        All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process. Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.
+        <span id="requirements-text-en">All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process. Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.</span>
+        <span id="requirements-text-es" style="display: none;">Todos los empleados deben ser elegibles para trabajar en los Estados Unidos. Se le requerirá proporcionar documentación para verificar su elegibilidad como parte del proceso I-9. La ley federal requiere que todos los empleadores verifiquen la identidad y elegibilidad de empleo de todos los empleados. Necesitará proporcionar documentación aceptable dentro de tres (3) días hábiles de comenzar el empleo.</span>
       </p>
       
       <p style="
@@ -49,7 +52,8 @@
         line-height: 1.6; 
         margin: 0;
       ">
-        <strong>Document Requirements:</strong> Accepted formats include PDF, JPG, JPEG, PNG. Maximum file size is 10MB per file. Documents must be clear and legible with personal information visible.
+        <span id="doc-requirements-en"><strong>Document Requirements:</strong> Accepted formats include PDF, JPG, JPEG, PNG. Maximum file size is 10MB per file. Documents must be clear and legible with personal information visible.</span>
+        <span id="doc-requirements-es" style="display: none;"><strong>Requisitos de Documentos:</strong> Los formatos aceptados incluyen PDF, JPG, JPEG, PNG. El tamaño máximo de archivo es de 10MB por archivo. Los documentos deben ser claros y legibles con información personal visible.</span>
       </p>
     </div>
     
@@ -67,7 +71,8 @@
         margin: 0;
         font-size: 0.875rem;
       ">
-        <strong>Privacy Notice:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws. All information provided will be verified during the background check process.
+        <span id="privacy-notice-en"><strong>Privacy Notice:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws. All information provided will be verified during the background check process.</span>
+        <span id="privacy-notice-es" style="display: none;"><strong>Aviso de Privacidad:</strong> Al continuar, usted reconoce que la información que proporciona será utilizada para propósitos de empleo y se mantendrá confidencial de acuerdo con las leyes aplicables. Toda la información proporcionada será verificada durante el proceso de verificación de antecedentes.</span>
       </p>
     </div>
     
@@ -79,7 +84,8 @@
         margin: 0 0 0.75rem 0; 
         text-align: center;
       ">
-        Please select your preferred language:
+        <span id="language-prompt-en">Please select your preferred language:</span>
+        <span id="language-prompt-es" style="display: none;">Por favor seleccione su idioma preferido:</span>
       </p>
       <div style="display: flex; gap: 0.75rem; justify-content: center;">
         <button
@@ -169,14 +175,16 @@
       margin: 0 0 0.5rem 0;
       font-family: 'Bricolage Grotesque', sans-serif;
     ">
-      Loading Application
+      <span id="loading-title-en">Loading Application</span>
+      <span id="loading-title-es" style="display: none;">Cargando Aplicación</span>
     </h3>
     <p id="loading-text" style="
       color: #6b7280; 
       line-height: 1.5;
       margin: 0;
     ">
-      Please wait while we prepare your application form...
+      <span id="loading-text-en">Please wait while we prepare your application form...</span>
+      <span id="loading-text-es" style="display: none;">Por favor espere mientras preparamos su formulario de aplicación...</span>
     </p>
   </div>
 
@@ -254,14 +262,24 @@
     const spanishBtn = document.getElementById('spanish-button');
     const continueBtn = document.getElementById('continue-button');
     
+    // Show/hide content based on selected language
+    const enElements = document.querySelectorAll('[id$="-en"]');
+    const esElements = document.querySelectorAll('[id$="-es"]');
+    
     if (language === 'en') {
       englishBtn.style.background = '#131f5b';
       spanishBtn.style.background = '#6b7280';
       continueBtn.textContent = 'Accept & Continue in English';
+      
+      enElements.forEach(el => el.style.display = '');
+      esElements.forEach(el => el.style.display = 'none');
     } else {
       englishBtn.style.background = '#6b7280';
       spanishBtn.style.background = '#131f5b';
       continueBtn.textContent = 'Aceptar y Continuar en Español';
+      
+      enElements.forEach(el => el.style.display = 'none');
+      esElements.forEach(el => el.style.display = '');
     }
     
     trackEvent('language_selected', { language });
@@ -299,13 +317,25 @@
       };
       iframe.onerror = function() {
         console.error('Failed to load application');
-        document.getElementById('loading-text').textContent = 'Failed to load application. Please refresh and try again.';
+        const loadingTextEn = document.getElementById('loading-text-en');
+        const loadingTextEs = document.getElementById('loading-text-es');
+        if (selectedLanguage === 'en') {
+          loadingTextEn.textContent = 'Failed to load application. Please refresh and try again.';
+        } else {
+          loadingTextEs.textContent = 'Error al cargar la aplicación. Por favor actualice y vuelva a intentar.';
+        }
       };
       
       document.getElementById('application-container').appendChild(iframe);
     } catch (error) {
       console.error('Error loading application:', error);
-      document.getElementById('loading-text').textContent = 'An error occurred. Please refresh and try again.';
+      const loadingTextEn = document.getElementById('loading-text-en');
+      const loadingTextEs = document.getElementById('loading-text-es');
+      if (selectedLanguage === 'en') {
+        loadingTextEn.textContent = 'An error occurred. Please refresh and try again.';
+      } else {
+        loadingTextEs.textContent = 'Ocurrió un error. Por favor actualice y vuelva a intentar.';
+      }
     }
   }
 
@@ -336,7 +366,10 @@
         "></div>
       </div>
       <p style="text-align: center; font-size: 0.875rem; color: #6b7280; margin: 0;">
-        Step ${current} of ${total} (${percentage}% complete)
+        ${selectedLanguage === 'en' 
+          ? `Step ${current} of ${total} (${percentage}% complete)` 
+          : `Paso ${current} de ${total} (${percentage}% completo)`
+        }
       </p>
     `;
     container.style.display = 'block';

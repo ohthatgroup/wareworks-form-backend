@@ -1,6 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { CheckCircle, AlertCircle, Edit, Eye, Download } from 'lucide-react'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface ReviewStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -10,6 +11,7 @@ interface ReviewStepProps {
 
 export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
   const { watch, formState: { errors } } = form
+  const { t } = useLanguage()
   const formData = watch()
 
   const hasErrors = Object.keys(errors).length > 0
@@ -21,41 +23,41 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
   }
 
   // Map field names to their respective steps for better error reporting
-  const fieldToStep: Record<string, { stepIndex: number, stepName: string }> = {
-    legalFirstName: { stepIndex: 0, stepName: 'Personal Information' },
-    legalLastName: { stepIndex: 0, stepName: 'Personal Information' },
-    middleInitial: { stepIndex: 0, stepName: 'Personal Information' },
-    otherLastNames: { stepIndex: 0, stepName: 'Personal Information' },
-    dateOfBirth: { stepIndex: 0, stepName: 'Personal Information' },
-    socialSecurityNumber: { stepIndex: 0, stepName: 'Personal Information' },
-    streetAddress: { stepIndex: 1, stepName: 'Contact Details' },
-    city: { stepIndex: 1, stepName: 'Contact Details' },
-    state: { stepIndex: 1, stepName: 'Contact Details' },
-    zipCode: { stepIndex: 1, stepName: 'Contact Details' },
-    phoneNumber: { stepIndex: 1, stepName: 'Contact Details' },
-    cellPhone: { stepIndex: 1, stepName: 'Contact Details' },
-    emergencyName: { stepIndex: 1, stepName: 'Contact Details' },
-    emergencyPhone: { stepIndex: 1, stepName: 'Contact Details' },
-    citizenshipStatus: { stepIndex: 2, stepName: 'Work Authorization' },
-    age18: { stepIndex: 2, stepName: 'Work Authorization' },
-    transportation: { stepIndex: 2, stepName: 'Work Authorization' },
-    workAuthorizationConfirm: { stepIndex: 2, stepName: 'Work Authorization' },
-    positionApplied: { stepIndex: 3, stepName: 'Position & Experience' },
-    jobDiscovery: { stepIndex: 3, stepName: 'Position & Experience' },
-    fullTimeEmployment: { stepIndex: 4, stepName: 'Availability' },
-    swingShifts: { stepIndex: 4, stepName: 'Availability' },
-    graveyardShifts: { stepIndex: 4, stepName: 'Availability' },
-    previouslyApplied: { stepIndex: 4, stepName: 'Availability' },
+  const fieldToStep: Record<string, { stepIndex: number, stepNameKey: string }> = {
+    legalFirstName: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    legalLastName: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    middleInitial: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    otherLastNames: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    dateOfBirth: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    socialSecurityNumber: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    streetAddress: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    city: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    state: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    zipCode: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    phoneNumber: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    cellPhone: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    emergencyName: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    emergencyPhone: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    citizenshipStatus: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    age18: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    transportation: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    workAuthorizationConfirm: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    positionApplied: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    jobDiscovery: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    fullTimeEmployment: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    swingShifts: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    graveyardShifts: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    previouslyApplied: { stepIndex: 4, stepNameKey: 'review.availability_title' },
   }
 
   // Get specific error details for display
   const errorDetails = Object.entries(errors).map(([fieldName, error]) => {
-    const stepInfo = fieldToStep[fieldName] || { stepIndex: -1, stepName: 'Unknown Section' }
+    const stepInfo = fieldToStep[fieldName] || { stepIndex: -1, stepNameKey: 'review.personal_info_title' }
     return {
       fieldName,
       message: error.message || 'This field is required',
       stepIndex: stepInfo.stepIndex,
-      stepName: stepInfo.stepName
+      stepName: t(stepInfo.stepNameKey)
     }
   })
 
@@ -89,15 +91,15 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           <h3 className={`font-medium ${
             hasErrors ? 'text-red-900' : 'text-green-900'
           }`}>
-            {hasErrors ? 'Please Review Required Fields' : 'Application Ready for Submission'}
+            {hasErrors ? t('review.required_fields') : t('review.ready_submission')}
           </h3>
         </div>
         <p className={`text-sm ${
           hasErrors ? 'text-red-800' : 'text-green-800'
         }`}>
           {hasErrors 
-            ? 'Please review and fix the following issues before submitting:'
-            : 'All required information has been provided. Review your details below and submit when ready.'
+            ? t('review.fix_issues')
+            : t('review.all_provided')
           }
         </p>
         
@@ -115,7 +117,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                     onClick={() => handleEdit(stepIndex)}
                     className="ml-3 px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
                   >
-                    Fix
+                    {t('review.fix_button')}
                   </button>
                 )}
               </div>
@@ -127,32 +129,32 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Personal Information */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Personal Information</h3>
+          <h3 className="font-semibold text-primary">{t('review.personal_info_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(0)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="font-medium">Name:</span>
+            <span className="font-medium">{t('review.name_label')}</span>
             <p>{formData.legalFirstName} {formData.middleInitial} {formData.legalLastName}</p>
           </div>
           <div>
-            <span className="font-medium">Date of Birth:</span>
-            <p>{formData.dateOfBirth || 'Not provided'}</p>
+            <span className="font-medium">{t('review.date_of_birth_label')}</span>
+            <p>{formData.dateOfBirth || t('review.not_provided')}</p>
           </div>
           <div>
-            <span className="font-medium">Phone:</span>
-            <p>{formData.phoneNumber || 'Not provided'}</p>
+            <span className="font-medium">{t('review.phone_label')}</span>
+            <p>{formData.phoneNumber || t('review.not_provided')}</p>
           </div>
           <div>
-            <span className="font-medium">Email:</span>
-            <p>{formData.email || 'Not provided'}</p>
+            <span className="font-medium">{t('review.email_label')}</span>
+            <p>{formData.email || t('review.not_provided')}</p>
           </div>
         </div>
       </div>
@@ -160,14 +162,14 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Address */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Contact Details</h3>
+          <h3 className="font-semibold text-primary">{t('review.contact_details_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(1)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="text-sm">
@@ -179,24 +181,24 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Work Authorization */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Work Authorization</h3>
+          <h3 className="font-semibold text-primary">{t('review.work_authorization_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(2)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="text-sm">
           <div>
-            <span className="font-medium">Citizenship Status:</span>
-            <p>{formData.citizenshipStatus || 'Not provided'}</p>
+            <span className="font-medium">{t('review.citizenship_status_label')}</span>
+            <p>{formData.citizenshipStatus || t('review.not_provided')}</p>
           </div>
           {formData.workAuthorization && (
             <div className="mt-2">
-              <span className="font-medium">Work Authorization:</span>
+              <span className="font-medium">{t('review.work_authorization_label')}</span>
               <p>{formData.workAuthorization}</p>
             </div>
           )}
@@ -206,24 +208,24 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Position & Experience */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Position & Experience</h3>
+          <h3 className="font-semibold text-primary">{t('review.position_experience_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(3)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="text-sm space-y-2">
           <div>
-            <span className="font-medium">Position Applied For:</span>
-            <p>{formData.positionApplied || 'Not provided'}</p>
+            <span className="font-medium">{t('review.position_applied_label')}</span>
+            <p>{formData.positionApplied || t('review.not_provided')}</p>
           </div>
           <div>
-            <span className="font-medium">Expected Salary:</span>
-            <p>{formData.expectedSalary || 'Not provided'}</p>
+            <span className="font-medium">{t('review.expected_salary_label')}</span>
+            <p>{formData.expectedSalary || t('review.not_provided')}</p>
           </div>
         </div>
       </div>
@@ -231,24 +233,24 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Availability */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Availability</h3>
+          <h3 className="font-semibold text-primary">{t('review.availability_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(4)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="text-sm space-y-2">
           <div>
-            <span className="font-medium">Full-time Employment:</span>
-            <p>{formData.fullTimeEmployment || 'Not provided'}</p>
+            <span className="font-medium">{t('review.full_time_employment_label')}</span>
+            <p>{formData.fullTimeEmployment || t('review.not_provided')}</p>
           </div>
           <div>
-            <span className="font-medium">Previously Applied:</span>
-            <p>{formData.previouslyApplied || 'Not provided'}</p>
+            <span className="font-medium">{t('review.previously_applied_label')}</span>
+            <p>{formData.previouslyApplied || t('review.not_provided')}</p>
           </div>
         </div>
       </div>
@@ -256,24 +258,24 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Education & Employment */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Education & Employment</h3>
+          <h3 className="font-semibold text-primary">{t('review.education_employment_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(5)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="text-sm space-y-4">
           <div>
-            <span className="font-medium">Education Entries:</span>
-            <p>{formData.education?.length || 0} entries</p>
+            <span className="font-medium">{t('review.education_entries_label')}</span>
+            <p>{formData.education?.length || 0} {t('review.entries_count')}</p>
           </div>
           <div>
-            <span className="font-medium">Employment Entries:</span>
-            <p>{formData.employment?.length || 0} entries</p>
+            <span className="font-medium">{t('review.employment_entries_label')}</span>
+            <p>{formData.employment?.length || 0} {t('review.entries_count')}</p>
           </div>
         </div>
       </div>
@@ -281,14 +283,14 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Documents */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Documents</h3>
+          <h3 className="font-semibold text-primary">{t('review.documents_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(6)}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Edit size={16} />
-            Edit
+            {t('review.edit_button')}
           </button>
         </div>
         <div className="text-sm space-y-3">
@@ -310,7 +312,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                       type="button"
                       onClick={() => previewDocument(doc)}
                       className="text-primary hover:text-primary-dark p-1"
-                      title="Preview"
+                      title={t('review.preview_title')}
                     >
                       <Eye size={16} />
                     </button>
@@ -338,7 +340,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                         }
                       }}
                       className="text-primary hover:text-primary-dark p-1"
-                      title="Download"
+                      title={t('review.download_title')}
                     >
                       <Download size={16} />
                     </button>
@@ -347,20 +349,20 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-600">No documents uploaded yet.</p>
+            <p className="text-gray-600">{t('review.no_documents')}</p>
           )}
         </div>
       </div>
 
       {/* Legal Disclaimer */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Legal Acknowledgment</h3>
+        <h3 className="font-semibold text-gray-900 mb-4">{t('review.legal_acknowledgment_title')}</h3>
         <div className="text-sm text-gray-700 space-y-2">
           <p>
-            By submitting this application, I certify that all information provided is true and complete to the best of my knowledge. I understand that any false information may result in disqualification from employment or termination if hired.
+            {t('review.legal_text_1')}
           </p>
           <p>
-            I authorize WareWorks to verify the information provided and to conduct background checks as permitted by law.
+            {t('review.legal_text_2')}
           </p>
         </div>
       </div>

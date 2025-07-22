@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Upload, X, Eye, Download } from 'lucide-react'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface DocumentsStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -10,6 +11,7 @@ interface DocumentsStepProps {
 
 export function DocumentsStep({ form }: DocumentsStepProps) {
   const { register, formState: { errors }, setValue, watch } = form
+  const { t } = useLanguage()
   const [uploadedFiles, setUploadedFiles] = useState<{[key: string]: File[]}>({})
   const documents = watch('documents') || []
   
@@ -22,12 +24,12 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const equipmentRidingJack = watch('equipmentRidingJack')
   
   const certifiedEquipment = [
-    { key: 'equipmentSD', value: equipmentSD, label: 'SD - Sit Down Forklift' },
-    { key: 'equipmentSU', value: equipmentSU, label: 'SU - Stand Up Forklift' },
-    { key: 'equipmentSUR', value: equipmentSUR, label: 'SUR - Stand Up Reach' },
-    { key: 'equipmentCP', value: equipmentCP, label: 'CP - Cherry Picker' },
-    { key: 'equipmentCL', value: equipmentCL, label: 'CL - Clamps' },
-    { key: 'equipmentRidingJack', value: equipmentRidingJack, label: 'Riding Jack' }
+    { key: 'equipmentSD', value: equipmentSD, labelKey: 'equipment.sd_label' },
+    { key: 'equipmentSU', value: equipmentSU, labelKey: 'equipment.su_label' },
+    { key: 'equipmentSUR', value: equipmentSUR, labelKey: 'equipment.sur_label' },
+    { key: 'equipmentCP', value: equipmentCP, labelKey: 'equipment.cp_label' },
+    { key: 'equipmentCL', value: equipmentCL, labelKey: 'equipment.cl_label' },
+    { key: 'equipmentRidingJack', value: equipmentRidingJack, labelKey: 'equipment.riding_jack_label' }
   ].filter(equipment => equipment.value === 'certified')
 
   // Watch for certified skills (this would need to be implemented in the skills component)
@@ -137,7 +139,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 type="button"
                 onClick={() => previewFile(file)}
                 className="text-primary hover:text-primary-dark p-1"
-                title="Preview"
+                title={t('documents.preview')}
               >
                 <Eye size={16} />
               </button>
@@ -145,7 +147,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 href={URL.createObjectURL(file)}
                 download={file.name}
                 className="text-primary hover:text-primary-dark p-1"
-                title="Download"
+                title={t('documents.download')}
               >
                 <Download size={16} />
               </a>
@@ -153,7 +155,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 type="button"
                 onClick={() => removeFile(type, index)}
                 className="text-red-600 hover:text-red-800 p-1"
-                title="Remove"
+                title={t('documents.remove')}
               >
                 <X size={16} />
               </button>
@@ -171,13 +173,13 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
         {/* Government ID */}
         <div>
           <label className="form-label">
-            Government-Issued Photo ID <span className="text-red-500">*</span>
+            {t('documents.id_label')} <span className="text-red-500">*</span>
           </label>
           <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
             <div className="mt-4">
               <label htmlFor="id-upload" className="cursor-pointer">
-                <span className="btn-primary inline-block">Choose File</span>
+                <span className="btn-primary inline-block">{t('documents.choose_file')}</span>
                 <input
                   id="id-upload"
                   type="file"
@@ -188,7 +190,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               </label>
             </div>
             <p className="mt-2 text-sm text-gray-500">
-              Driver's License, Passport, or State ID (PDF, JPG, PNG up to 10MB)
+              {t('documents.id_description')}
             </p>
           </div>
           {uploadedFiles['id'] && renderFileList('id', uploadedFiles['id'])}
@@ -197,13 +199,13 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
         {/* Resume */}
         <div>
           <label className="form-label">
-            Resume/CV
+            {t('documents.resume_label')}
           </label>
           <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
             <Upload className="mx-auto h-12 w-12 text-gray-400" />
             <div className="mt-4">
               <label htmlFor="resume-upload" className="cursor-pointer">
-                <span className="btn-secondary inline-block">Choose File</span>
+                <span className="btn-secondary inline-block">{t('documents.choose_file')}</span>
                 <input
                   id="resume-upload"
                   type="file"
@@ -214,7 +216,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               </label>
             </div>
             <p className="mt-2 text-sm text-gray-500">
-              Your current resume (PDF, DOC, DOCX up to 10MB)
+              {t('documents.resume_description')}
             </p>
           </div>
           {uploadedFiles['resume'] && renderFileList('resume', uploadedFiles['resume'])}
@@ -224,9 +226,9 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
         {/* Certifications - Dynamic based on selections */}
         {(certifiedEquipment.length > 0 || certifiedSkills.length > 0) && (
           <div className="border-t pt-6">
-            <h3 className="text-lg font-medium text-primary mb-4">Certifications & Documentation</h3>
+            <h3 className="text-lg font-medium text-primary mb-4">{t('documents.certifications_title')}</h3>
             <p className="text-sm text-gray-600 mb-6">
-              You indicated you have certifications. Please upload your certification documents:
+              {t('documents.certifications_description')}
             </p>
             
             <div className="space-y-6">
@@ -234,13 +236,13 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               {certifiedEquipment.map((equipment) => (
                 <div key={equipment.key}>
                   <label className="form-label">
-                    {equipment.label} Certification
+                    {t(equipment.labelKey)} {t('documents.certification_label')}
                   </label>
                   <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
                     <Upload className="mx-auto h-12 w-12 text-primary" />
                     <div className="mt-4">
                       <label htmlFor={`${equipment.key}-cert-upload`} className="cursor-pointer">
-                        <span className="btn-primary inline-block">Upload Certification</span>
+                        <span className="btn-primary inline-block">{t('documents.upload_certification')}</span>
                         <input
                           id={`${equipment.key}-cert-upload`}
                           type="file"
@@ -252,7 +254,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-primary">
-                      Official certification for {equipment.label.split(' - ')[1]}
+                      {t('documents.official_certification')} {t(equipment.labelKey).split(' - ')[1]}
                     </p>
                   </div>
                   {uploadedFiles[`${equipment.key}-cert`] && renderFileList(`${equipment.key}-cert`, uploadedFiles[`${equipment.key}-cert`])}
@@ -263,13 +265,13 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               {certifiedSkills.map((skill) => (
                 <div key={skill.key}>
                   <label className="form-label">
-                    {skill.label} Certification
+                    {skill.label} {t('documents.certification_label')}
                   </label>
                   <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
                     <Upload className="mx-auto h-12 w-12 text-primary" />
                     <div className="mt-4">
                       <label htmlFor={`${skill.key}-cert-upload`} className="cursor-pointer">
-                        <span className="btn-primary inline-block">Upload Certification</span>
+                        <span className="btn-primary inline-block">{t('documents.upload_certification')}</span>
                         <input
                           id={`${skill.key}-cert-upload`}
                           type="file"
@@ -281,7 +283,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-primary">
-                      Documentation for {skill.label}
+                      {t('documents.documentation_for')} {skill.label}
                     </p>
                   </div>
                   {uploadedFiles[`${skill.key}-cert`] && renderFileList(`${skill.key}-cert`, uploadedFiles[`${skill.key}-cert`])}

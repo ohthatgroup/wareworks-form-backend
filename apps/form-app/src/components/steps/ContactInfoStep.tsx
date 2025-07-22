@@ -1,6 +1,7 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface ContactInfoStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -62,6 +63,7 @@ const US_STATES = [
 
 export function ContactInfoStep({ form }: ContactInfoStepProps) {
   const { register, formState: { errors }, setValue } = form
+  const { t } = useLanguage()
   
   const formatPhoneNumber = (value: string) => {
     // Remove all non-digits
@@ -82,7 +84,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="md:col-span-3">
           <Input
-            label="Street Address"
+            label={t('contact_info.street_address')}
             registration={register('streetAddress')}
             error={errors.streetAddress?.message}
             required
@@ -90,7 +92,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         </div>
         
         <Input
-          label="Apartment #"
+          label={t('contact_info.apartment_number')}
           registration={register('aptNumber')}
           error={errors.aptNumber?.message}
         />
@@ -98,7 +100,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Input
-          label="City"
+          label={t('contact_info.city')}
           registration={register('city')}
           error={errors.city?.message}
           required
@@ -106,14 +108,14 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         
         <div>
           <label className="form-label">
-            State
+            {t('contact_info.state')}
             <span className="text-red-500 ml-1">*</span>
           </label>
           <select
             className={`form-input ${errors.state ? 'border-red-500 focus:border-red-500' : ''}`}
             {...register('state')}
           >
-            <option value="">Select State</option>
+            <option value="">{t('contact_info.select_state')}</option>
             {US_STATES.map((state) => (
               <option key={state.value} value={state.value}>
                 {state.label}
@@ -126,10 +128,10 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         </div>
         
         <Input
-          label="ZIP Code"
+          label={t('contact_info.zip_code')}
           registration={register('zipCode')}
           error={errors.zipCode?.message}
-          placeholder="12345 or 12345-6789"
+          placeholder={t('contact_info.zip_placeholder')}
           required
         />
       </div>
@@ -137,7 +139,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="form-label">
-            Primary Phone Number
+            {t('contact_info.primary_phone')}
             <span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -148,7 +150,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
               const formatted = formatPhoneNumber(e.target.value)
               setValue('phoneNumber', formatted)
             }}
-            placeholder="(555) 123-4567"
+            placeholder={t('contact_info.phone_placeholder')}
             maxLength={14}
           />
           {errors.phoneNumber && (
@@ -157,7 +159,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         </div>
         
         <div className="space-y-2">
-          <label className="form-label">Secondary Phone Number</label>
+          <label className="form-label">{t('contact_info.secondary_phone')}</label>
           <input
             type="tel"
             className={`form-input ${errors.homePhone ? 'border-red-500 focus:border-red-500' : ''}`}
@@ -166,7 +168,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
               const formatted = formatPhoneNumber(e.target.value)
               setValue('homePhone', formatted)
             }}
-            placeholder="(555) 123-4567"
+            placeholder={t('contact_info.phone_placeholder')}
             maxLength={14}
           />
           {errors.homePhone && (
@@ -176,26 +178,26 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
       </div>
 
       <Input
-        label="Email Address"
+        label={t('contact_info.email')}
         type="email"
         registration={register('email')}
         error={errors.email?.message}
-        placeholder="your.email@example.com"
+        placeholder={t('contact_info.email_placeholder')}
       />
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">Emergency Contact</h3>
+        <h3 className="text-lg font-medium text-primary mb-4">{t('contact_info.emergency_contact.title')}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Input
-            label="Emergency Contact Name"
+            label={t('contact_info.emergency_contact.name')}
             registration={register('emergencyName')}
             error={errors.emergencyName?.message}
           />
           
           <div className="space-y-2">
             <label className="form-label">
-              Emergency Contact Phone
+              {t('contact_info.emergency_contact.phone')}
             </label>
             <input
               type="tel"
@@ -205,7 +207,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
                 const formatted = formatPhoneNumber(e.target.value)
                 setValue('emergencyPhone', formatted)
               }}
-              placeholder="(555) 123-4567"
+              placeholder={t('contact_info.phone_placeholder')}
               maxLength={14}
             />
             {errors.emergencyPhone && (
@@ -214,10 +216,10 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           </div>
           
           <Input
-            label="Relationship"
+            label={t('contact_info.emergency_contact.relationship')}
             registration={register('emergencyRelationship')}
             error={errors.emergencyRelationship?.message}
-            placeholder="e.g., Spouse, Parent, Sibling"
+            placeholder={t('contact_info.relationship_placeholder')}
           />
         </div>
       </div>

@@ -3,98 +3,107 @@ import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Select } from '../ui/Select'
 import { Input } from '../ui/Input'
 import { RadioGroup } from '../ui/RadioGroup'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface CitizenshipStepProps {
   form: UseFormReturn<ValidatedApplicationData>
   isSubmitting: boolean
 }
 
-const CITIZENSHIP_OPTIONS = [
-  { value: 'us_citizen', label: 'A citizen of the United States' },
-  { value: 'noncitizen_national', label: 'A noncitizen national of the United States' },
-  { value: 'lawful_permanent', label: 'A lawful permanent resident' },
-  { value: 'alien_authorized', label: 'An alien authorized to work' }
-]
-
-const ALIEN_WORK_AUTH_OPTIONS = [
-  { value: 'uscis_a_number', label: 'USCIS A-Number' },
-  { value: 'form_i94', label: 'Form I-94 Admission Number' },
-  { value: 'foreign_passport', label: 'Foreign Passport Number and Country of Issuance' }
-]
+// Options will be generated inside the component to use translations
 
 export function CitizenshipStep({ form }: CitizenshipStepProps) {
   const { register, watch, formState: { errors } } = form
+  const { t } = useLanguage()
   const citizenshipStatus = watch('citizenshipStatus')
+  
+  const citizenshipOptions = [
+    { value: 'us_citizen', label: t('citizenship.us_citizen') },
+    { value: 'noncitizen_national', label: t('citizenship.noncitizen_national') },
+    { value: 'lawful_permanent', label: t('citizenship.lawful_permanent') },
+    { value: 'alien_authorized', label: t('citizenship.alien_authorized') }
+  ]
+
+  const alienWorkAuthOptions = [
+    { value: 'uscis_a_number', label: t('citizenship.uscis_option') },
+    { value: 'form_i94', label: t('citizenship.form_i94_option') },
+    { value: 'foreign_passport', label: t('citizenship.foreign_passport_option') }
+  ]
+
+  const yesNoOptions = [
+    { value: 'yes', label: t('common.yes') },
+    { value: 'no', label: t('common.no') }
+  ]
 
   return (
     <div className="space-y-6">
 
       <Select
-        label="Citizenship Status"
+        label={t('citizenship.status_label')}
         registration={register('citizenshipStatus')}
         error={errors.citizenshipStatus?.message}
-        options={CITIZENSHIP_OPTIONS}
-        placeholder="Please select your citizenship status"
+        options={citizenshipOptions}
+        placeholder={t('citizenship.status_placeholder')}
       />
 
       {/* Conditional fields based on citizenship status */}
       {citizenshipStatus === 'lawful_permanent' && (
         <Input
-          label="USCIS A-Number"
+          label={t('citizenship.uscis_a_number')}
           registration={register('uscisANumber')}
           error={errors.uscisANumber?.message}
-          placeholder="A12345678"
+          placeholder={t('citizenship.a_number_placeholder')}
         />
       )}
 
       {citizenshipStatus === 'alien_authorized' && (
         <div className="space-y-4">
           <Input
-            label="Work Authorization Expiration Date"
+            label={t('citizenship.work_auth_expiration')}
             type="date"
             registration={register('workAuthExpiration')}
             error={errors.workAuthExpiration?.message}
           />
           
           <Select
-            label="Enter one of the following"
+            label={t('citizenship.enter_following')}
             registration={register('alienDocumentType')}
             error={errors.alienDocumentType?.message}
-            options={ALIEN_WORK_AUTH_OPTIONS}
-            placeholder="Select which information you will provide"
+            options={alienWorkAuthOptions}
+            placeholder={t('citizenship.select_info_placeholder')}
           />
           
           {watch('alienDocumentType') === 'uscis_a_number' && (
             <Input
-              label="USCIS A-Number"
+              label={t('citizenship.uscis_a_number')}
               registration={register('alienDocumentNumber')}
               error={errors.alienDocumentNumber?.message}
-              placeholder="A12345678"
+              placeholder={t('citizenship.a_number_placeholder')}
             />
           )}
           
           {watch('alienDocumentType') === 'form_i94' && (
             <Input
-              label="Form I-94 Admission Number"
+              label={t('citizenship.form_i94_number')}
               registration={register('alienDocumentNumber')}
               error={errors.alienDocumentNumber?.message}
-              placeholder="I-94 admission number"
+              placeholder={t('citizenship.i94_placeholder')}
             />
           )}
           
           {watch('alienDocumentType') === 'foreign_passport' && (
             <div className="space-y-4">
               <Input
-                label="Foreign Passport Number"
+                label={t('citizenship.foreign_passport_number')}
                 registration={register('alienDocumentNumber')}
                 error={errors.alienDocumentNumber?.message}
-                placeholder="Passport number"
+                placeholder={t('citizenship.passport_placeholder')}
               />
               <Input
-                label="Country of Issuance"
+                label={t('citizenship.country_issuance')}
                 registration={register('documentCountry')}
                 error={errors.documentCountry?.message}
-                placeholder="Country that issued the passport"
+                placeholder={t('citizenship.country_placeholder')}
               />
             </div>
           )}
@@ -102,40 +111,31 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
       )}
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">Basic Eligibility Questions</h3>
+        <h3 className="text-lg font-medium text-primary mb-4">{t('citizenship.eligibility_questions')}</h3>
         
         <div className="space-y-6">
           <RadioGroup
-            label="Are you 18 years or older?"
+            label={t('citizenship.age_18_question')}
             name="age18"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('age18')}
             error={errors.age18?.message}
             required
           />
 
           <RadioGroup
-            label="Do you have reliable transportation to work?"
+            label={t('citizenship.transportation_question')}
             name="transportation"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('transportation')}
             error={errors.transportation?.message}
             required
           />
 
           <RadioGroup
-            label="Are you legally authorized to work in the United States?"
+            label={t('citizenship.work_authorization_question')}
             name="workAuthorizationConfirm"
-            options={[
-              { value: 'yes', label: 'Yes' },
-              { value: 'no', label: 'No' }
-            ]}
+            options={yesNoOptions}
             registration={register('workAuthorizationConfirm')}
             error={errors.workAuthorizationConfirm?.message}
             required

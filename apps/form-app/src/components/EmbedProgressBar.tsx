@@ -21,6 +21,7 @@ export function EmbedProgressBar({
   language,
   onLanguageChange
 }: EmbedProgressBarProps) {
+  const { t } = useLanguage()
   const progress = ((currentStep + 1) / totalSteps) * 100
 
   const handleStepClick = (stepIndex: number) => {
@@ -44,9 +45,9 @@ export function EmbedProgressBar({
             <span className="text-white font-bold text-sm">W</span>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-gray-900">WareWorks Application</h3>
+            <h3 className="text-sm font-semibold text-gray-900">{t('embed.app_title')}</h3>
             <p className="text-xs text-gray-500">
-              Step {currentStep + 1} of {totalSteps} • {steps[currentStep]}
+              {t('progress.step_indicator', { current: currentStep + 1, total: totalSteps })} • {steps[currentStep]}
             </p>
           </div>
         </div>
@@ -62,8 +63,8 @@ export function EmbedProgressBar({
               onChange={(e) => onLanguageChange(e.target.value as 'en' | 'es')}
               className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="en">English</option>
-              <option value="es">Español</option>
+              <option value="en">{t('embed.language_english')}</option>
+              <option value="es">{t('embed.language_spanish')}</option>
             </select>
           </div>
         </div>
@@ -147,9 +148,9 @@ export function createEmbedProgressBarHTML(props: EmbedProgressBarProps) {
             <span class="text-white font-bold text-sm">W</span>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-gray-900">WareWorks Application</h3>
+            <h3 class="text-sm font-semibold text-gray-900">${language === 'en' ? 'WareWorks Application' : 'Aplicación WareWorks'}</h3>
             <p class="text-xs text-gray-500">
-              Step ${currentStep + 1} of ${totalSteps} • ${steps[currentStep]}
+              ${language === 'en' ? `Step ${currentStep + 1} of ${totalSteps}` : `Paso ${currentStep + 1} de ${totalSteps}`} • ${steps[currentStep]}
             </p>
           </div>
         </div>
@@ -157,8 +158,8 @@ export function createEmbedProgressBarHTML(props: EmbedProgressBarProps) {
         <!-- Language Selector -->
         <div class="flex items-center space-x-2">
           <select id="language-selector" class="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500">
-            <option value="en" ${language === 'en' ? 'selected' : ''}>English</option>
-            <option value="es" ${language === 'es' ? 'selected' : ''}>Español</option>
+            <option value="en" ${language === 'en' ? 'selected' : ''}>${language === 'en' ? 'English' : 'Inglés'}</option>
+            <option value="es" ${language === 'es' ? 'selected' : ''}>${language === 'en' ? 'Spanish' : 'Español'}</option>
           </select>
         </div>
       </div>

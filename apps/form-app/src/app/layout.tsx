@@ -1,9 +1,29 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
-export const metadata: Metadata = {
-  title: 'WareWorks Application Form',
-  description: 'Join the WareWorks team - submit your employment application',
+// Dynamic metadata based on language parameter
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: { lang?: string }
+}): Promise<Metadata> {
+  const lang = searchParams?.lang === 'es' ? 'es' : 'en'
+  
+  const metadata = {
+    en: {
+      title: 'WareWorks Application Form',
+      description: 'Join the WareWorks team - submit your employment application',
+    },
+    es: {
+      title: 'Formulario de Aplicación WareWorks',
+      description: 'Únete al equipo WareWorks - envía tu solicitud de empleo',
+    }
+  }
+
+  return {
+    title: metadata[lang].title,
+    description: metadata[lang].description,
+  }
 }
 
 export default function RootLayout({

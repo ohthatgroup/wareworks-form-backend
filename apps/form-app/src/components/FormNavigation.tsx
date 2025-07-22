@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight, Send } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 interface FormNavigationProps {
   currentStep: number
@@ -19,6 +20,7 @@ export function FormNavigation({
   isSubmitting,
   canProceed 
 }: FormNavigationProps) {
+  const { t } = useLanguage()
   const isFirstStep = currentStep === 0
   const isLastStep = currentStep === totalSteps - 1
 
@@ -35,7 +37,7 @@ export function FormNavigation({
         }`}
       >
         <ChevronLeft size={20} />
-        Previous
+        {t('navigation.previous')}
       </button>
 
       {isLastStep ? (
@@ -52,12 +54,12 @@ export function FormNavigation({
           {isSubmitting ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Submitting...
+              {t('navigation.submitting')}
             </>
           ) : (
             <>
               <Send size={20} />
-              Submit Application
+              {t('navigation.submit')}
             </>
           )}
         </button>
@@ -72,7 +74,7 @@ export function FormNavigation({
               : 'bg-primary text-white hover:bg-primary-hover'
           }`}
         >
-          Next
+          {t('navigation.next')}
           <ChevronRight size={20} />
         </button>
       )}

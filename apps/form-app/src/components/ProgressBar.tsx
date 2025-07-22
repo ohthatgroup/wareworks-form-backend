@@ -1,3 +1,5 @@
+import { useLanguage } from '@/contexts/LanguageContext'
+
 interface ProgressBarProps {
   currentStep: number
   totalSteps: number
@@ -13,6 +15,7 @@ export function ProgressBar({
   onStepClick,
   completedSteps = []
 }: ProgressBarProps) {
+  const { t } = useLanguage()
   const progress = ((currentStep + 1) / totalSteps) * 100
 
   const handleStepClick = (stepIndex: number) => {
@@ -29,7 +32,7 @@ export function ProgressBar({
     <div className="mb-8">
       <div className="flex justify-between items-center mb-4">
         <span className="text-sm font-medium text-primary">
-          Step {currentStep + 1} of {totalSteps}
+          {t('progress.step_indicator', { current: currentStep + 1, total: totalSteps })}
         </span>
         <span className="text-sm text-gray-600">
           {steps[currentStep]}

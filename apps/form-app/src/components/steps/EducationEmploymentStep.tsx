@@ -3,6 +3,7 @@ import { UseFormReturn, useFieldArray } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { Plus, Trash2 } from 'lucide-react'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 interface EducationEmploymentStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -11,6 +12,7 @@ interface EducationEmploymentStepProps {
 
 export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) {
   const { register, control, formState: { errors } } = form
+  const { t } = useLanguage()
 
   const {
     fields: educationFields,
@@ -90,7 +92,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
       {/* Education Section */}
       <div className="border-t pt-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-primary">Education History</h3>
+          <h3 className="text-lg font-medium text-primary">{t('education.title')}</h3>
           <button
             type="button"
             onClick={addEducation}
@@ -98,7 +100,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Plus size={16} />
-            Add Education
+            {t('education.add_button')}
           </button>
         </div>
 
@@ -106,7 +108,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
         {educationFields.map((field, index) => (
           <div key={field.id} className="bg-gray-50 rounded-lg p-6 mb-4">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="font-medium text-gray-900">Education Entry {index + 1}</h4>
+              <h4 className="font-medium text-gray-900">{t('education.entry_title')} {index + 1}</h4>
               <button
                 type="button"
                 onClick={() => removeEducation(index)}
@@ -118,28 +120,28 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="School Name and Location"
+                label={t('education.school_name')}
                 registration={register(`education.${index}.schoolName`)}
                 error={errors.education?.[index]?.schoolName?.message}
-                placeholder="e.g., San Diego State University"
+                placeholder={t('education.school_placeholder')}
               />
               
               <Input
-                label="Graduation Year"
+                label={t('education.graduation_year')}
                 registration={register(`education.${index}.graduationYear`)}
                 error={errors.education?.[index]?.graduationYear?.message}
-                placeholder="e.g., 2020"
+                placeholder={t('education.graduation_placeholder')}
               />
               
               <Input
-                label="Field of Study/Major"
+                label={t('education.field_of_study')}
                 registration={register(`education.${index}.fieldOfStudy`)}
                 error={errors.education?.[index]?.fieldOfStudy?.message}
-                placeholder="e.g., Business Administration"
+                placeholder={t('education.field_placeholder')}
               />
               
               <div>
-                <label className="form-label">Diploma/Degree Received</label>
+                <label className="form-label">{t('education.degree_received')}</label>
                 <div className="flex gap-4 mt-2">
                   <label className="flex items-center">
                     <input
@@ -148,7 +150,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                       {...register(`education.${index}.degreeReceived`)}
                       className="mr-2"
                     />
-                    Yes
+                    {t('common.yes')}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -157,7 +159,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                       {...register(`education.${index}.degreeReceived`)}
                       className="mr-2"
                     />
-                    No
+                    {t('common.no')}
                   </label>
                 </div>
               </div>
@@ -169,7 +171,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
       {/* Employment Section */}
       <div className="border-t pt-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-primary">Employment History</h3>
+          <h3 className="text-lg font-medium text-primary">{t('employment.title')}</h3>
           <button
             type="button"
             onClick={addEmployment}
@@ -177,7 +179,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Plus size={16} />
-            Add Employment
+            {t('employment.add_button')}
           </button>
         </div>
 
@@ -185,7 +187,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
         {employmentFields.map((field, index) => (
           <div key={field.id} className="bg-gray-50 rounded-lg p-6 mb-4">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="font-medium text-gray-900">Employment Entry {index + 1}</h4>
+              <h4 className="font-medium text-gray-900">{t('employment.entry_title')} {index + 1}</h4>
               <button
                 type="button"
                 onClick={() => removeEmployment(index)}
@@ -197,22 +199,22 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
             <div className="space-y-4">
               <Input
-                label="Company Name and Location"
+                label={t('employment.company_name')}
                 registration={register(`employment.${index}.companyName`)}
                 error={errors.employment?.[index]?.companyName?.message}
-                placeholder="e.g., ABC Logistics, San Diego, CA"
+                placeholder={t('employment.company_placeholder')}
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Start Date"
+                  label={t('employment.start_date')}
                   type="date"
                   registration={register(`employment.${index}.startDate`)}
                   error={errors.employment?.[index]?.startDate?.message}
                 />
                 
                 <Input
-                  label="End Date"
+                  label={t('employment.end_date')}
                   type="date"
                   registration={register(`employment.${index}.endDate`)}
                   error={errors.employment?.[index]?.endDate?.message}
@@ -221,43 +223,43 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Starting Position"
+                  label={t('employment.starting_position')}
                   registration={register(`employment.${index}.startingPosition`)}
                   error={errors.employment?.[index]?.startingPosition?.message}
-                  placeholder="e.g., Warehouse Associate"
+                  placeholder={t('employment.starting_placeholder')}
                 />
                 
                 <Input
-                  label="Ending Position"
+                  label={t('employment.ending_position')}
                   registration={register(`employment.${index}.endingPosition`)}
                   error={errors.employment?.[index]?.endingPosition?.message}
-                  placeholder="e.g., Lead Warehouse Associate"
+                  placeholder={t('employment.ending_placeholder')}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Supervisor Name"
+                  label={t('employment.supervisor_name')}
                   registration={register(`employment.${index}.supervisorName`)}
                   error={errors.employment?.[index]?.supervisorName?.message}
-                  placeholder="e.g., John Smith"
+                  placeholder={t('employment.supervisor_placeholder')}
                 />
                 
                 <Input
-                  label="Supervisor Phone"
+                  label={t('employment.supervisor_phone')}
                   type="tel"
                   registration={register(`employment.${index}.supervisorPhone`)}
                   error={errors.employment?.[index]?.supervisorPhone?.message}
-                  placeholder="(555) 123-4567"
+                  placeholder={t('employment.phone_placeholder')}
                 />
               </div>
 
               <div>
-                <label className="form-label">Job Responsibilities</label>
+                <label className="form-label">{t('employment.responsibilities')}</label>
                 <textarea
                   {...register(`employment.${index}.responsibilities`)}
                   className="form-input min-h-[100px]"
-                  placeholder="Describe your main duties and responsibilities..."
+                  placeholder={t('employment.responsibilities_placeholder')}
                 />
                 {errors.employment?.[index]?.responsibilities && (
                   <p className="form-error">{errors.employment[index]?.responsibilities?.message}</p>
@@ -265,11 +267,11 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
               </div>
 
               <div>
-                <label className="form-label">Reason for Leaving</label>
+                <label className="form-label">{t('employment.reason_leaving')}</label>
                 <textarea
                   {...register(`employment.${index}.reasonForLeaving`)}
                   className="form-input min-h-[80px]"
-                  placeholder="e.g., Career advancement, relocation, etc."
+                  placeholder={t('employment.reason_placeholder')}
                 />
                 {errors.employment?.[index]?.reasonForLeaving && (
                   <p className="form-error">{errors.employment[index]?.reasonForLeaving?.message}</p>
@@ -277,7 +279,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
               </div>
 
               <div>
-                <label className="form-label">May we contact this employer?</label>
+                <label className="form-label">{t('employment.may_contact')}</label>
                 <div className="flex gap-4 mt-2">
                   <label className="flex items-center">
                     <input
@@ -286,7 +288,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                       {...register(`employment.${index}.mayContact`)}
                       className="mr-2"
                     />
-                    Yes
+                    {t('common.yes')}
                   </label>
                   <label className="flex items-center">
                     <input
@@ -295,7 +297,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                       {...register(`employment.${index}.mayContact`)}
                       className="mr-2"
                     />
-                    No
+                    {t('common.no')}
                   </label>
                 </div>
               </div>
