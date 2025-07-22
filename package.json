@@ -13,7 +13,12 @@
     "deploy:preview": "netlify deploy"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0",
+    "@types/node": "^20.19.9",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.2.0"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
   }
 }
