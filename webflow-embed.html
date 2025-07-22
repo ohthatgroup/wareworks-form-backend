@@ -136,38 +136,84 @@ Copy this code into your Webflow embed element
     ">
       Please select your preferred language:
     </p>
-    <div class="button-container" style="display: flex; gap: 0.9375rem; justify-content: center; flex-wrap: wrap;">
-      <button onclick="loadApplicationEmbed('en')" style="
-        background: #131f5b; 
-        color: white; 
-        border: none; 
-        padding: 1em 1.5em; 
-        border-radius: 0.25rem; 
-        cursor: pointer; 
-        font-size: 1rem; 
-        min-width: 12.5rem; 
-        transition: all 0.2s ease;
-        font-family: 'Figtree', sans-serif;
-        font-weight: 400;
-      " onmouseover="this.style.background='#1e308e'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#131f5b'; this.style.transform='none'">
-        Accept & Continue in English
-      </button>
-      <button onclick="loadApplicationEmbed('es')" style="
-        background: #131f5b; 
-        color: white; 
-        border: none; 
-        padding: 1em 1.5em; 
-        border-radius: 0.25rem; 
-        cursor: pointer; 
-        font-size: 1rem; 
-        min-width: 12.5rem; 
-        transition: all 0.2s ease;
-        font-family: 'Figtree', sans-serif;
-        font-weight: 400;
-      " onmouseover="this.style.background='#1e308e'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#131f5b'; this.style.transform='none'">
-        Aceptar y Continuar en Español
-      </button>
+    
+    <!-- Modern Language Toggle -->
+    <div style="display: flex; justify-content: center; margin-bottom: 1.875rem;">
+      <div id="language-toggle" style="
+        background: #f3f4f6; 
+        border-radius: 0.5rem; 
+        padding: 0.25rem; 
+        display: flex;
+        position: relative;
+        max-width: 320px;
+        width: 100%;
+      ">
+        <button 
+          id="btn-english" 
+          onclick="selectLanguage('en')" 
+          style="
+            flex: 1;
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.375rem; 
+            font-weight: 500; 
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Figtree', sans-serif;
+            font-size: 0.95rem;
+            background: white;
+            color: #131f5b;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          "
+        >
+          English
+        </button>
+        <button 
+          id="btn-spanish" 
+          onclick="selectLanguage('es')" 
+          style="
+            flex: 1;
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.375rem; 
+            font-weight: 500; 
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Figtree', sans-serif;
+            font-size: 0.95rem;
+            background: transparent;
+            color: #6b7280;
+          "
+        >
+          Español
+        </button>
+      </div>
     </div>
+    
+    <!-- Single Continue Button -->
+    <button
+      id="continue-button"
+      onclick="loadApplicationEmbed(selectedLanguage)"
+      style="
+        width: 100%; 
+        max-width: 320px;
+        background: #131f5b; 
+        color: white; 
+        border: none;
+        padding: 1rem 2rem; 
+        border-radius: 0.5rem; 
+        font-weight: 500; 
+        font-size: 1rem;
+        cursor: pointer; 
+        transition: all 0.2s ease;
+        font-family: 'Figtree', sans-serif;
+        box-shadow: 0 4px 12px rgba(19, 31, 91, 0.15);
+      " 
+      onmouseover="this.style.background='#1e308e'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(19, 31, 91, 0.25)'" 
+      onmouseout="this.style.background='#131f5b'; this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(19, 31, 91, 0.15)'"
+    >
+      Accept & Continue
+    </button>
   </div>
 
   <!-- Loading State -->
@@ -245,12 +291,12 @@ Copy this code into your Webflow embed element
       font-size: 1.3rem !important;
     }
     
-    #language-disclaimer .button-container {
-      flex-direction: column !important;
+    #language-toggle {
+      max-width: 100% !important;
     }
     
-    #language-disclaimer button {
-      min-width: 100% !important;
+    #continue-button {
+      max-width: 100% !important;
     }
   }
   
@@ -279,6 +325,9 @@ Copy this code into your Webflow embed element
     WEBFLOW_DOMAIN: window.location.hostname
   };
 
+  // Track selected language
+  let selectedLanguage = 'en';
+
   // Analytics tracking
   function trackEvent(eventName, parameters = {}) {
     if (typeof gtag !== 'undefined') {
@@ -290,38 +339,30 @@ Copy this code into your Webflow embed element
     }
   }
 
-  // Start application with language selection
-  window.startApplication = function(language = 'en') {
-    console.log('Starting WareWorks application in language:', language);
+  // Language selection handler
+  window.selectLanguage = function(language) {
+    selectedLanguage = language;
     
-    // Track application start
-    trackEvent('application_start', {
-      language: language,
-      referrer: CONFIG.WEBFLOW_DOMAIN
-    });
+    const englishBtn = document.getElementById('btn-english');
+    const spanishBtn = document.getElementById('btn-spanish');
     
-    // Hide disclaimer, show loading
-    document.getElementById('language-disclaimer').style.display = 'none';
-    document.getElementById('application-loading').style.display = 'block';
-    
-    // Build application URL with parameters
-    const url = new URL(CONFIG.FORM_APP_URL);
-    url.searchParams.set('lang', language);
-    url.searchParams.set('source', 'webflow');
-    url.searchParams.set('referrer', CONFIG.WEBFLOW_DOMAIN);
-    
-    // Add UTM parameters if present
-    const urlParams = new URLSearchParams(window.location.search);
-    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(param => {
-      if (urlParams.has(param)) {
-        url.searchParams.set(param, urlParams.get(param));
-      }
-    });
-    
-    // Redirect to standalone application
-    setTimeout(() => {
-      window.location.href = url.toString();
-    }, 500);
+    if (language === 'en') {
+      englishBtn.style.background = 'white';
+      englishBtn.style.color = '#131f5b';
+      englishBtn.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+      
+      spanishBtn.style.background = 'transparent';
+      spanishBtn.style.color = '#6b7280';
+      spanishBtn.style.boxShadow = 'none';
+    } else {
+      spanishBtn.style.background = 'white';
+      spanishBtn.style.color = '#131f5b';
+      spanishBtn.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+      
+      englishBtn.style.background = 'transparent';
+      englishBtn.style.color = '#6b7280';
+      englishBtn.style.boxShadow = 'none';
+    }
   };
 
   // State management for application
@@ -618,7 +659,12 @@ Copy this code into your Webflow embed element
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       console.log('WareWorks application embed initialized');
+      // Set default language selection
+      selectLanguage('en');
     });
+  } else {
+    console.log('WareWorks application embed initialized');
+    selectLanguage('en');
   }
 })();
 </script>

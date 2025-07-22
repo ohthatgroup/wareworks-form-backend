@@ -19,7 +19,6 @@ import { ReviewStep } from '../components/steps/ReviewStep'
 import { SuccessStep } from '../components/steps/SuccessStep'
 import { LanguageProvider, useLanguage } from '../contexts/LanguageContext'
 import { LanguageSelector } from '../components/ui/LanguageSelector'
-import { LandingPage } from '../components/LandingPage'
 
 const STEPS = [
   { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
@@ -33,7 +32,7 @@ const STEPS = [
 ]
 
 function ApplicationFormContent() {
-  const [showLanding, setShowLanding] = useState(true)
+  // Removed showLanding state - no more React landing page needed
   const [currentStep, setCurrentStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   interface SubmissionResult {
@@ -107,15 +106,7 @@ function ApplicationFormContent() {
     }
   }, [isEmbedded])
 
-  // Handle landing page continue
-  const handleContinueFromLanding = useCallback(() => {
-    setShowLanding(false)
-  }, [])
-
-  // Show landing page first for embedded forms
-  if (showLanding && isEmbedded) {
-    return <LandingPage onContinue={handleContinueFromLanding} />
-  }
+  // No more React landing page - Webflow embed handles language selection entirely
 
   // Send progress updates to parent window (embed)
   const sendProgressUpdate = useCallback(() => {
@@ -381,7 +372,7 @@ function ApplicationFormContent() {
 
   return (
     <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
-      {/* Only show language selector when NOT embedded - no internal progress bar */}
+      {/* Only show language selector when NOT embedded */}
       {!isEmbedded && (
         <div className="mb-4 flex justify-end">
           <LanguageSelector variant="compact" />
