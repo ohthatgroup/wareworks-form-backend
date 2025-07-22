@@ -19,6 +19,7 @@ import { ReviewStep } from '../components/steps/ReviewStep'
 import { SuccessStep } from '../components/steps/SuccessStep'
 import { LanguageProvider, useLanguage } from '../contexts/LanguageContext'
 import { LanguageSelector } from '../components/ui/LanguageSelector'
+import { LandingPage } from '../components/LandingPage'
 
 const STEPS = [
   { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
@@ -32,6 +33,7 @@ const STEPS = [
 ]
 
 function ApplicationFormContent() {
+  const [showLanding, setShowLanding] = useState(true)
   const [currentStep, setCurrentStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   interface SubmissionResult {
@@ -104,6 +106,16 @@ function ApplicationFormContent() {
       }
     }
   }, [isEmbedded])
+
+  // Handle landing page continue
+  const handleContinueFromLanding = useCallback(() => {
+    setShowLanding(false)
+  }, [])
+
+  // Show landing page first for embedded forms
+  if (showLanding && isEmbedded) {
+    return <LandingPage onContinue={handleContinueFromLanding} />
+  }
 
   // Send progress updates to parent window (embed)
   const sendProgressUpdate = useCallback(() => {
