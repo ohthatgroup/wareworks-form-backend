@@ -17,21 +17,23 @@ import { EducationEmploymentStep } from '../components/steps/EducationEmployment
 import { DocumentsStep } from '../components/steps/DocumentsStep'
 import { ReviewStep } from '../components/steps/ReviewStep'
 import { SuccessStep } from '../components/steps/SuccessStep'
+import { LanguageProvider, useLanguage } from '../contexts/LanguageContext'
 
 const STEPS = [
-  { id: 'personal', title: 'Personal Information', component: PersonalInfoStep },
-  { id: 'contact', title: 'Contact Details', component: ContactInfoStep },
-  { id: 'citizenship', title: 'Work Authorization', component: CitizenshipStep },
-  { id: 'position', title: 'Position & Experience', component: PositionStep },
-  { id: 'availability', title: 'Availability', component: AvailabilityStep },
-  { id: 'education', title: 'Education & Employment', component: EducationEmploymentStep },
-  { id: 'documents', title: 'Documents', component: DocumentsStep },
-  { id: 'review', title: 'Review & Submit', component: ReviewStep },
+  { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
+  { id: 'contact', titleKey: 'steps.contact.title', component: ContactInfoStep },
+  { id: 'citizenship', titleKey: 'steps.citizenship.title', component: CitizenshipStep },
+  { id: 'position', titleKey: 'steps.position.title', component: PositionStep },
+  { id: 'availability', titleKey: 'steps.availability.title', component: AvailabilityStep },
+  { id: 'education', titleKey: 'steps.education_employment.title', component: EducationEmploymentStep },
+  { id: 'documents', titleKey: 'steps.documents.title', component: DocumentsStep },
+  { id: 'review', titleKey: 'steps.review.title', component: ReviewStep },
 ]
 
 function ApplicationFormContent() {
   // Removed showLanding state - no more React landing page needed
   const [currentStep, setCurrentStep] = useState(0)
+  const { t } = useLanguage()
   const [isSubmitting, setIsSubmitting] = useState(false)
   interface SubmissionResult {
     success: boolean
@@ -370,7 +372,7 @@ function ApplicationFormContent() {
   return (
     <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
 
-      <FormStep title={STEPS[currentStep].title}>
+      <FormStep title={t(STEPS[currentStep].titleKey)}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <CurrentStepComponent 
             form={form}
@@ -394,5 +396,9 @@ function ApplicationFormContent() {
 }
 
 export default function ApplicationForm() {
-  return <ApplicationFormContent />
+  return (
+    <LanguageProvider>
+      <ApplicationFormContent />
+    </LanguageProvider>
+  )
 }
