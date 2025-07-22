@@ -16,6 +16,59 @@ Copy this code into your Webflow embed element
     margin: 0 auto 1.25rem;
     font-family: 'Figtree', sans-serif;
   ">
+    <!-- Modern Language Toggle - MOVED TO TOP -->
+    <div style="display: flex; justify-content: center; margin-bottom: 1.875rem;">
+      <div id="language-toggle" style="
+        background: #f3f4f6; 
+        border-radius: 0.5rem; 
+        padding: 0.25rem; 
+        display: flex;
+        position: relative;
+        max-width: 320px;
+        width: 100%;
+      ">
+        <button 
+          id="btn-english" 
+          onclick="selectLanguage('en')" 
+          style="
+            flex: 1;
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.375rem; 
+            font-weight: 500; 
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Figtree', sans-serif;
+            font-size: 0.95rem;
+            background: white;
+            color: #131f5b;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          "
+        >
+          English
+        </button>
+        <button 
+          id="btn-spanish" 
+          onclick="selectLanguage('es')" 
+          style="
+            flex: 1;
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.375rem; 
+            font-weight: 500; 
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Figtree', sans-serif;
+            font-size: 0.95rem;
+            background: transparent;
+            color: #6b7280;
+          "
+        >
+          Español
+        </button>
+      </div>
+    </div>
+
     <!-- Dynamic Title -->
     <h2 id="disclaimer-title" style="
       color: #131f5b; 
@@ -88,73 +141,11 @@ Copy this code into your Webflow embed element
       </div>
     </div>
     
-    <p id="language-instruction" style="
-      margin-bottom: 1.5625rem; 
-      color: #666; 
-      font-size: 1rem;
-      font-family: 'Figtree', sans-serif;
-      line-height: 1.6em;
-    ">
-      Please select your preferred language:
-    </p>
-    
-    <!-- Modern Language Toggle -->
-    <div style="display: flex; justify-content: center; margin-bottom: 1.875rem;">
-      <div id="language-toggle" style="
-        background: #f3f4f6; 
-        border-radius: 0.5rem; 
-        padding: 0.25rem; 
-        display: flex;
-        position: relative;
-        max-width: 320px;
-        width: 100%;
-      ">
-        <button 
-          id="btn-english" 
-          onclick="selectLanguage('en')" 
-          style="
-            flex: 1;
-            padding: 0.75rem 1.5rem; 
-            border-radius: 0.375rem; 
-            font-weight: 500; 
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Figtree', sans-serif;
-            font-size: 0.95rem;
-            background: white;
-            color: #131f5b;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-          "
-        >
-          English
-        </button>
-        <button 
-          id="btn-spanish" 
-          onclick="selectLanguage('es')" 
-          style="
-            flex: 1;
-            padding: 0.75rem 1.5rem; 
-            border-radius: 0.375rem; 
-            font-weight: 500; 
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Figtree', sans-serif;
-            font-size: 0.95rem;
-            background: transparent;
-            color: #6b7280;
-          "
-        >
-          Español
-        </button>
-      </div>
-    </div>
     
     <!-- Single Continue Button -->
     <button
       id="continue-button"
-      onclick="loadApplicationEmbed(selectedLanguage)"
+      onclick="continueWithSelectedLanguage()"
       style="
         width: 100%; 
         max-width: 320px;
@@ -265,6 +256,9 @@ Copy this code into your Webflow embed element
 </style>
 
 <script>
+// Track selected language globally so onclick can access it
+window.selectedLanguage = 'en';
+
 (function() {
   'use strict';
   
@@ -277,9 +271,6 @@ Copy this code into your Webflow embed element
     ANALYTICS_ID: 'G-XXXXXXXXXX', // Replace with your GA4 ID
     WEBFLOW_DOMAIN: window.location.hostname
   };
-
-  // Track selected language
-  let selectedLanguage = 'en';
 
   // Static translations for disclaimer
   const translations = {
@@ -382,7 +373,7 @@ Copy this code into your Webflow embed element
 
   // Language selection handler
   window.selectLanguage = function(language) {
-    selectedLanguage = language;
+    window.selectedLanguage = language;
     
     // Update toggle button states
     const englishBtn = document.getElementById('btn-english');
@@ -408,6 +399,11 @@ Copy this code into your Webflow embed element
 
     // Update disclaimer content
     updateDisclaimerContent(language);
+  };
+
+  // Continue button wrapper function that can access global selectedLanguage
+  window.continueWithSelectedLanguage = function() {
+    loadApplicationEmbed(window.selectedLanguage);
   };
 
   // State management for application
