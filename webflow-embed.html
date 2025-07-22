@@ -16,33 +16,21 @@ Copy this code into your Webflow embed element
     margin: 0 auto 1.25rem;
     font-family: 'Figtree', sans-serif;
   ">
-    <h2 style="
+    <!-- Dynamic Title -->
+    <h2 id="disclaimer-title" style="
       color: #131f5b; 
-      margin-bottom: 0.625rem; 
+      margin-bottom: 1.875rem; 
       font-family: 'Bricolage Grotesque', sans-serif; 
       font-size: 1.75rem;
       font-weight: 400;
       letter-spacing: -0.01em;
       line-height: 1.04em;
-      margin-bottom: 0.35em;
     ">
       Welcome to WareWorks
     </h2>
-    <h3 style="
-      color: #666; 
-      margin-bottom: 1.875rem; 
-      font-family: 'Bricolage Grotesque', sans-serif; 
-      font-size: 1.5rem; 
-      font-weight: 400;
-      letter-spacing: -0.01em;
-      line-height: 1.04em;
-      margin-bottom: 0.7em;
-    ">
-      Bienvenido a WareWorks
-    </h3>
     
-    <!-- Comprehensive Employment Eligibility Notice -->
-    <div style="
+    <!-- Employment Eligibility Notice -->
+    <div id="disclaimer-content" style="
       text-align: left; 
       margin-bottom: 1.875rem; 
       line-height: 1.6; 
@@ -51,7 +39,8 @@ Copy this code into your Webflow embed element
       border-radius: 0.75rem;
       border: 1px solid #d1d9e6;
     ">
-      <div style="margin-bottom: 1.25rem;">
+      <!-- Content will be dynamically updated based on language selection -->
+      <div id="disclaimer-text">
         <h4 style="
           margin-bottom: 0.75rem; 
           font-size: 1rem;
@@ -66,7 +55,7 @@ Copy this code into your Webflow embed element
           line-height: 1.6em;
           color: #080c24;
         ">
-          <strong>English:</strong> All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process. Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.
+          All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process. Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.
         </p>
         <p style="
           margin-bottom: 0.75rem; 
@@ -77,57 +66,29 @@ Copy this code into your Webflow embed element
         ">
           <strong>Document Requirements:</strong> Accepted formats include PDF, JPG, JPEG, PNG. Maximum file size is 10MB per file. Documents must be clear and legible with personal information visible.
         </p>
-      </div>
-      
-      <div style="margin-bottom: 1.25rem;">
-        <h4 style="
-          margin-bottom: 0.75rem; 
-          font-size: 1rem;
-          font-family: 'Bricolage Grotesque', sans-serif;
-          font-weight: 600;
-          color: #131f5b;
-        ">Requisitos de Elegibilidad de Empleo</h4>
-        <p style="
-          margin-bottom: 0.75rem; 
-          font-size: 0.88rem;
-          font-family: 'Figtree', sans-serif;
-          line-height: 1.6em;
-          color: #080c24;
-        ">
-          <strong>Español:</strong> Todos los empleados deben ser elegibles para trabajar en los Estados Unidos. Se le requerirá proporcionar documentación para verificar su elegibilidad como parte del proceso I-9. La ley federal requiere que todos los empleadores verifiquen la identidad y elegibilidad de empleo de todos los empleados. Necesitará proporcionar documentación aceptable dentro de tres (3) días hábiles de comenzar el empleo.
-        </p>
-        <p style="
-          margin-bottom: 0; 
-          font-size: 0.88rem;
-          font-family: 'Figtree', sans-serif;
-          line-height: 1.6em;
-          color: #080c24;
-        ">
-          <strong>Requisitos de Documentos:</strong> Los formatos aceptados incluyen PDF, JPG, JPEG, PNG. El tamaño máximo de archivo es 10MB por archivo. Los documentos deben ser claros y legibles con información personal visible.
-        </p>
-      </div>
 
-      <div style="
-        background: #fef3cd;
-        border: 1px solid #fde68a;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-      ">
-        <p style="
-          margin: 0; 
-          font-size: 0.85rem;
-          font-family: 'Figtree', sans-serif;
-          line-height: 1.5em;
-          color: #92400e;
-          font-weight: 500;
+        <div style="
+          background: #fef3cd;
+          border: 1px solid #fde68a;
+          border-radius: 0.5rem;
+          padding: 1rem;
+          margin-top: 1rem;
         ">
-          <strong>Privacy Notice:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws. All information provided will be verified during the background check process.
-        </p>
+          <p style="
+            margin: 0; 
+            font-size: 0.85rem;
+            font-family: 'Figtree', sans-serif;
+            line-height: 1.5em;
+            color: #92400e;
+            font-weight: 500;
+          ">
+            <strong>Privacy Notice:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws. All information provided will be verified during the background check process.
+          </p>
+        </div>
       </div>
     </div>
     
-    <p style="
+    <p id="language-instruction" style="
       margin-bottom: 1.5625rem; 
       color: #666; 
       font-size: 1rem;
@@ -237,7 +198,7 @@ Copy this code into your Webflow embed element
       animation: spin 1s linear infinite; 
       margin: 0 auto 1.5rem;
     "></div>
-    <h3 style="
+    <h3 id="loading-title" style="
       color: #111827; 
       font-size: 1.125rem;
       font-weight: 600;
@@ -246,7 +207,7 @@ Copy this code into your Webflow embed element
     ">
       Loading Application
     </h3>
-    <p style="
+    <p id="loading-text" style="
       color: #6b7280; 
       font-size: 0.875rem;
       font-family: 'Figtree', sans-serif;
@@ -283,12 +244,8 @@ Copy this code into your Webflow embed element
       padding: 1.5rem !important;
     }
     
-    #language-disclaimer h2 {
+    #disclaimer-title {
       font-size: 1.52rem !important;
-    }
-    
-    #language-disclaimer h3 {
-      font-size: 1.3rem !important;
     }
     
     #language-toggle {
@@ -301,12 +258,8 @@ Copy this code into your Webflow embed element
   }
   
   @media (max-width: 480px) {
-    #language-disclaimer h2 {
+    #disclaimer-title {
       font-size: 1.21rem !important;
-    }
-    
-    #language-disclaimer h3 {
-      font-size: 1.2rem !important;
     }
   }
 </style>
@@ -328,6 +281,34 @@ Copy this code into your Webflow embed element
   // Track selected language
   let selectedLanguage = 'en';
 
+  // Static translations for disclaimer
+  const translations = {
+    en: {
+      title: 'Welcome to WareWorks',
+      eligibilityTitle: 'Employment Eligibility Requirements',
+      eligibilityText: 'All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process. Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.',
+      documentRequirements: 'Document Requirements:',
+      documentText: 'Accepted formats include PDF, JPG, JPEG, PNG. Maximum file size is 10MB per file. Documents must be clear and legible with personal information visible.',
+      privacyNotice: 'Privacy Notice:',
+      privacyText: 'By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws. All information provided will be verified during the background check process.',
+      instruction: 'Please select your preferred language:',
+      loadingTitle: 'Loading Application',
+      loadingText: 'Please wait while we prepare your application form...'
+    },
+    es: {
+      title: 'Bienvenido a WareWorks',
+      eligibilityTitle: 'Requisitos de Elegibilidad de Empleo',
+      eligibilityText: 'Todos los empleados deben ser elegibles para trabajar en los Estados Unidos. Se le requerirá proporcionar documentación para verificar su elegibilidad como parte del proceso I-9. La ley federal requiere que todos los empleadores verifiquen la identidad y elegibilidad de empleo de todos los empleados. Necesitará proporcionar documentación aceptable dentro de tres (3) días hábiles de comenzar el empleo.',
+      documentRequirements: 'Requisitos de Documentos:',
+      documentText: 'Los formatos aceptados incluyen PDF, JPG, JPEG, PNG. El tamaño máximo de archivo es 10MB por archivo. Los documentos deben ser claros y legibles con información personal visible.',
+      privacyNotice: 'Aviso de Privacidad:',
+      privacyText: 'Al continuar, usted reconoce que la información que proporcione será utilizada para fines de empleo y se mantendrá confidencial de acuerdo con las leyes aplicables. Toda la información proporcionada será verificada durante el proceso de verificación de antecedentes.',
+      instruction: 'Por favor seleccione su idioma preferido:',
+      loadingTitle: 'Cargando Aplicación',
+      loadingText: 'Por favor espere mientras preparamos su formulario de solicitud...'
+    }
+  };
+
   // Analytics tracking
   function trackEvent(eventName, parameters = {}) {
     if (typeof gtag !== 'undefined') {
@@ -339,10 +320,71 @@ Copy this code into your Webflow embed element
     }
   }
 
+  // Update disclaimer content based on selected language
+  function updateDisclaimerContent(language) {
+    const t = translations[language];
+    
+    document.getElementById('disclaimer-title').textContent = t.title;
+    document.getElementById('language-instruction').textContent = t.instruction;
+    
+    // Update loading text too
+    document.getElementById('loading-title').textContent = t.loadingTitle;
+    document.getElementById('loading-text').textContent = t.loadingText;
+    
+    // Update disclaimer content
+    document.getElementById('disclaimer-text').innerHTML = `
+      <h4 style="
+        margin-bottom: 0.75rem; 
+        font-size: 1rem;
+        font-family: 'Bricolage Grotesque', sans-serif;
+        font-weight: 600;
+        color: #131f5b;
+      ">${t.eligibilityTitle}</h4>
+      <p style="
+        margin-bottom: 0.75rem; 
+        font-size: 0.88rem;
+        font-family: 'Figtree', sans-serif;
+        line-height: 1.6em;
+        color: #080c24;
+      ">
+        ${t.eligibilityText}
+      </p>
+      <p style="
+        margin-bottom: 0.75rem; 
+        font-size: 0.88rem;
+        font-family: 'Figtree', sans-serif;
+        line-height: 1.6em;
+        color: #080c24;
+      ">
+        <strong>${t.documentRequirements}</strong> ${t.documentText}
+      </p>
+
+      <div style="
+        background: #fef3cd;
+        border: 1px solid #fde68a;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+      ">
+        <p style="
+          margin: 0; 
+          font-size: 0.85rem;
+          font-family: 'Figtree', sans-serif;
+          line-height: 1.5em;
+          color: #92400e;
+          font-weight: 500;
+        ">
+          <strong>${t.privacyNotice}</strong> ${t.privacyText}
+        </p>
+      </div>
+    `;
+  }
+
   // Language selection handler
   window.selectLanguage = function(language) {
     selectedLanguage = language;
     
+    // Update toggle button states
     const englishBtn = document.getElementById('btn-english');
     const spanishBtn = document.getElementById('btn-spanish');
     
@@ -363,6 +405,9 @@ Copy this code into your Webflow embed element
       englishBtn.style.color = '#6b7280';
       englishBtn.style.boxShadow = 'none';
     }
+
+    // Update disclaimer content
+    updateDisclaimerContent(language);
   };
 
   // State management for application
@@ -418,9 +463,9 @@ Copy this code into your Webflow embed element
       
       container.style.display = 'block';
     
-      // Build application URL with parameters
+      // Build application URL with parameters - THIS IS THE KEY CONNECTION!
       const url = new URL(CONFIG.FORM_APP_URL);
-      url.searchParams.set('lang', language);
+      url.searchParams.set('lang', language); // This passes language to React app
       url.searchParams.set('embed', 'true');
       url.searchParams.set('source', 'webflow');
       url.searchParams.set('referrer', CONFIG.WEBFLOW_DOMAIN);
@@ -659,7 +704,7 @@ Copy this code into your Webflow embed element
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       console.log('WareWorks application embed initialized');
-      // Set default language selection
+      // Set default language selection and update content
       selectLanguage('en');
     });
   } else {

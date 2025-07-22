@@ -34,11 +34,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Load saved language preference from localStorage after hydration
+    // Set initial language after hydration - priority: URL param > localStorage > default 'en'
     if (hydrated && typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('preferred-language') as 'en' | 'es'
-      if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
-        setLanguage(savedLanguage)
+      const urlParams = new URLSearchParams(window.location.search)
+      const urlLanguage = urlParams.get('lang') as 'en' | 'es' | null
+      
+      if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
+        // URL param takes priority (from embed)
+        setLanguage(urlLanguage)
+      } else {
+        // Fallback to localStorage
+        const savedLanguage = localStorage.getItem('preferred-language') as 'en' | 'es'
+        if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+          setLanguage(savedLanguage)
+        }
       }
     }
   }, [hydrated])
