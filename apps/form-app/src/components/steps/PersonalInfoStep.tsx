@@ -1,7 +1,6 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
-import { useLanguage } from '../../contexts/LanguageContext'
 
 interface PersonalInfoStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -10,7 +9,6 @@ interface PersonalInfoStepProps {
 
 export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
   const { register, formState: { errors }, setValue, watch } = form
-  const { t } = useLanguage()
   
   const formatSSN = (value: string) => {
     // Remove all non-digits
@@ -31,14 +29,14 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Input
-          label={t('personal_info.legal_first_name', 'Legal First Name')}
+          label="Legal First Name"
           registration={register('legalFirstName')}
           error={errors.legalFirstName?.message}
           required
         />
         
         <Input
-          label={t('personal_info.middle_initial', 'Middle Initial')}
+          label="Middle Initial"
           registration={register('middleInitial')}
           error={errors.middleInitial?.message}
           maxLength={1}
@@ -46,7 +44,7 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
         />
         
         <Input
-          label={t('personal_info.legal_last_name', 'Legal Last Name')}
+          label="Legal Last Name"
           registration={register('legalLastName')}
           error={errors.legalLastName?.message}
           required
@@ -54,15 +52,15 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
       </div>
 
       <Input
-        label={t('personal_info.other_last_names', 'Other Last Names Used')}
+        label="Other Last Names Used"
         registration={register('otherLastNames')}
         error={errors.otherLastNames?.message}
-        placeholder={t('personal_info.other_names_placeholder', 'Any previous or maiden names')}
+        placeholder="Any previous or maiden names"
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
-          label={t('personal_info.date_of_birth', 'Date of Birth')}
+          label="Date of Birth"
           type="date"
           registration={register('dateOfBirth')}
           error={errors.dateOfBirth?.message}
@@ -70,7 +68,7 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
         
         <div className="space-y-2">
           <label className="form-label">
-            {t('personal_info.social_security_number', 'Social Security Number')}
+            Social Security Number
             <span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -80,7 +78,7 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
               const formatted = formatSSN(e.target.value)
               setValue('socialSecurityNumber', formatted)
             }}
-            placeholder={t('personal_info.ssn_placeholder', 'XXX-XX-XXXX')}
+            placeholder="XXX-XX-XXXX"
             maxLength={11}
           />
           {errors.socialSecurityNumber && (

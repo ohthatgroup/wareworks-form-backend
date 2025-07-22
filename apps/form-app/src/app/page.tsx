@@ -17,18 +17,16 @@ import { EducationEmploymentStep } from '../components/steps/EducationEmployment
 import { DocumentsStep } from '../components/steps/DocumentsStep'
 import { ReviewStep } from '../components/steps/ReviewStep'
 import { SuccessStep } from '../components/steps/SuccessStep'
-import { LanguageProvider, useLanguage } from '../contexts/LanguageContext'
-import { LanguageSelector } from '../components/ui/LanguageSelector'
 
 const STEPS = [
-  { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
-  { id: 'contact', titleKey: 'steps.contact.title', component: ContactInfoStep },
-  { id: 'citizenship', titleKey: 'steps.citizenship.title', component: CitizenshipStep },
-  { id: 'position', titleKey: 'steps.position.title', component: PositionStep },
-  { id: 'availability', titleKey: 'steps.availability.title', component: AvailabilityStep },
-  { id: 'education', titleKey: 'steps.education_employment.title', component: EducationEmploymentStep },
-  { id: 'documents', titleKey: 'steps.documents.title', component: DocumentsStep },
-  { id: 'review', titleKey: 'steps.review.title', component: ReviewStep },
+  { id: 'personal', title: 'Personal Information', component: PersonalInfoStep },
+  { id: 'contact', title: 'Contact Details', component: ContactInfoStep },
+  { id: 'citizenship', title: 'Work Authorization', component: CitizenshipStep },
+  { id: 'position', title: 'Position & Experience', component: PositionStep },
+  { id: 'availability', title: 'Availability', component: AvailabilityStep },
+  { id: 'education', title: 'Education & Employment', component: EducationEmploymentStep },
+  { id: 'documents', title: 'Documents', component: DocumentsStep },
+  { id: 'review', title: 'Review & Submit', component: ReviewStep },
 ]
 
 function ApplicationFormContent() {
@@ -44,7 +42,6 @@ function ApplicationFormContent() {
 
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const { t } = useLanguage()
 
   // Initialize form first
   const form = useForm<ValidatedApplicationData>({
@@ -372,14 +369,8 @@ function ApplicationFormContent() {
 
   return (
     <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
-      {/* Only show language selector when NOT embedded */}
-      {!isEmbedded && (
-        <div className="mb-4 flex justify-end">
-          <LanguageSelector variant="compact" />
-        </div>
-      )}
 
-      <FormStep title={t(STEPS[currentStep].titleKey, STEPS[currentStep].titleKey)}>
+      <FormStep title={STEPS[currentStep].title}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <CurrentStepComponent 
             form={form}
@@ -403,9 +394,5 @@ function ApplicationFormContent() {
 }
 
 export default function ApplicationForm() {
-  return (
-    <LanguageProvider>
-      <ApplicationFormContent />
-    </LanguageProvider>
-  )
+  return <ApplicationFormContent />
 }
