@@ -1,4 +1,4 @@
-import { ValidatedApplicationData } from '../types'
+import { ApplicationData } from '../types'
 import { PDFDocument, PDFForm, PDFTextField, rgb } from 'pdf-lib'
 import fs from 'fs/promises'
 import path from 'path'
@@ -21,7 +21,7 @@ export class PDFService {
     }
   }
 
-  async generateApplicationPDF(data: ValidatedApplicationData): Promise<Buffer> {
+  async generateApplicationPDF(data: ApplicationData): Promise<Buffer | { applicationPDF: Buffer; i9PDF: Buffer }> {
     if (!process.env.ENABLE_PDF_GENERATION || process.env.ENABLE_PDF_GENERATION !== 'true') {
       throw new Error('PDF generation disabled')
     }
@@ -40,19 +40,30 @@ export class PDFService {
       // Fill the form fields based on template analysis
       await this.fillApplicationFields(form, data)
       
-      // If I-9 documents are provided, merge the I-9 form as well
-      if (this.hasI9Documents(data)) {
-        await this.addI9Form(pdfDoc, data)
-      }
-      
       // Merge uploaded documents if any
       if (data.documents && data.documents.length > 0) {
         await this.mergeUploadedDocuments(pdfDoc, data.documents)
       }
       
-      // Serialize the PDF
-      const pdfBytes = await pdfDoc.save()
-      return Buffer.from(pdfBytes)
+      // Generate separate I-9 form if needed
+      let i9Buffer: Buffer | null = null
+      if (this.hasI9Documents(data)) {
+        i9Buffer = await this.addI9Form(pdfDoc, data)
+      }
+      
+      // Serialize the main application PDF
+      const applicationPdfBytes = await pdfDoc.save()
+      const applicationBuffer = Buffer.from(applicationPdfBytes)
+      
+      // Return both PDFs if I-9 is needed
+      if (i9Buffer) {
+        return {
+          applicationPDF: applicationBuffer,
+          i9PDF: i9Buffer
+        }
+      } else {
+        return applicationBuffer
+      }
 
     } catch (error) {
       console.error('PDF generation error:', error)
@@ -60,7 +71,7 @@ export class PDFService {
     }
   }
 
-  private async fillApplicationFields(form: PDFForm, data: ValidatedApplicationData) {
+  private async fillApplicationFields(form: PDFForm, data: ApplicationData) {
     // Personal Information
     this.setTextField(form, 'Legal First Name', data.legalFirstName)
     this.setTextField(form, 'Legal Last Name', data.legalLastName)
@@ -155,6 +166,68 @@ export class PDFService {
     }
   }
 
+  private setCheckboxField(form: PDFForm, fieldName: string, checked: boolean) {
+    try {
+      const field = form.getField(fieldName)
+      if (field && 'check' in field) {
+        if (checked) {
+          (field as any).check()
+          console.log(`  ✅ Checked "${fieldName}"`)
+        } else {
+          (field as any).uncheck()
+        }
+      }
+    } catch (error) {
+      console.warn(`Could not set checkbox "${fieldName}":`, error)
+    }
+  }
+
+  private setDropdownField(form: PDFForm, fieldName: string, value: string | undefined) {
+    if (!value) return
+    
+    try {
+      const field = form.getField(fieldName)
+      if (field && 'select' in field) {
+        (field as any).select(value)
+        console.log(`  🔽 Set dropdown "${fieldName}" = "${value}"`)
+      }
+    } catch (error) {
+      console.warn(`Could not set dropdown "${fieldName}":`, error)
+    }
+  }
+
+  private setCitizenshipCheckboxes(form: PDFForm, citizenshipStatus: string) {
+    console.log(`Setting citizenship status: ${citizenshipStatus}`)
+    
+    // Reset all citizenship checkboxes first
+    this.setCheckboxField(form, 'CB_1', false) // US Citizen
+    this.setCheckboxField(form, 'CB_2', false) // Non-citizen national
+    this.setCheckboxField(form, 'CB_3', false) // Lawful permanent resident  
+    this.setCheckboxField(form, 'CB_4', false) // Alien authorized to work
+    
+    // Set the appropriate checkbox based on status
+    switch (citizenshipStatus) {
+      case 'citizen':
+        this.setCheckboxField(form, 'CB_1', true) // US Citizen
+        break
+      case 'non_citizen_national':
+        this.setCheckboxField(form, 'CB_2', true) // Non-citizen national
+        break
+      case 'permanent_resident':
+        this.setCheckboxField(form, 'CB_3', true) // Lawful permanent resident
+        break
+      case 'authorized_alien':
+      case 'work_authorized':
+        this.setCheckboxField(form, 'CB_4', true) // Alien authorized to work
+        break
+      default:
+        console.warn(`Unknown citizenship status: ${citizenshipStatus}`)
+        // Default to authorized alien if status is unclear
+        this.setCheckboxField(form, 'CB_4', true)
+        break
+    }
+  }
+
   private formatAvailability(availability: any): string {
     if (!availability || !availability.available) return ''
     return availability.time || 'Available'
@@ -173,56 +246,127 @@ export class PDFService {
     return mapping[experience] || experience
   }
 
-  private hasI9Documents(data: ValidatedApplicationData): boolean {
+  private hasI9Documents(data: ApplicationData): boolean {
     return !!(data.citizenshipStatus && data.citizenshipStatus !== 'citizen')
   }
 
-  private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData) {
+  private async addI9Form(pdfDoc: PDFDocument, data: ApplicationData): Promise<Buffer | null> {
     try {
+      console.log('Creating separate filled I-9 form for non-citizen applicant...')
       const i9TemplatePath = path.join(process.cwd(), 'Templates', 'i-9.pdf')
       const i9TemplateBytes = await fs.readFile(i9TemplatePath)
       const i9Doc = await PDFDocument.load(i9TemplateBytes)
       
-      // Fill I-9 specific fields
+      // Fill the I-9 form fields
+      console.log('Filling I-9 form fields...')
       const i9Form = i9Doc.getForm()
       this.fillI9Fields(i9Form, data)
       
-      // Copy I-9 pages to main document
-      const i9Pages = await pdfDoc.copyPages(i9Doc, i9Doc.getPageIndices())
-      i9Pages.forEach((page) => pdfDoc.addPage(page))
+      // CRITICAL FIX: Instead of merging into main PDF (which loses form fields),
+      // return the filled I-9 as a separate PDF buffer
+      console.log('Saving filled I-9 form as separate PDF...')
+      const filledI9Bytes = await i9Doc.save()
+      
+      console.log('✅ I-9 form filled successfully with Section 1 data')
+      console.log('📝 Note: I-9 form returned as separate PDF to preserve form fields')
+      
+      return Buffer.from(filledI9Bytes)
       
     } catch (error) {
-      console.warn('Could not add I-9 form:', error)
+      console.warn('Could not create I-9 form:', error)
+      return null
     }
   }
 
-  private fillI9Fields(form: PDFForm, data: ValidatedApplicationData) {
-    // Fill I-9 form fields based on the template analysis
+  private fillI9Fields(form: PDFForm, data: ApplicationData & any) {
+    console.log('Filling I-9 form fields with CORRECT field names...')
+    
+    // SECTION 1: Employee Information and Attestation
+    console.log('Filling Section 1: Employee Information...')
+    
+    // Primary employee fields (using CORRECT field names from template analysis)
     this.setTextField(form, 'Last Name (Family Name)', data.legalLastName)
     this.setTextField(form, 'First Name Given Name', data.legalFirstName)
     this.setTextField(form, 'Employee Middle Initial (if any)', data.middleInitial || '')
     this.setTextField(form, 'Employee Other Last Names Used (if any)', data.otherLastNames || '')
+    
+    // Address fields  
     this.setTextField(form, 'Address Street Number and Name', data.streetAddress)
     this.setTextField(form, 'Apt Number (if any)', data.aptNumber || '')
     this.setTextField(form, 'City or Town', data.city)
+    
+    // State field (this is a dropdown!)
+    this.setDropdownField(form, 'State', data.state)
+    
     this.setTextField(form, 'ZIP Code', data.zipCode)
     this.setTextField(form, 'Date of Birth mmddyyyy', this.formatDateForI9(data.dateOfBirth))
-    this.setTextField(form, 'US Social Security Number', data.socialSecurityNumber)
+    
+    // Handle SSN with length constraint (9 characters max)
+    const ssn = data.socialSecurityNumber?.replace(/[^\d]/g, '').substring(0, 9)
+    this.setTextField(form, 'US Social Security Number', ssn)
+    
     this.setTextField(form, 'Telephone Number', data.phoneNumber)
     this.setTextField(form, 'Employees E-mail Address', data.email || '')
     
-    // Work authorization fields
-    if (data.uscisANumber) {
+    // Additional Section 1 duplicate fields
+    this.setTextField(form, 'Last Name Family Name from Section 1', data.legalLastName)
+    this.setTextField(form, 'First Name Given Name from Section 1', data.legalFirstName) 
+    this.setTextField(form, 'Middle initial if any from Section 1', data.middleInitial || '')
+    
+    // Handle citizenship status checkboxes (Section 1)
+    console.log('Setting citizenship status checkboxes...')
+    this.setCitizenshipCheckboxes(form, data.citizenshipStatus)
+    
+    // CRITICAL: Work authorization text fields (the ones you mentioned!)
+    console.log('Filling work authorization text fields...')
+    
+    if (data.citizenshipStatus === 'permanent_resident' && data.uscisANumber) {
+      // Fill the permanent resident text field
+      this.setTextField(form, '3 A lawful permanent resident Enter USCIS or ANumber', data.uscisANumber)
+      console.log(`  ✅ Set permanent resident field with USCIS A-Number: ${data.uscisANumber}`)
+      
+      // Also fill the separate USCIS A-Number field
       this.setTextField(form, 'USCIS ANumber', data.uscisANumber)
     }
     
-    // Current date for signature
-    const today = new Date().toLocaleDateString('en-US', { 
-      month: '2-digit', 
-      day: '2-digit', 
-      year: 'numeric' 
-    }).replace(/\//g, '')
-    this.setTextField(form, "Today's Date mmddyyy", today)
+    // For alien authorized to work (CB_4), fill the expiration date AND one of the required fields
+    if (data.citizenshipStatus === 'authorized_alien' || data.citizenshipStatus === 'work_authorized') {
+      // Always fill the expiration date for alien authorized
+      if (data.workAuthorizationExpiration) {
+        this.setTextField(form, 'Exp Date mmddyyyy', this.formatDateForI9(data.workAuthorizationExpiration))
+        console.log(`  ✅ Set work authorization expiration: ${data.workAuthorizationExpiration}`)
+      }
+      
+      // For CB_4, must fill ONE of: USCIS A-Number OR I-94 OR Foreign Passport
+      console.log('  📋 Filling CB_4 associated fields (choose one):')
+      
+      // Priority 1: USCIS A-Number (if available for alien authorized)
+      if (data.uscisANumber) {
+        this.setTextField(form, 'USCIS ANumber', data.uscisANumber)
+        console.log(`    ✅ Set USCIS A-Number: ${data.uscisANumber}`)
+      }
+      // Priority 2: Form I-94 Admission Number
+      else if (data.i94AdmissionNumber) {
+        const truncatedI94 = data.i94AdmissionNumber.substring(0, 11)
+        this.setTextField(form, 'Form I94 Admission Number', truncatedI94)
+        console.log(`    ✅ Set I-94 Admission Number: ${truncatedI94}`)
+      }
+      // Priority 3: Foreign Passport Number and Country
+      else if (data.foreignPassportNumber && data.foreignPassportCountry) {
+        this.setTextField(form, 'Foreign Passport Number and Country of IssuanceRow1', 
+          `${data.foreignPassportNumber} - ${data.foreignPassportCountry}`)
+        console.log(`    ✅ Set Foreign Passport: ${data.foreignPassportNumber} - ${data.foreignPassportCountry}`)
+      } else {
+        console.warn('    ⚠️ CB_4 checked but no USCIS A-Number, I-94, or Foreign Passport provided')
+      }
+    }
+    
+    // Note: I-94 and Foreign Passport are now handled above in the CB_4 logic
+    
+    console.log('✅ Section 1 (Employee Information) completed')
+    console.log('📝 Note: Signature fields and Sections 2-3 left blank for HR to complete manually')
+    
+    console.log('I-9 form fields filled successfully')
   }
 
   private formatDateForI9(dateString: string): string {
