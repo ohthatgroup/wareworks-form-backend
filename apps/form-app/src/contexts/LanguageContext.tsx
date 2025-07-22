@@ -16,6 +16,12 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<'en' | 'es'>('en')
   const [isLoaded, setIsLoaded] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    // Mark as hydrated to prevent SSR mismatch
+    setHydrated(true)
+  }, [])
 
   useEffect(() => {
     // Load translations on mount
@@ -29,13 +35,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Load saved language preference from localStorage after hydration
-    if (typeof window !== 'undefined') {
+    if (hydrated && typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('preferred-language') as 'en' | 'es'
       if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
         setLanguage(savedLanguage)
       }
     }
-  }, [])
+  }, [hydrated])
 
   useEffect(() => {
     // Listen for language changes from parent window (embed)
@@ -56,17 +62,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLanguageState(newLanguage)
     translationService.setLanguage(newLanguage)
     
-    // Save preference to localStorage
-    localStorage.setItem('preferred-language', newLanguage)
+    // Save preference to localStorage only after hydration
+    if (hydrated && typeof window !== 'undefined') {
+      localStorage.setItem('preferred-language', newLanguage)
+    }
     
     // Also save to form data if available (for iframe communication)
-    try {
-      const event = new CustomEvent('languageChanged', {
-        detail: { language: newLanguage }
-      })
-      window.dispatchEvent(event)
-    } catch (error) {
-      // Ignore errors in iframe context
+    if (hydrated) {
+      try {
+        const event = new CustomEvent('languageChanged', {
+          detail: { language: newLanguage }
+        })
+        window.dispatchEvent(event)
+      } catch (error) {
+        // Ignore errors in iframe context
+      }
     }
   }
 

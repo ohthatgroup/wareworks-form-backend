@@ -123,6 +123,8 @@ function ApplicationFormContent() {
       // Use proper target origin instead of '*' for security
       const targetOrigin = window.location.origin.includes('localhost') 
         ? 'http://localhost:3000' 
+        : window.location.origin.includes('wareworks-backend.netlify.app')
+        ? 'https://www.wareworks.me'
         : window.location.origin
       
       window.parent.postMessage({
@@ -141,6 +143,8 @@ function ApplicationFormContent() {
       const allowedOrigins = [
         'http://localhost:3000',
         'https://wareworks-backend.netlify.app',
+        'https://www.wareworks.me',
+        'https://wareworks.me',
         window.location.origin
       ]
       
