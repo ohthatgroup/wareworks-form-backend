@@ -18,7 +18,9 @@ const baseSchema = z.object({
   state: z.string().optional(),
   zipCode: z.string().optional(),
   phoneNumber: z.string().optional(),
+  primaryPhoneNumber1: z.boolean().optional(),
   homePhone: z.string().optional(),
+  primaryPhoneNumber2: z.boolean().optional(),
   cellPhone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Cell phone number is required'),
   email: z.string().optional(),
   

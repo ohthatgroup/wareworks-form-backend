@@ -14,13 +14,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Create JWT auth client
-    const auth = new google.auth.JWT(
-      serviceAccountEmail,
-      undefined,
-      privateKey,
-      ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-      undefined
-    )
+    const auth = new google.auth.JWT({
+      email: serviceAccountEmail,
+      key: privateKey,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
+    })
 
     // Initialize Google Sheets API
     const sheets = google.sheets({ version: 'v4', auth })
@@ -68,7 +66,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ 
       error: errorMessage,
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
     }, { status: statusCode })
   }
 }

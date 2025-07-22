@@ -121,7 +121,7 @@ class TranslationService {
 
   private async loadFromGoogleSheetsWithRetry(): Promise<void> {
     const maxRetries = 2
-    let lastError: Error
+    let lastError: Error = new Error('No attempts made')
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
