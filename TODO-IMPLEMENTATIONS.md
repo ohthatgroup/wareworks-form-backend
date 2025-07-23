@@ -2,8 +2,8 @@
 
 This document lists all the functionality that was **mocked/skipped** during our 1-hour speed build. Each item needs proper implementation for production use.
 
-**Last Updated**: July 21, 2025  
-**Recent Session Fixes**: 8 major UI/UX and technical issues resolved
+**Last Updated**: July 23, 2025  
+**Recent Session Analysis**: Major architecture clarifications and implementation recommendations
 
 ## 📄 PDF Generation & Processing
 
@@ -32,11 +32,23 @@ This document lists all the functionality that was **mocked/skipped** during our
 
 ### Field Mapping
 - **Location**: Need new service
-- **Current**: No field mapping
-- **TODO**: Create PDF field mapping service based on `template-analysis.json`
+- **Current**: Hardcoded field names in PDFService.ts (brittle to template changes)
+- **TODO**: Create configuration-based field mapping with fallbacks
 - **Priority**: HIGH
-- **Effort**: 2-3 hours
-- **Status**: ❌ **NOT IMPLEMENTED**
+- **Effort**: 3-4 hours
+- **Status**: ⚠️ **NEEDS IMPROVEMENT** - Current implementation is fragile
+
+**Recommended Implementation**:
+1. Create `shared/config/pdfFieldMappings.ts` with field mapping configuration
+2. Replace hardcoded `setTextField()` calls with `processFieldMapping()` function
+3. Add template validator utility for change detection
+4. Implement fallback field names for robustness
+
+```typescript
+// Configuration approach allows updates without code changes
+// Fallback field names handle template changes automatically
+// Template validation detects changes before they break production
+```
 
 ## 📧 Email Service Implementation
 
@@ -59,29 +71,33 @@ This document lists all the functionality that was **mocked/skipped** during our
 ### Email Templates
 - **Location**: Need to create
 - **Current**: No templates
-- **TODO**: Create HTML email templates for notifications
-- **Priority**: MEDIUM
-- **Effort**: 1-2 hours
-- **Status**: ❌ **NOT IMPLEMENTED**
+- **TODO**: Create simple email templates for HR notifications
+- **Priority**: LOW
+- **Effort**: 30 minutes
+- **Status**: ⚠️ **OVER-ENGINEERED** - Complex templates not needed
+
+**Simplified Recommendation**:
+Since only HR receives emails, use plain text format with essential details:
+- Applicant name, position, contact info
+- Basic application summary
+- Link to detailed data source
+- Skip HTML templates, priority flags, and A/B testing
 
 ## 🗄️ Database Integration
 
 ### Google Sheets Service
-- **Location**: `shared/services/GoogleSheetsService.ts:8`
-- **Current**: Logs data structure only
-- **TODO**: Implement actual Google Sheets API integration
-- **Priority**: HIGH
-- **Effort**: 3-4 hours
-- **Status**: ❌ **NOT IMPLEMENTED**
-- **Note**: Translation database CSV created, integration with provided URL pending
+- **Location**: `shared/services/GoogleSheetsService.ts` (REMOVED)
+- **Current**: Completely removed from codebase
+- **TODO**: Re-implement in separate application version if needed
+- **Priority**: ❌ **REMOVED**
+- **Effort**: N/A
+- **Status**: ✅ **INTENTIONALLY REMOVED** - Simplified architecture
 
-```typescript
-// TODO: Implement actual Google Sheets API integration
-// - Set up Google Service Account authentication
-// - Create/update spreadsheet with application data
-// - Handle sheet creation and column mapping
-// - Implement error handling and retries
-```
+**Architecture Decision**:
+Google Sheets integration was removed to simplify the system. Current data flow:
+1. Form submission → PDF generation → Email to HR
+2. No persistent storage in this version
+3. Can be re-added in different application version if needed
 
 ## 📁 File Upload & Storage
 
@@ -255,10 +271,17 @@ This document lists all the functionality that was **mocked/skipped** during our
 ### Auto-save Functionality
 - **Location**: Main form component
 - **Current**: No auto-save
-- **TODO**: Implement localStorage auto-save
+- **TODO**: Implement form state persistence for browser crashes
 - **Priority**: MEDIUM
 - **Effort**: 2-3 hours
 - **Status**: ❌ **NOT IMPLEMENTED**
+
+**Implementation Strategy**:
+1. Create `useFormPersistence` hook for auto-save on form changes
+2. Store form data in localStorage (excluding large files)
+3. Add recovery notification component for saved data
+4. Handle cleanup after successful submission
+5. Store file metadata separately due to size constraints
 
 ### Progress Persistence
 - **Location**: Form state management
@@ -303,6 +326,74 @@ This document lists all the functionality that was **mocked/skipped** during our
 - **Priority**: LOW
 - **Effort**: 1 hour
 - **Status**: ❌ **NOT IMPLEMENTED**
+
+---
+
+## 🏗️ Architecture & Implementation Insights (July 23, 2025)
+
+### Backend Deployment Strategy - **CLARIFIED**
+**Question**: How will backend services be deployed in relation to the static frontend?
+
+**Answer**: Backend services are already deployed with the frontend:
+- ✅ **Netlify Functions** handle API endpoints (serverless)
+- ✅ **Same deployment pipeline** - `npm run build` compiles both
+- ✅ **Same domain** - no CORS issues
+- ✅ Backend services (`ApplicationService`, `PDFService`, `EmailService`) run inside Netlify Functions
+
+**Action Required**: Enable services with environment variables (`ENABLE_PDF_GENERATION=true`, `ENABLE_EMAIL_NOTIFICATIONS=true`)
+
+### Performance Benchmarks - **SIMPLIFIED**
+**Question**: What performance benchmarks should we establish for form rendering with large file uploads?
+
+**Answer**: Original complex benchmarks were over-engineered. Focus on:
+- ✅ **Page loads in under 3 seconds** on average internet
+- ✅ **File uploads don't freeze the browser**
+- ✅ **Form submits within 5 seconds** for typical files
+- ✅ **Works on mobile devices** without crashing
+
+**Critical Issues Identified**:
+- Synchronous Base64 conversion blocks UI thread (DocumentsStep.tsx:39-50)
+- Multiple file re-processing on state changes (lines 65-81, 95-110)
+- No progress indication for large files
+- Memory leaks from unreleased FileReader objects
+
+### Form State Persistence - **STRATEGY DEFINED**
+**Question**: How should we implement form state persistence across page refreshes or browser crashes?
+
+**Implementation Steps**:
+1. Add `useFormPersistence` hook to main form component
+2. Modify file upload to store metadata separately (files too large for localStorage)
+3. Add recovery notification at top of form
+4. Handle cleanup after successful submission
+
+### Validation Edge Cases - **US EMPLOYMENT SPECIFIC**
+**Question**: What additional edge cases need validation coverage for US Wareworks applications?
+
+**Critical Legal Compliance Issues**:
+1. **Age Verification**: Real birth date validation vs self-reported "18+"
+2. **SSN Validation**: Enhanced validation to prevent fake/test numbers  
+3. **Work Authorization**: Expiration date checking for temporary workers
+4. **Phone Numbers**: Area code validation for US numbers
+5. **Emergency Contact**: Must be different from applicant
+
+### PDF Field Mapping Robustness - **SOLUTION PROVIDED**
+**Question**: How can we make PDF field mapping more robust to changes in form structure?
+
+**Implementation Steps**:
+1. Create `shared/config/pdfFieldMappings.ts` with field mapping configuration
+2. Replace hardcoded `setTextField()` calls with `processFieldMapping()` function  
+3. Add template validator utility (`npm run validate-pdf-template`)
+4. Test with current PDF template to ensure all fields map correctly
+
+**Benefits**: Fallback field names handle template changes, configuration-only updates, graceful degradation
+
+### Email Template Management - **KEEP SIMPLE**
+**Question**: How will email templates be managed and personalized for HR?
+
+**Answer**: Complex template systems are unnecessary since only HR receives emails:
+- ✅ **Plain text email** with applicant name, position, contact info
+- ✅ **Essential details only** - no HTML, priority flags, or A/B testing
+- ✅ **Link to detailed data** source for full information
 
 ---
 
@@ -369,8 +460,15 @@ This document lists all the functionality that was **mocked/skipped** during our
 - **Language Preference**: Only localStorage usage (appropriate for user preference)
 - **No Data Loss Risk**: Form data is submitted directly to backend, not stored locally
 
-### Next Priority Items:
-1. **Google Sheets Translation Integration** (HIGH) - User provided URL, CSV ready
-2. **Email Notifications** (HIGH) - Netlify Email Extension setup required
-3. **Security Enhancements** (HIGH) - Rate limiting and CSRF protection
-4. **File Upload Backend** (MEDIUM) - Netlify Blobs integration for document storage
+### Next Priority Items (Updated July 23, 2025):
+1. **PDF Field Mapping Robustness** (HIGH) - Implement configuration-based mapping with fallbacks
+2. **Email Service Implementation** (HIGH) - Replace stub with actual SMTP sending
+3. **Form State Persistence** (MEDIUM) - Add auto-save and crash recovery
+4. **Performance Optimization** (MEDIUM) - Fix synchronous Base64 conversion blocking UI
+5. **Validation Enhancement** (MEDIUM) - Add US employment-specific edge cases
+6. **Security Enhancements** (HIGH) - Rate limiting and CSRF protection
+
+### Removed/Simplified Items:
+- ❌ **Google Sheets Integration** - Intentionally removed from this version
+- ⬇️ **Email Templates** - Simplified to plain text (no HTML/personalization needed)
+- ⬇️ **Performance Benchmarks** - Simplified from complex metrics to basic usability goals
