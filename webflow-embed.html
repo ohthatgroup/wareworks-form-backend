@@ -321,18 +321,16 @@
       iframe.style.cssText = `
         width: 100%; 
         border: none; 
-        height: 1200px;
+        height: 800px;
         background: transparent;
         display: block;
+        overflow: hidden;
       `;
       iframe.onload = function() {
         document.getElementById('loading-section').style.display = 'none';
         document.getElementById('application-container').style.display = 'block';
         
-        // Try to auto-resize after content loads
-        setTimeout(autoResizeIframe, 1000);
-        setTimeout(autoResizeIframe, 3000);
-        
+        console.log('Iframe loaded, waiting for height messages...');
         trackEvent('application_loaded');
       };
       iframe.onerror = function() {
@@ -370,26 +368,39 @@
     }
   }, false);
 
-  // Simple iframe auto-resize solution
-  function autoResizeIframe() {
-    const iframe = document.querySelector('#application-container iframe');
-    if (!iframe) return;
+  // Handle iframe resize messages from the form
+  window.addEventListener('message', function(event) {
+    // Validate origin for security
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001', 
+      'http://localhost:3002',
+      'http://localhost:3003',
+      'http://localhost:3004',
+      'https://wareworks-backend.netlify.app'
+    ];
     
-    try {
-      // Reset height to allow shrinking
-      iframe.style.height = 'auto';
-      
-      // Set height to content height
-      const contentHeight = iframe.contentWindow.document.body.scrollHeight;
-      iframe.style.height = Math.max(600, contentHeight + 50) + 'px';
-      
-      console.log('Auto-resized iframe to:', contentHeight + 50 + 'px');
-    } catch (e) {
-      // Cross-origin restrictions - fallback to fixed height
-      iframe.style.height = '1200px';
-      console.log('Cross-origin restriction, using fixed height');
+    // Allow same origin
+    if (event.origin !== window.location.origin && !allowedOrigins.includes(event.origin)) {
+      return;
     }
-  }
+
+    // Handle height resize messages
+    if (event.data.type === 'iframe-resize' && event.data.source === 'wareworks-form') {
+      const iframe = document.querySelector('#application-container iframe');
+      if (iframe && event.data.height) {
+        const newHeight = Math.max(600, parseInt(event.data.height) + 20);
+        iframe.style.height = newHeight + 'px';
+        console.log('Iframe resized to:', newHeight + 'px');
+        
+        // Also adjust the container if needed
+        const container = document.getElementById('application-container');
+        if (container) {
+          container.style.minHeight = newHeight + 'px';
+        }
+      }
+    }
+  }, false);
 
   function updateProgressBar(current, total) {
     const container = document.getElementById('progress-bar-container');

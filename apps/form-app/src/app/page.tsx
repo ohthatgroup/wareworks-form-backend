@@ -85,6 +85,82 @@ function ApplicationFormContent() {
   // Check if we're in an embedded context
   const isEmbedded = typeof window !== 'undefined' && window.parent !== window
 
+  // Robust iframe height communication
+  useEffect(() => {
+    if (!isEmbedded) return;
+
+    let timeoutId: NodeJS.Timeout;
+    
+    const sendHeightToParent = () => {
+      // Clear any pending timeout
+      if (timeoutId) clearTimeout(timeoutId);
+      
+      // Debounce to prevent excessive calls
+      timeoutId = setTimeout(() => {
+        try {
+          // Get the full height of the document
+          const bodyHeight = document.body.scrollHeight;
+          const htmlHeight = document.documentElement.scrollHeight;
+          const windowHeight = window.innerHeight;
+          
+          // Use the largest height value
+          const height = Math.max(bodyHeight, htmlHeight, windowHeight);
+          
+          console.log('Sending height to parent:', height);
+          
+          window.parent.postMessage({
+            type: 'iframe-resize',
+            height: height,
+            source: 'wareworks-form'
+          }, '*');
+        } catch (error) {
+          console.warn('Could not send height to parent:', error);
+        }
+      }, 100);
+    };
+
+    // Send height immediately
+    sendHeightToParent();
+
+    // Send height when window resizes
+    const handleResize = () => sendHeightToParent();
+    window.addEventListener('resize', handleResize);
+
+    // Send height when content changes
+    const resizeObserver = new ResizeObserver(() => {
+      sendHeightToParent();
+    });
+
+    // Observe body for size changes
+    if (document.body) {
+      resizeObserver.observe(document.body);
+    }
+
+    // Also send height when DOM changes (for dynamic content)
+    const mutationObserver = new MutationObserver(() => {
+      sendHeightToParent();
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    // Send height periodically as fallback
+    const interval = setInterval(sendHeightToParent, 2000);
+
+    // Cleanup
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      clearInterval(interval);
+      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, [isEmbedded]);
+
   
   // Add embedded class to body when in iframe
   useEffect(() => {
