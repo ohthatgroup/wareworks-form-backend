@@ -144,7 +144,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     
     // Use debounced conversion to prevent UI blocking
     const convertedDocuments = await convertFilesWithDelay(fileArray, existingFiles, newFiles)
-    setValue('documents', convertedDocuments)
+    setValue('documents', convertedDocuments, { shouldValidate: true })
   }
 
   const removeFile = async (type: string, index: number) => {
@@ -160,7 +160,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     // Convert remaining files to schema format
     const allFiles = Object.values(newFiles).flat()
     const convertedDocuments = await convertFilesWithDelay([], allFiles, newFiles)
-    setValue('documents', convertedDocuments)
+    setValue('documents', convertedDocuments, { shouldValidate: true })
   }
 
   const previewFile = (file: File) => {

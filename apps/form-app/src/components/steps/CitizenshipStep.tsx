@@ -1,4 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
+import { useEffect } from 'react'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Select } from '../ui/Select'
 import { Input } from '../ui/Input'
@@ -13,9 +14,22 @@ interface CitizenshipStepProps {
 // Options will be generated inside the component to use translations
 
 export function CitizenshipStep({ form }: CitizenshipStepProps) {
-  const { register, watch, formState: { errors } } = form
+  const { register, watch, setValue, formState: { errors } } = form
   const { t } = useLanguage()
   const citizenshipStatus = watch('citizenshipStatus')
+  
+  // Clear conditional fields when citizenship status changes
+  useEffect(() => {
+    if (citizenshipStatus !== 'lawful_permanent') {
+      setValue('uscisANumber', '')
+    }
+    if (citizenshipStatus !== 'alien_authorized') {
+      setValue('workAuthExpiration', '')
+      setValue('alienDocumentType', '')
+      setValue('alienDocumentNumber', '')
+      setValue('documentCountry', '')
+    }
+  }, [citizenshipStatus, setValue])
   
   const citizenshipOptions = [
     { value: 'us_citizen', label: t('citizenship.us_citizen') },
@@ -84,7 +98,7 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
           
           {watch('alienDocumentType') === 'form_i94' && (
             <Input
-              label={t('citizenship.form_i94_number')}
+              label={t('citizenship.form_i94_admission')}
               registration={register('alienDocumentNumber')}
               error={errors.alienDocumentNumber?.message}
               placeholder={t('citizenship.i94_placeholder')}
@@ -100,7 +114,7 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
                 placeholder={t('citizenship.passport_placeholder')}
               />
               <Input
-                label={t('citizenship.country_issuance')}
+                label={t('citizenship.country_of_issuance')}
                 registration={register('documentCountry')}
                 error={errors.documentCountry?.message}
                 placeholder={t('citizenship.country_placeholder')}
@@ -111,7 +125,7 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
       )}
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">{t('citizenship.eligibility_questions')}</h3>
+        <h3 className="text-lg font-medium text-primary mb-4">{t('citizenship.basic_eligibility_title')}</h3>
         
         <div className="space-y-6">
           <RadioGroup
@@ -120,7 +134,6 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
             options={yesNoOptions}
             registration={register('age18')}
             error={errors.age18?.message}
-            required
           />
 
           <RadioGroup
@@ -129,16 +142,14 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
             options={yesNoOptions}
             registration={register('transportation')}
             error={errors.transportation?.message}
-            required
           />
 
           <RadioGroup
-            label={t('citizenship.work_authorization_question')}
+            label={t('citizenship.work_auth_question')}
             name="workAuthorizationConfirm"
             options={yesNoOptions}
             registration={register('workAuthorizationConfirm')}
             error={errors.workAuthorizationConfirm?.message}
-            required
           />
         </div>
       </div>

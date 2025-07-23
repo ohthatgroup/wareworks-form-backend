@@ -83,8 +83,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
               { key: 'availabilitySaturday', labelKey: 'availability.saturday', descriptionKey: 'availability.saturday_description' }
             ].map((day) => {
               const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
-              // Consider the day selected if it has any value (excluding the placeholder)
-              const isSelected = Boolean(currentValue !== undefined && currentValue !== null && currentValue !== '' && currentValue !== 'SELECTED')
+              // Consider the day selected if it has any value (including the placeholder)
+              const isSelected = Boolean(currentValue && currentValue !== '')
               
               return (
                 <div 
@@ -100,13 +100,14 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                       <input
                         type="checkbox"
                         id={`${day.key}_checkbox`}
-                        checked={isSelected || currentValue === 'SELECTED'}
+                        checked={isSelected}
                         onChange={(e) => {
-                          if (!e.target.checked) {
-                            setValue(day.key as keyof ValidatedApplicationData, '')
+                          if (e.target.checked) {
+                            // Set a placeholder value to show the time input field
+                            setValue(day.key as keyof ValidatedApplicationData, 'SELECTED' as any)
                           } else {
-                            // Set empty string to show the time input field
-                            setValue(day.key as keyof ValidatedApplicationData, '')
+                            // Clear the value
+                            setValue(day.key as keyof ValidatedApplicationData, '' as any)
                           }
                         }}
                         className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
@@ -122,13 +123,17 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                     </div>
                     
                     {/* Availability Time Input - full width below label */}
-                    {(isSelected || currentValue === 'SELECTED') && (
+                    {isSelected && (
                       <div className="ml-8">
                         <input
                           {...register(day.key as keyof ValidatedApplicationData)}
                           type="text"
                           className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
                           placeholder={t('availability.time_placeholder')}
+                          value={currentValue === 'SELECTED' ? '' : currentValue || ''}
+                          onChange={(e) => {
+                            setValue(day.key as keyof ValidatedApplicationData, e.target.value as any)
+                          }}
                         />
                       </div>
                     )}
@@ -138,7 +143,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                       </p>
                       
                       {/* Error display */}
-                      {(isSelected || currentValue === 'SELECTED') && errors[day.key as keyof ValidatedApplicationData] && (
+                      {isSelected && errors[day.key as keyof ValidatedApplicationData] && (
                         <p className="text-xs text-red-500 mt-1">
                           {errors[day.key as keyof ValidatedApplicationData]?.message}
                         </p>

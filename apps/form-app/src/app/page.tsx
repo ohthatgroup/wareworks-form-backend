@@ -242,8 +242,8 @@ function ApplicationFormContent() {
       switch (stepIndex) {
         case 0: // Personal Information - Only truly required fields per schema
           return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
-        case 1: // Contact Details - Only address and phone required per schema
-          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
+        case 1: // Contact Details - Only address and cellPhone required per schema
+          return ['streetAddress', 'cellPhone']
         case 2: // Citizenship - Conditional requirements based on citizenship status
           const citizenshipStatus = formValues.citizenshipStatus
           if (citizenshipStatus === 'lawful_permanent') {
@@ -295,21 +295,21 @@ function ApplicationFormContent() {
 
   // Memoized validation for form submission readiness
   const isFormReadyForSubmission = useMemo(() => {
-    // Check all required fields across all steps
+    // Check all required fields based on actual schema requirements
     let allRequiredFields = [
-      'legalFirstName', 'legalLastName', 'dateOfBirth', 'socialSecurityNumber',
-      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 
-      'emergencyName', 'emergencyPhone', 'emergencyRelationship',
-      'citizenshipStatus', 'age18', 'transportation', 'workAuthorizationConfirm',
-      'positionApplied', 'jobDiscovery',
+      // Required from schema (.min(1) and .regex() validations)
+      'legalFirstName', 'legalLastName', 'socialSecurityNumber',
+      'streetAddress', 'cellPhone',
       'fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied'
     ]
     
     // Add conditional citizenship requirements
     if (formValues.citizenshipStatus === 'lawful_permanent') {
-      allRequiredFields.push('uscisANumber')
+      allRequiredFields.push('citizenshipStatus', 'uscisANumber')
     } else if (formValues.citizenshipStatus === 'alien_authorized') {
-      allRequiredFields.push('workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry')
+      allRequiredFields.push('citizenshipStatus', 'workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry')
+    } else if (formValues.citizenshipStatus) {
+      allRequiredFields.push('citizenshipStatus')
     }
     
     const requiredFieldsValid = allRequiredFields.every(field => {

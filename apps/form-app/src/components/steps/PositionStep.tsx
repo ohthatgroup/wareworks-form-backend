@@ -24,7 +24,6 @@ export function PositionStep({ form }: PositionStepProps) {
           registration={register('positionApplied')}
           error={errors.positionApplied?.message}
           placeholder={t('position.position_placeholder')}
-          required
         />
         
         <Input
@@ -40,7 +39,6 @@ export function PositionStep({ form }: PositionStepProps) {
         registration={register('jobDiscovery')}
         error={errors.jobDiscovery?.message}
         placeholder={t('position.discovery_placeholder')}
-        required
       />
 
       <div className="border-t pt-6">
