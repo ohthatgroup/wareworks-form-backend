@@ -119,7 +119,7 @@ function ApplicationFormContent() {
         totalSteps: STEPS.length
       }, targetOrigin)
     }
-  }, [isEmbedded, currentStep, completedSteps])
+  }, [isEmbedded, currentStep, completedSteps.length])
 
   // Listen for navigation messages from parent
   useEffect(() => {

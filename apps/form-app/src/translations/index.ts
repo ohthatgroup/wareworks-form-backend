@@ -548,3 +548,8 @@ export const translations = {
 
 export type TranslationKey = keyof typeof translations.en;
 export type Language = 'en' | 'es';
+
+// Helper function to safely translate dynamic keys
+export function translateDynamic(translationObj: typeof translations.en, key: string): string {
+  return translationObj[key as TranslationKey] || key;
+}

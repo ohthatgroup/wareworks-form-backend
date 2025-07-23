@@ -3,10 +3,16 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { translations, TranslationKey, Language } from '../translations'
 
+// Create a more flexible translation function type
+type TranslationFunction = {
+  (key: TranslationKey): string;
+  (key: string): string;
+}
+
 interface LanguageContextType {
   language: Language
   setLanguage: (language: Language) => void
-  t: (key: string, params?: Record<string, string | number>, fallback?: string) => string
+  t: TranslationFunction & ((key: string, params?: Record<string, string | number>, fallback?: string) => string)
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
@@ -46,12 +52,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }
 
   const t = (key: string, params?: Record<string, string | number>, fallback?: string): string => {
-    let translation = translations[language][key as TranslationKey] || fallback || key
+    let translation: string = translations[language][key as TranslationKey] || fallback || key
     
     // Handle parameter interpolation
     if (params && typeof translation === 'string') {
       Object.entries(params).forEach(([paramKey, value]) => {
-        translation = (translation as string).replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(value))
+        translation = translation.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(value))
       })
     }
     
