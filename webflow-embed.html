@@ -321,12 +321,17 @@
       iframe.style.cssText = `
         width: 100%; 
         border: none; 
-        min-height: 600px;
+        height: 1200px;
         background: transparent;
+        display: block;
       `;
       iframe.onload = function() {
         document.getElementById('loading-section').style.display = 'none';
         document.getElementById('application-container').style.display = 'block';
+        
+        // Try to auto-resize after content loads
+        setTimeout(autoResizeIframe, 1000);
+        setTimeout(autoResizeIframe, 3000);
         
         trackEvent('application_loaded');
       };
@@ -364,6 +369,27 @@
       });
     }
   }, false);
+
+  // Simple iframe auto-resize solution
+  function autoResizeIframe() {
+    const iframe = document.querySelector('#application-container iframe');
+    if (!iframe) return;
+    
+    try {
+      // Reset height to allow shrinking
+      iframe.style.height = 'auto';
+      
+      // Set height to content height
+      const contentHeight = iframe.contentWindow.document.body.scrollHeight;
+      iframe.style.height = Math.max(600, contentHeight + 50) + 'px';
+      
+      console.log('Auto-resized iframe to:', contentHeight + 50 + 'px');
+    } catch (e) {
+      // Cross-origin restrictions - fallback to fixed height
+      iframe.style.height = '1200px';
+      console.log('Cross-origin restriction, using fixed height');
+    }
+  }
 
   function updateProgressBar(current, total) {
     const container = document.getElementById('progress-bar-container');

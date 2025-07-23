@@ -86,8 +86,8 @@ function ApplicationFormContent() {
   // Check if we're in an embedded context
   const isEmbedded = typeof window !== 'undefined' && window.parent !== window
 
-  // Handle iframe height communication
-  useIframeHeight()
+  // Handle iframe height communication - disabled for new auto-resize approach
+  // useIframeHeight()
   
   // Add embedded class to body when in iframe
   useEffect(() => {
