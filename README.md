@@ -38,7 +38,7 @@ wareworks-form-v2/
 - **Frontend**: Next.js 14, React 18, Tailwind CSS
 - **Backend**: Netlify Functions v2, TypeScript
 - **Forms**: React Hook Form, Zod validation
-- **Storage**: Netlify Blobs (documents), Google Sheets (data)
+- **Storage**: Netlify Blobs (documents), Email notifications (data)
 - **Email**: Gmail SMTP via Nodemailer
 
 ## 🔧 Environment Variables
@@ -49,10 +49,7 @@ Create `.env.local` in `apps/form-app/`:
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:8888
 
-# Google Services
-GOOGLE_SHEETS_ID=your_spreadsheet_id
-GOOGLE_SERVICE_ACCOUNT_EMAIL=your_service_account
-GOOGLE_PRIVATE_KEY=your_private_key
+# Optional Services (disabled by default)
 
 # Email Configuration
 GMAIL_USER=your_gmail_account
@@ -62,7 +59,6 @@ HR_EMAIL=hr@wareworks.me
 # Feature Flags
 ENABLE_PDF_GENERATION=false
 ENABLE_EMAIL_NOTIFICATIONS=false
-ENABLE_GOOGLE_SHEETS=true
 ```
 
 ## 🚢 Deployment
@@ -88,7 +84,7 @@ ENABLE_GOOGLE_SHEETS=true
 - ✅ TypeScript throughout
 - 🚧 File uploads with Netlify Blobs
 - 🚧 PDF generation with filled templates
-- 🚧 Google Sheets integration
+- ✅ Email-based data collection
 - 🚧 Email notifications
 
 ## 🔗 Integration

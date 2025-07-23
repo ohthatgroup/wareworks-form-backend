@@ -1,12 +1,18 @@
-import type { Metadata } from 'next'
+import type { Metadata, ResolvingMetadata } from 'next'
 import './globals.css'
 
-// Dynamic metadata based on language parameter
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined }
-}): Promise<Metadata> {
+type Props = {
+  params: { [key: string]: string }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // Fetch parent metadata if needed
+  const previousMetadata = await parent
+  
   const lang = searchParams?.lang === 'es' ? 'es' : 'en'
   
   const metadata = {
@@ -23,6 +29,7 @@ export async function generateMetadata({
   return {
     title: metadata[lang].title,
     description: metadata[lang].description,
+    ...previousMetadata,
   }
 }
 

@@ -1,15 +1,12 @@
 import { ValidatedApplicationData, SubmissionResult } from '../types'
-import { GoogleSheetsService } from './GoogleSheetsService'
 import { EmailService } from './EmailService'
 import { PDFService } from './PDFService'
 
 export class ApplicationService {
-  private googleSheets: GoogleSheetsService
   private emailService: EmailService
   private pdfService: PDFService
 
   constructor() {
-    this.googleSheets = new GoogleSheetsService()
     this.emailService = new EmailService()
     this.pdfService = new PDFService()
   }
@@ -17,10 +14,6 @@ export class ApplicationService {
   async submitApplication(data: ValidatedApplicationData): Promise<SubmissionResult> {
     try {
       console.log('Processing application:', data.submissionId)
-
-      // Save to Google Sheets (keep existing functionality)
-      const sheetsResult = await this.googleSheets.saveApplication(data)
-      console.log('Saved to Google Sheets:', sheetsResult)
 
       // Generate PDF if enabled
       let pdfBuffer: Buffer | null = null
