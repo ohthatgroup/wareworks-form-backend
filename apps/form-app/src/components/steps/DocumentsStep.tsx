@@ -148,14 +148,23 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               >
                 <Eye size={16} />
               </button>
-              <a
-                href={URL.createObjectURL(file)}
-                download={file.name}
+              <button
+                onClick={() => {
+                  // Create blob URL safely
+                  const url = URL.createObjectURL(file);
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = file.name;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+                }}
                 className="text-primary hover:text-primary-dark p-1"
                 title={t('documents.download')}
               >
                 <Download size={16} />
-              </a>
+              </button>
               <button
                 type="button"
                 onClick={() => removeFile(type, index)}

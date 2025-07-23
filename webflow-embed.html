@@ -234,10 +234,25 @@
   
   // Configuration
   const CONFIG = {
-    // Use localhost for development, replace with your actual Netlify URL when deployed
-    FORM_APP_URL: window.location.hostname === 'localhost' || window.location.hostname.includes('webflow.io') 
-      ? 'http://localhost:3000' 
-      : 'https://wareworks-backend.netlify.app', // Your actual Netlify URL
+    // Secure URL validation and construction
+    FORM_APP_URL: (function() {
+      const hostname = window.location.hostname;
+      // Strict whitelist of allowed domains
+      const allowedDomains = ['localhost', 'wareworks.me', 'webflow.io'];
+      const isAllowedDomain = allowedDomains.some(domain => 
+        hostname === domain || hostname.endsWith('.' + domain)
+      );
+      
+      if (hostname === 'localhost') {
+        return 'http://localhost:3000';
+      } else if (isAllowedDomain) {
+        return 'https://wareworks-backend.netlify.app';
+      } else {
+        // Fallback for unknown domains - use secure default
+        console.warn('Unknown domain detected, using secure fallback');
+        return 'https://wareworks-backend.netlify.app';
+      }
+    })(),
     ANALYTICS_ID: 'G-XXXXXXXXXX', // Replace with your GA4 ID
     WEBFLOW_DOMAIN: window.location.hostname
   };
@@ -354,24 +369,28 @@
     const container = document.getElementById('progress-bar-container');
     if (!container) return;
     
-    const percentage = Math.round((current / total) * 100);
-    container.innerHTML = `
-      <div style="background: #f3f4f6; border-radius: 0.5rem; height: 8px; margin: 1rem 0;">
-        <div style="
-          background: linear-gradient(90deg, #131f5b 0%, #1e308e 100%); 
-          height: 100%; 
-          border-radius: 0.5rem; 
-          width: ${percentage}%;
-          transition: width 0.3s ease;
-        "></div>
-      </div>
-      <p style="text-align: center; font-size: 0.875rem; color: #6b7280; margin: 0;">
-        ${selectedLanguage === 'en' 
-          ? `Step ${current} of ${total} (${percentage}% complete)` 
-          : `Paso ${current} de ${total} (${percentage}% completo)`
-        }
-      </p>
-    `;
+    // Sanitize inputs
+    const safePercentage = Math.max(0, Math.min(100, Math.round((current / total) * 100)));
+    
+    // Clear container safely
+    container.innerHTML = '';
+    
+    // Create elements using DOM methods instead of innerHTML
+    const progressWrapper = document.createElement('div');
+    progressWrapper.style.cssText = 'background: #f3f4f6; border-radius: 0.5rem; height: 8px; margin: 1rem 0;';
+    
+    const progressBar = document.createElement('div');
+    progressBar.style.cssText = `background: linear-gradient(90deg, #131f5b 0%, #1e308e 100%); height: 100%; border-radius: 0.5rem; width: ${safePercentage}%; transition: width 0.3s ease;`;
+    
+    const progressText = document.createElement('p');
+    progressText.style.cssText = 'text-align: center; font-size: 0.875rem; color: #6b7280; margin: 0;';
+    progressText.textContent = selectedLanguage === 'en' 
+          ? `Step ${current} of ${total} (${safePercentage}% complete)` 
+          : `Paso ${current} de ${total} (${safePercentage}% completo)`;
+    
+    progressWrapper.appendChild(progressBar);
+    container.appendChild(progressWrapper);
+    container.appendChild(progressText);
     container.style.display = 'block';
   }
 
