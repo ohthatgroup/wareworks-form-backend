@@ -6,7 +6,7 @@ import { translations, TranslationKey, Language } from '../translations'
 interface LanguageContextType {
   language: Language
   setLanguage: (language: Language) => void
-  t: (key: TranslationKey, params?: Record<string, string | number>, fallback?: string) => string
+  t: (key: string, params?: Record<string, string | number>, fallback?: string) => string
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
@@ -45,13 +45,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const t = (key: TranslationKey, params?: Record<string, string | number>, fallback?: string): string => {
-    let translation = translations[language][key] || fallback || key
+  const t = (key: string, params?: Record<string, string | number>, fallback?: string): string => {
+    let translation = translations[language][key as TranslationKey] || fallback || key
     
     // Handle parameter interpolation
     if (params && typeof translation === 'string') {
       Object.entries(params).forEach(([paramKey, value]) => {
-        translation = translation.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(value))
+        translation = (translation as string).replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(value))
       })
     }
     

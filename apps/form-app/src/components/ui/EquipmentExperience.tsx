@@ -1,11 +1,12 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { translateKey, EquipmentLabelKey, EquipmentDescriptionKey } from '../../types/translations'
 
 interface EquipmentItem {
   key: keyof ValidatedApplicationData
-  labelKey: string
-  descriptionKey: string
+  labelKey: EquipmentLabelKey
+  descriptionKey: EquipmentDescriptionKey
 }
 
 interface EquipmentExperienceProps {
@@ -81,7 +82,7 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                       htmlFor={equipment.key}
                       className="text-sm font-medium text-gray-900 cursor-pointer"
                     >
-                      {t(equipment.labelKey as any)}
+                      {t(equipment.labelKey)}
                     </label>
                     
                     {/* Experience Level Dropdown - to the right of label */}

@@ -18,6 +18,7 @@ import { DocumentsStep } from '../components/steps/DocumentsStep'
 import { ReviewStep } from '../components/steps/ReviewStep'
 import { SuccessStep } from '../components/steps/SuccessStep'
 import { LanguageProvider, useLanguage } from '../contexts/LanguageContext'
+import { translateKey, SubmissionResult } from '../types/translations'
 
 const STEPS = [
   { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
@@ -35,12 +36,6 @@ function ApplicationFormContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const { t } = useLanguage()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  interface SubmissionResult {
-    success: boolean
-    submissionId: string
-    message?: string
-    timestamp: string
-  }
 
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
@@ -372,7 +367,7 @@ function ApplicationFormContent() {
   return (
     <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
 
-      <FormStep title={t(STEPS[currentStep].titleKey as any)}>
+      <FormStep title={translateKey(t, STEPS[currentStep].titleKey)}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <CurrentStepComponent 
             form={form}

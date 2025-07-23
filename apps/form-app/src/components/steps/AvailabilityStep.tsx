@@ -3,6 +3,7 @@ import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { RadioGroup } from '../ui/RadioGroup'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { translateKey } from '../../types/translations'
 
 interface AvailabilityStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -115,7 +116,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           htmlFor={`${day.key}_checkbox`}
                           className="text-sm font-medium text-gray-900 cursor-pointer"
                         >
-                          {t(day.labelKey as any)}
+                          {translateKey(t, day.labelKey)}
                         </label>
                         
                         {/* Availability Time Input - to the right of label */}
