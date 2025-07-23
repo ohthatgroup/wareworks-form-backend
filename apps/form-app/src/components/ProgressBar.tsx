@@ -39,44 +39,55 @@ export function ProgressBar({
         </span>
       </div>
       
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-        <div 
-          className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      
-      {/* Horizontally Scrollable Step Indicators */}
-      <div className="md:overflow-visible overflow-x-auto scrollbar-hide">
-        <div className="flex justify-between min-w-max md:min-w-0 px-2 md:px-0" style={{minWidth: '600px'}}>
-        {steps.map((step, index) => {
-          const isCompleted = completedSteps.includes(index)
-          const isCurrent = index === currentStep
-          const isClickable = isStepClickable(index)
-          
-          return (
-            <div 
-              key={index}
-              className={`group ${isClickable ? 'cursor-pointer' : ''}`}
-              onClick={() => handleStepClick(index)}
-            >
-              <div 
-                className={`
-                  h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200
-                  ${isCurrent 
-                    ? 'bg-primary text-white px-3 gap-2' 
-                    : isCompleted
-                    ? 'bg-green-500 text-white w-8 group-hover:px-3 group-hover:gap-2'
-                    : 'bg-gray-200 text-gray-600 w-8 group-hover:px-3 group-hover:gap-2 hover:bg-gray-300'
-                  }
-                `}
-              >
-                {isCompleted ? '✓' : index + 1}
-                {isCurrent && step}
-                {!isCurrent && <span className="opacity-0 group-hover:opacity-100">{step}</span>}
-            </div>
-          )
-        })}
+      {/* Progress Bar */}
+      <div className="mt-6">
+        <div className="w-full bg-gray-100 rounded-lg h-12 flex">
+          {steps.map((step, index) => {
+            const isCompleted = completedSteps.includes(index)
+            const isCurrent = index === currentStep
+            const isClickable = isStepClickable(index)
+            const isLast = index === steps.length - 1
+            
+            return (
+              <div key={index} className="flex flex-1">
+                <div 
+                  className={`
+                    group flex-1 flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out
+                    ${isCurrent ? 'bg-primary' : isCompleted ? 'bg-green-500' : 'hover:bg-gray-200'}
+                  `}
+                  onClick={() => handleStepClick(index)}
+                >
+                  <span className={`font-bold text-sm transition-colors duration-300 ${
+                    isCurrent || isCompleted ? 'text-white' : 'text-gray-600'
+                  }`}>
+                    {index + 1}
+                  </span>
+                  
+                  {isCurrent && (
+                    <span className="ml-3 text-white text-sm font-medium whitespace-nowrap">
+                      {step}
+                    </span>
+                  )}
+                  
+                  {!isCurrent && (
+                    <span className={`
+                      ml-3 text-sm font-medium whitespace-nowrap transition-all duration-300 ease-in-out
+                      opacity-0 w-0 overflow-hidden group-hover:opacity-100 group-hover:w-auto
+                      ${isCompleted ? 'text-white' : 'text-gray-700'}
+                    `}>
+                      {step}
+                    </span>
+                  )}
+                </div>
+                
+                {!isLast && (
+                  <div className="w-6 flex items-center justify-center bg-gray-100 h-full">
+                    <span className="text-gray-400 font-bold text-2xl leading-none">/</span>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
