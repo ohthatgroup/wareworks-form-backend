@@ -57,13 +57,13 @@ export function ProgressBar({
           return (
             <div 
               key={index}
-              className={`flex flex-col items-center relative group ${isClickable ? 'cursor-pointer' : ''}`}
+              className={`flex items-center relative group ${isClickable ? 'cursor-pointer' : ''}`}
               onClick={() => handleStepClick(index)}
             >
               {/* Step Circle */}
               <div 
                 className={`
-                  w-10 h-10 md:w-8 md:h-8 rounded-full flex items-center justify-center text-sm md:text-xs font-bold mb-2 transition-all duration-200 relative z-10
+                  w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200 relative z-10 flex-shrink-0
                   ${isCurrent 
                     ? 'bg-primary text-white shadow-lg scale-110' 
                     : isCompleted
@@ -76,22 +76,26 @@ export function ProgressBar({
                 {isCompleted ? '✓' : index + 1}
               </div>
               
-              {/* Step Label - Always show current step name on mobile, hover for others */}
-              <span 
-                className={`
-                  text-xs text-center leading-tight transition-all duration-200 max-w-16 truncate
-                  ${isCurrent 
-                    ? 'text-primary font-bold block' 
-                    : 'text-gray-500 hidden md:group-hover:block md:absolute md:top-12 md:left-1/2 md:transform md:-translate-x-1/2 md:bg-gray-800 md:text-white md:px-2 md:py-1 md:rounded md:whitespace-nowrap md:z-20'
-                  }
-                `}
-              >
-                {isCurrent ? step : step}
-              </span>
+              {/* Step Label - Only show for current step or on hover */}
+              {(isCurrent || false) && (
+                <span 
+                  className={`
+                    ml-2 text-xs leading-tight transition-all duration-200 whitespace-nowrap
+                    ${isCurrent 
+                      ? 'text-primary font-bold' 
+                      : 'text-gray-500 opacity-0 group-hover:opacity-100'
+                    }
+                  `}
+                >
+                  {step}
+                </span>
+              )}
               
-              {/* Mobile: Show step name for current step only */}
-              {isCurrent && (
-                <span className="md:hidden text-xs text-primary font-medium text-center mt-1 max-w-16 truncate">
+              {/* Hover label for non-current steps */}
+              {!isCurrent && (
+                <span 
+                  className="ml-2 text-xs leading-tight transition-all duration-200 whitespace-nowrap text-gray-500 opacity-0 group-hover:opacity-100"
+                >
                   {step}
                 </span>
               )}
