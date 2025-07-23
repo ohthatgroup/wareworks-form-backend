@@ -7,24 +7,69 @@ export class EmailService {
       return
     }
 
+    const hrEmail = process.env.HR_EMAIL || 'hr@wareworks.me'
+    const subject = `New Application: ${data.legalFirstName} ${data.legalLastName} - ${data.positionApplied}`
+
     try {
-      // TODO: Implement actual email sending
-      // For now, just log what we would send
-      console.log('Would send email notification:', {
-        to: process.env.HR_EMAIL || 'hr@wareworks.me',
-        subject: `New Application: ${data.legalFirstName} ${data.legalLastName}`,
-        submissionId: data.submissionId,
-        hasPDF: !!pdfBuffer,
-        timestamp: data.submittedAt
+      // Use Netlify's Email Extension (powered by Mailgun)
+      const emailData = {
+        to: hrEmail,
+        subject: subject,
+        text: this.generatePlainTextEmail(data),
+        attachments: pdfBuffer ? [{
+          filename: `${data.legalFirstName}_${data.legalLastName}_Application.pdf`,
+          content: pdfBuffer.toString('base64'),
+          contentType: 'application/pdf'
+        }] : []
+      }
+
+      // Call Netlify Email function
+      const response = await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData)
       })
 
-      // Simulate email sending delay
-      await new Promise(resolve => setTimeout(resolve, 100))
+      if (!response.ok) {
+        throw new Error(`Email send failed: ${response.status} ${response.statusText}`)
+      }
+
+      console.log('Email sent successfully to:', hrEmail)
 
     } catch (error) {
       console.error('Email service error:', error)
       throw new Error(`Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
+  }
+
+  private generatePlainTextEmail(data: ValidatedApplicationData): string {
+    return `
+New Employment Application Received
+
+Applicant Information:
+- Name: ${data.legalFirstName} ${data.legalLastName}
+- Position: ${data.positionApplied}
+- Email: ${data.email}
+- Phone: ${data.phoneNumber}
+- Address: ${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}
+
+Emergency Contact:
+- Name: ${data.emergencyName}
+- Phone: ${data.emergencyPhone}
+- Relationship: ${data.emergencyRelationship}
+
+Application Details:
+- Submission ID: ${data.submissionId}
+- Submitted: ${data.submittedAt}
+- Expected Salary: ${data.expectedSalary || 'Not specified'}
+- How they found the job: ${data.jobDiscovery || 'Not specified'}
+
+Please review the attached PDF for complete application details.
+
+This is an automated notification from the Wareworks application system.
+    `.trim()
   }
 }
 
