@@ -57,48 +57,23 @@ export function ProgressBar({
           return (
             <div 
               key={index}
-              className={`flex items-center relative group ${isClickable ? 'cursor-pointer' : ''}`}
+              className={`group ${isClickable ? 'cursor-pointer' : ''}`}
               onClick={() => handleStepClick(index)}
             >
-              {/* Step Circle */}
               <div 
                 className={`
-                  w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200 relative z-10 flex-shrink-0
+                  h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200
                   ${isCurrent 
-                    ? 'bg-primary text-white shadow-lg scale-110' 
+                    ? 'bg-primary text-white px-3 gap-2' 
                     : isCompleted
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                    ? 'bg-green-500 text-white w-8 group-hover:px-3 group-hover:gap-2'
+                    : 'bg-gray-200 text-gray-600 w-8 group-hover:px-3 group-hover:gap-2 hover:bg-gray-300'
                   }
-                  ${isClickable ? 'hover:scale-125 hover:shadow-lg' : ''}
                 `}
               >
                 {isCompleted ? '✓' : index + 1}
-              </div>
-              
-              {/* Step Label - Only show for current step or on hover */}
-              {(isCurrent || false) && (
-                <span 
-                  className={`
-                    ml-2 text-xs leading-tight transition-all duration-200 whitespace-nowrap
-                    ${isCurrent 
-                      ? 'text-primary font-bold' 
-                      : 'text-gray-500 opacity-0 group-hover:opacity-100'
-                    }
-                  `}
-                >
-                  {step}
-                </span>
-              )}
-              
-              {/* Hover label for non-current steps */}
-              {!isCurrent && (
-                <span 
-                  className="ml-2 text-xs leading-tight transition-all duration-200 whitespace-nowrap text-gray-500 opacity-0 group-hover:opacity-100"
-                >
-                  {step}
-                </span>
-              )}
+                {isCurrent && step}
+                {!isCurrent && <span className="opacity-0 group-hover:opacity-100">{step}</span>}
             </div>
           )
         })}
