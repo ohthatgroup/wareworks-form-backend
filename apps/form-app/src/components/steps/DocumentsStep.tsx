@@ -51,7 +51,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   }
 
   // Debounced file conversion to prevent UI blocking
-  const convertFilesWithDelay = async (files: File[], existingFiles: File[]): Promise<any[]> => {
+  const convertFilesWithDelay = async (files: File[], existingFiles: File[], currentFileMap: {[key: string]: File[]}): Promise<any[]> => {
     return new Promise((resolve) => {
       setTimeout(async () => {
         const allFiles = [...existingFiles, ...files]
@@ -59,7 +59,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           allFiles.map(async (file) => {
             const base64Data = await fileToBase64(file)
             return {
-              type: getFileType(file),
+              type: getFileType(file, currentFileMap),
               name: file.name,
               size: file.size,
               mimeType: file.type,
@@ -72,9 +72,9 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     })
   }
 
-  const getFileType = (file: File): 'identification' | 'resume' | 'certification' => {
-    const fileCategory = Object.keys(uploadedFiles).find(key => 
-      uploadedFiles[key].includes(file)
+  const getFileType = (file: File, currentFiles: {[key: string]: File[]}): 'identification' | 'resume' | 'certification' => {
+    const fileCategory = Object.keys(currentFiles).find(key => 
+      currentFiles[key].includes(file)
     )
     
     if (fileCategory === 'id') return 'identification'
@@ -95,7 +95,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     setUploadedFiles(newFiles)
     
     // Use debounced conversion to prevent UI blocking
-    const convertedDocuments = await convertFilesWithDelay(fileArray, existingFiles)
+    const convertedDocuments = await convertFilesWithDelay(fileArray, existingFiles, newFiles)
     setValue('documents', convertedDocuments)
   }
 
@@ -111,7 +111,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     
     // Convert remaining files to schema format
     const allFiles = Object.values(newFiles).flat()
-    const convertedDocuments = await convertFilesWithDelay([], allFiles)
+    const convertedDocuments = await convertFilesWithDelay([], allFiles, newFiles)
     setValue('documents', convertedDocuments)
   }
 

@@ -5,7 +5,6 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { applicationSchema, type ValidatedApplicationData } from '../shared/validation/schemas'
-import { useIframeHeight } from '../hooks/useIframeHeight'
 import { FormStep } from '../components/FormStep'
 import { FormNavigation } from '../components/FormNavigation'
 import { ProgressBar } from '../components/ProgressBar'
@@ -86,8 +85,6 @@ function ApplicationFormContent() {
   // Check if we're in an embedded context
   const isEmbedded = typeof window !== 'undefined' && window.parent !== window
 
-  // Handle iframe height communication - disabled for new auto-resize approach
-  // useIframeHeight()
   
   // Add embedded class to body when in iframe
   useEffect(() => {

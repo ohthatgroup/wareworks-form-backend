@@ -66,11 +66,11 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
           />
           
           <Select
-            label={t('citizenship.enter_following')}
+            label={t('citizenship.select_document_type')}
             registration={register('alienDocumentType')}
             error={errors.alienDocumentType?.message}
             options={alienWorkAuthOptions}
-            placeholder={t('citizenship.select_info_placeholder')}
+            placeholder={t('citizenship.document_type_placeholder')}
           />
           
           {watch('alienDocumentType') === 'uscis_a_number' && (
