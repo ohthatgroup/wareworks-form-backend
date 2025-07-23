@@ -20,7 +20,7 @@
   
   /* Ensure iframe fills container properly */
   body.embedded {
-    overflow: hidden;
+    overflow: visible;
     height: auto;
     min-height: auto;
   }

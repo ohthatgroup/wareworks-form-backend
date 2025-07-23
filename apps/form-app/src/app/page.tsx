@@ -8,6 +8,7 @@ import { applicationSchema, type ValidatedApplicationData } from '../shared/vali
 import { useIframeHeight } from '../hooks/useIframeHeight'
 import { FormStep } from '../components/FormStep'
 import { FormNavigation } from '../components/FormNavigation'
+import { ProgressBar } from '../components/ProgressBar'
 import { PersonalInfoStep } from '../components/steps/PersonalInfoStep'
 import { ContactInfoStep } from '../components/steps/ContactInfoStep'
 import { CitizenshipStep } from '../components/steps/CitizenshipStep'
@@ -168,8 +169,8 @@ function ApplicationFormContent() {
       switch (stepIndex) {
         case 0: // Personal Information - Only truly required fields per schema
           return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
-        case 1: // Contact Details - Only address and cell phone required per schema
-          return ['streetAddress', 'cellPhone']
+        case 1: // Contact Details - Only address and phone required per schema
+          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
         case 2: // Work Authorization - All are optional per schema
           return []
         case 3: // Position & Experience - All are optional per schema
@@ -366,6 +367,13 @@ function ApplicationFormContent() {
 
   return (
     <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
+      <ProgressBar 
+        currentStep={currentStep}
+        totalSteps={STEPS.length}
+        steps={STEPS.map(step => translateKey(t, step.titleKey))}
+        onStepClick={handleStepClick}
+        completedSteps={completedSteps}
+      />
 
       <FormStep title={translateKey(t, STEPS[currentStep].titleKey)}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
