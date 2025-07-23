@@ -47,7 +47,7 @@ export function ProgressBar({
       </div>
       
       {/* Horizontally Scrollable Step Indicators */}
-      <div className="overflow-x-auto scrollbar-hide">
+      <div className="md:overflow-visible overflow-x-auto scrollbar-hide">
         <div className="flex justify-between min-w-max md:min-w-0 px-2 md:px-0" style={{minWidth: '600px'}}>
         {steps.map((step, index) => {
           const isCompleted = completedSteps.includes(index)
