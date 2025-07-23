@@ -352,7 +352,7 @@ function ApplicationFormContent() {
         }
       }
       
-      alert(t('system.submission_failed', userFriendlyMessage))
+      alert(t('embed.error_occurred') + ': ' + userFriendlyMessage)
     } finally {
       setIsSubmitting(false)
     }
