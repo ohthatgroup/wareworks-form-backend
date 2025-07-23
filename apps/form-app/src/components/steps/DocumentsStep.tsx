@@ -49,6 +49,38 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     })
   }
 
+  // Debounced file conversion to prevent UI blocking
+  const convertFilesWithDelay = async (files: File[], existingFiles: File[]): Promise<any[]> => {
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        const allFiles = [...existingFiles, ...files]
+        const convertedDocuments = await Promise.all(
+          allFiles.map(async (file) => {
+            const base64Data = await fileToBase64(file)
+            return {
+              type: getFileType(file),
+              name: file.name,
+              size: file.size,
+              mimeType: file.type,
+              data: base64Data
+            }
+          })
+        )
+        resolve(convertedDocuments)
+      }, 100) // Small delay to prevent UI blocking
+    })
+  }
+
+  const getFileType = (file: File): 'identification' | 'resume' | 'certification' => {
+    const fileCategory = Object.keys(uploadedFiles).find(key => 
+      uploadedFiles[key].includes(file)
+    )
+    
+    if (fileCategory === 'id') return 'identification'
+    if (fileCategory === 'resume') return 'resume'
+    return 'certification'
+  }
+
   const handleFileUpload = async (type: string, files: FileList) => {
     const fileArray = Array.from(files)
     const newFiles = { ...uploadedFiles }
@@ -57,26 +89,12 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       newFiles[type] = []
     }
     
-    newFiles[type] = [...newFiles[type], ...fileArray]
+    const existingFiles = newFiles[type] || []
+    newFiles[type] = [...existingFiles, ...fileArray]
     setUploadedFiles(newFiles)
     
-    // Convert all files to schema format
-    const allFiles = Object.values(newFiles).flat()
-    const convertedDocuments = await Promise.all(
-      allFiles.map(async (file) => {
-        const base64Data = await fileToBase64(file)
-        return {
-          type: Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'id' ? 'identification' as const :
-                Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'resume' ? 'resume' as const :
-                'certification' as const,
-          name: file.name,
-          size: file.size,
-          mimeType: file.type,
-          data: base64Data
-        }
-      })
-    )
-    
+    // Use debounced conversion to prevent UI blocking
+    const convertedDocuments = await convertFilesWithDelay(fileArray, existingFiles)
     setValue('documents', convertedDocuments)
   }
 
@@ -92,21 +110,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     
     // Convert remaining files to schema format
     const allFiles = Object.values(newFiles).flat()
-    const convertedDocuments = await Promise.all(
-      allFiles.map(async (file) => {
-        const base64Data = await fileToBase64(file)
-        return {
-          type: Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'id' ? 'identification' as const :
-                Object.keys(newFiles).find(key => newFiles[key].includes(file)) === 'resume' ? 'resume' as const :
-                'certification' as const,
-          name: file.name,
-          size: file.size,
-          mimeType: file.type,
-          data: base64Data
-        }
-      })
-    )
-    
+    const convertedDocuments = await convertFilesWithDelay([], allFiles)
     setValue('documents', convertedDocuments)
   }
 
