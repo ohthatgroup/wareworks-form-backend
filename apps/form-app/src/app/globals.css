@@ -18,11 +18,47 @@
     min-height: 100vh;
   }
   
-  /* Ensure iframe fills container properly */
+  /* Ensure iframe fills container properly - remove all default styling on mobile for webflow wrapper */
   body.embedded {
     overflow: visible;
     height: auto;
     min-height: auto;
+  }
+  
+  /* Mobile-specific: Remove all margins, paddings, shadows for webflow wrapper */
+  @media (max-width: 768px) {
+    body.embedded {
+      margin: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+    }
+    
+    /* Remove default container styling on mobile */
+    .embedded .container,
+    .embedded .form-container {
+      margin: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      max-width: 100% !important;
+    }
+    
+    /* Remove margins from main form wrapper on mobile */
+    .embedded main {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    /* Ensure form steps have minimal padding on mobile */
+    .embedded .form-step {
+      padding: 1rem !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
   }
   
   h1, h2, h3, h4, h5, h6 {

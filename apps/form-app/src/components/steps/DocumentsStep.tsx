@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '../../shared/validation/schemas'
 import { Upload, X, Eye, Download } from 'lucide-react'
@@ -36,6 +36,54 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   // Watch for certified skills (this would need to be implemented in the skills component)
   // For now, this is placeholder for when skills certification is implemented
   const certifiedSkills: { key: string; value: string; label: string }[] = []
+
+  // Restore file state from form data when component mounts
+  useEffect(() => {
+    const restoreFilesFromFormData = async () => {
+      if (documents && documents.length > 0) {
+        const restoredFiles: {[key: string]: File[]} = {}
+        
+        for (const doc of documents) {
+          try {
+            // Convert base64 back to File object
+            const byteString = atob(doc.data)
+            const arrayBuffer = new ArrayBuffer(byteString.length)
+            const uint8Array = new Uint8Array(arrayBuffer)
+            
+            for (let i = 0; i < byteString.length; i++) {
+              uint8Array[i] = byteString.charCodeAt(i)
+            }
+            
+            const blob = new Blob([arrayBuffer], { type: doc.mimeType })
+            const file = new File([blob], doc.name, { type: doc.mimeType })
+            
+            // Determine file category based on document type
+            let fileCategory: string
+            if (doc.type === 'identification') {
+              fileCategory = 'id'
+            } else if (doc.type === 'resume') {
+              fileCategory = 'resume'
+            } else {
+              // For certification files, we need to match them to their categories
+              // This is a simplified approach - in practice you might store the category
+              fileCategory = 'certification'
+            }
+            
+            if (!restoredFiles[fileCategory]) {
+              restoredFiles[fileCategory] = []
+            }
+            restoredFiles[fileCategory].push(file)
+          } catch (error) {
+            console.warn('Failed to restore file:', doc.name, error)
+          }
+        }
+        
+        setUploadedFiles(restoredFiles)
+      }
+    }
+    
+    restoreFilesFromFormData()
+  }, []) // Empty dependency array - only run on mount
 
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
