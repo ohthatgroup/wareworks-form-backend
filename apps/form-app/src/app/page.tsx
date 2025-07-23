@@ -372,7 +372,7 @@ function ApplicationFormContent() {
   return (
     <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
 
-      <FormStep title={t(STEPS[currentStep].titleKey)}>
+      <FormStep title={t(STEPS[currentStep].titleKey as any)}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <CurrentStepComponent 
             form={form}
