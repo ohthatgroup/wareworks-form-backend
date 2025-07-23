@@ -1,4 +1,4 @@
-import { ValidatedApplicationData } from '../types'
+import { ValidatedApplicationData } from '../validation/schemas'
 
 export class EmailService {
   async sendApplicationNotification(data: ValidatedApplicationData, pdfBuffer: Buffer | null): Promise<void> {

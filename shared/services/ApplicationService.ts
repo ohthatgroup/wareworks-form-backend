@@ -1,4 +1,5 @@
-import { ValidatedApplicationData, SubmissionResult } from '../types'
+import { ValidatedApplicationData } from '../validation/schemas'
+import { SubmissionResult } from '../types'
 import { EmailService } from './EmailService'
 import { PDFService } from './PDFService'
 
@@ -19,7 +20,14 @@ export class ApplicationService {
       let pdfBuffer: Buffer | null = null
       if (process.env.ENABLE_PDF_GENERATION === 'true') {
         try {
-          pdfBuffer = await this.pdfService.generateApplicationPDF(data)
+          const pdfResult = await this.pdfService.generateApplicationPDF(data)
+          // Handle both single PDF and multiple PDF results
+          if (Buffer.isBuffer(pdfResult)) {
+            pdfBuffer = pdfResult
+          } else {
+            // Use the main application PDF, I-9 will be handled separately
+            pdfBuffer = pdfResult.applicationPDF
+          }
           console.log('PDF generated successfully')
         } catch (error) {
           console.error('PDF generation failed:', error)

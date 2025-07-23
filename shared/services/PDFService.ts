@@ -1,7 +1,7 @@
-import { ApplicationData } from '../types'
+import { ValidatedApplicationData } from '../validation/schemas'
 import { PDFDocument, PDFForm, PDFTextField, rgb } from 'pdf-lib'
-import fs from 'fs/promises'
-import path from 'path'
+import * as fs from 'fs/promises'
+import * as path from 'path'
 import { pdfFieldMappings, i9FieldMappings, FieldMapping } from '../config/pdfFieldMappings'
 
 export class PDFService {
@@ -22,7 +22,7 @@ export class PDFService {
     }
   }
 
-  async generateApplicationPDF(data: ApplicationData): Promise<Buffer | { applicationPDF: Buffer; i9PDF: Buffer }> {
+  async generateApplicationPDF(data: ValidatedApplicationData): Promise<Buffer | { applicationPDF: Buffer; i9PDF: Buffer }> {
     if (!process.env.ENABLE_PDF_GENERATION || process.env.ENABLE_PDF_GENERATION !== 'true') {
       throw new Error('PDF generation disabled')
     }
@@ -72,7 +72,7 @@ export class PDFService {
     }
   }
 
-  private async fillApplicationFields(form: PDFForm, data: ApplicationData) {
+  private async fillApplicationFields(form: PDFForm, data: ValidatedApplicationData) {
     // Personal Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalFirstName, data.legalFirstName)
     this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalLastName, data.legalLastName)
@@ -92,16 +92,14 @@ export class PDFService {
     this.setTextFieldWithMapping(form, pdfFieldMappings.emergencyContact.phone, data.emergencyPhone)
     this.setTextFieldWithMapping(form, pdfFieldMappings.emergencyContact.relationship, data.emergencyRelationship)
     
-    // Weekly Availability (if present in data)
-    if (data.weeklyAvailability) {
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.sunday, this.formatAvailability(data.weeklyAvailability.sunday))
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.monday, this.formatAvailability(data.weeklyAvailability.monday))
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.tuesday, this.formatAvailability(data.weeklyAvailability.tuesday))
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.wednesday, this.formatAvailability(data.weeklyAvailability.wednesday))
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.thursday, this.formatAvailability(data.weeklyAvailability.thursday))
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.friday, this.formatAvailability(data.weeklyAvailability.friday))
-      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.saturday, this.formatAvailability(data.weeklyAvailability.saturday))
-    }
+    // Weekly Availability
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.sunday, data.availabilitySunday)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.monday, data.availabilityMonday)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.tuesday, data.availabilityTuesday)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.wednesday, data.availabilityWednesday)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.thursday, data.availabilityThursday)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.friday, data.availabilityFriday)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.saturday, data.availabilitySaturday)
     
     // Position Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.position.positionApplied, data.positionApplied)
@@ -114,49 +112,44 @@ export class PDFService {
     this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.sur, this.formatEquipmentExperience(data.equipmentSUR))
     this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.cp, this.formatEquipmentExperience(data.equipmentCP))
     this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.cl, this.formatEquipmentExperience(data.equipmentCL))
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.rj, this.formatEquipmentExperience(data.equipmentRJ))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.rj, this.formatEquipmentExperience(data.equipmentRidingJack))
     
     // Skills and Qualifications
-    if (data.skillsQualifications && Array.isArray(data.skillsQualifications)) {
-      const skillMappings = [pdfFieldMappings.skills.skill1, pdfFieldMappings.skills.skill2, pdfFieldMappings.skills.skill3]
-      data.skillsQualifications.forEach((skill, index) => {
-        if (index < 3 && skillMappings[index]) {
-          this.setTextFieldWithMapping(form, skillMappings[index], skill.skill)
-        }
-      })
-    }
+    this.setTextFieldWithMapping(form, pdfFieldMappings.skills.skill1, data.skills1)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.skills.skill2, data.skills2)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.skills.skill3, data.skills3)
     
     // Education (if present)
     if (data.education && Array.isArray(data.education)) {
       data.education.forEach((edu, index) => {
         if (index === 0) {
-          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Name, `${edu.schoolName} - ${edu.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Name, edu.schoolName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Year, edu.graduationYear)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Major, edu.degree)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Major, edu.fieldOfStudy)
         } else if (index === 1) {
-          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Name, `${edu.schoolName} - ${edu.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Name, edu.schoolName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Year, edu.graduationYear)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Major, edu.degree)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Major, edu.fieldOfStudy)
         }
       })
     }
     
     // Employment History (if present)
-    if (data.employmentHistory && Array.isArray(data.employmentHistory)) {
-      data.employmentHistory.forEach((emp, index) => {
+    if (data.employment && Array.isArray(data.employment)) {
+      data.employment.forEach((emp, index) => {
         if (index === 0) {
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Name, `${emp.companyName} - ${emp.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Name, emp.companyName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1StartPosition, emp.startingPosition)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1EndPosition, emp.endingPosition)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Phone, emp.phoneNumber)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Phone, emp.supervisorPhone)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Supervisor, emp.supervisorName)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Responsibilities, emp.responsibilities)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeaving, emp.reasonForLeaving)
         } else if (index === 1) {
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Name, `${emp.companyName} - ${emp.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Name, emp.companyName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2StartPosition, emp.startingPosition)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2EndPosition, emp.endingPosition)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Phone, emp.phoneNumber)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Phone, emp.supervisorPhone)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Supervisor, emp.supervisorName)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Responsibilities, emp.responsibilities)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeaving, emp.reasonForLeaving)
@@ -273,10 +266,6 @@ export class PDFService {
     }
   }
 
-  private formatAvailability(availability: any): string {
-    if (!availability || !availability.available) return ''
-    return availability.time || 'Available'
-  }
 
   private formatEquipmentExperience(experience: string | undefined): string {
     if (!experience) return ''
@@ -291,11 +280,11 @@ export class PDFService {
     return mapping[experience] || experience
   }
 
-  private hasI9Documents(data: ApplicationData): boolean {
+  private hasI9Documents(data: ValidatedApplicationData): boolean {
     return !!(data.citizenshipStatus && data.citizenshipStatus !== 'citizen')
   }
 
-  private async addI9Form(pdfDoc: PDFDocument, data: ApplicationData): Promise<Buffer | null> {
+  private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData): Promise<Buffer | null> {
     try {
       console.log('Creating separate filled I-9 form for non-citizen applicant...')
       const i9TemplatePath = path.join(process.cwd(), 'Templates', 'i-9.pdf')
@@ -323,7 +312,7 @@ export class PDFService {
     }
   }
 
-  private fillI9Fields(form: PDFForm, data: ApplicationData & any) {
+  private fillI9Fields(form: PDFForm, data: ValidatedApplicationData & any) {
     console.log('Filling I-9 form fields with field mappings...')
     
     // SECTION 1: Employee Information and Attestation

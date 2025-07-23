@@ -1,4 +1,4 @@
-import { ValidatedApplicationData } from '../types'
+import { ValidatedApplicationData } from '../validation/schemas'
 
 interface UploadedFile {
   type: 'identification' | 'resume' | 'certification'
