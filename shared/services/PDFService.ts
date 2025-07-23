@@ -2,6 +2,7 @@ import { ApplicationData } from '../types'
 import { PDFDocument, PDFForm, PDFTextField, rgb } from 'pdf-lib'
 import fs from 'fs/promises'
 import path from 'path'
+import { pdfFieldMappings, i9FieldMappings, FieldMapping } from '../config/pdfFieldMappings'
 
 export class PDFService {
   private templateAnalysis: any
@@ -73,53 +74,54 @@ export class PDFService {
 
   private async fillApplicationFields(form: PDFForm, data: ApplicationData) {
     // Personal Information
-    this.setTextField(form, 'Legal First Name', data.legalFirstName)
-    this.setTextField(form, 'Legal Last Name', data.legalLastName)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalFirstName, data.legalFirstName)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalLastName, data.legalLastName)
     
     // Contact Information
-    this.setTextField(form, 'Street Address', data.streetAddress)
-    this.setTextField(form, 'City', data.city)
-    this.setTextField(form, 'State', data.state)
-    this.setTextField(form, 'Zip Code', data.zipCode)
-    this.setTextField(form, 'Home Phone', data.homePhone || data.phoneNumber)
-    this.setTextField(form, 'Cell Phone Number', data.cellPhone || data.phoneNumber)
-    this.setTextField(form, 'Social Security Number', data.socialSecurityNumber)
-    this.setTextField(form, 'Email', data.email || '')
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.streetAddress, data.streetAddress)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.city, data.city)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.state, data.state)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.zipCode, data.zipCode)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.homePhone, data.homePhone || data.phoneNumber)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.cellPhone, data.cellPhone || data.phoneNumber)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.socialSecurityNumber, data.socialSecurityNumber)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.email, data.email || '')
     
     // Emergency Contact
-    this.setTextField(form, 'Name', data.emergencyName)
-    this.setTextField(form, 'Number', data.emergencyPhone)
-    this.setTextField(form, 'Relationship', data.emergencyRelationship)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.emergencyContact.name, data.emergencyName)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.emergencyContact.phone, data.emergencyPhone)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.emergencyContact.relationship, data.emergencyRelationship)
     
     // Weekly Availability (if present in data)
     if (data.weeklyAvailability) {
-      this.setTextField(form, 'Sunday', this.formatAvailability(data.weeklyAvailability.sunday))
-      this.setTextField(form, 'Monday', this.formatAvailability(data.weeklyAvailability.monday))
-      this.setTextField(form, 'Tuesday', this.formatAvailability(data.weeklyAvailability.tuesday))
-      this.setTextField(form, 'Wednesday', this.formatAvailability(data.weeklyAvailability.wednesday))
-      this.setTextField(form, 'Thursday', this.formatAvailability(data.weeklyAvailability.thursday))
-      this.setTextField(form, 'Friday', this.formatAvailability(data.weeklyAvailability.friday))
-      this.setTextField(form, 'Saturday', this.formatAvailability(data.weeklyAvailability.saturday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.sunday, this.formatAvailability(data.weeklyAvailability.sunday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.monday, this.formatAvailability(data.weeklyAvailability.monday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.tuesday, this.formatAvailability(data.weeklyAvailability.tuesday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.wednesday, this.formatAvailability(data.weeklyAvailability.wednesday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.thursday, this.formatAvailability(data.weeklyAvailability.thursday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.friday, this.formatAvailability(data.weeklyAvailability.friday))
+      this.setTextFieldWithMapping(form, pdfFieldMappings.weeklyAvailability.saturday, this.formatAvailability(data.weeklyAvailability.saturday))
     }
     
     // Position Information
-    this.setTextField(form, 'Position Applied For', data.positionApplied)
-    this.setTextField(form, 'How did you discover this job opening', data.jobDiscovery)
-    this.setTextField(form, 'Expected Salary', data.expectedSalary)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.position.positionApplied, data.positionApplied)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscovery, data.jobDiscovery)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.position.expectedSalary, data.expectedSalary)
     
     // Equipment Experience
-    this.setTextField(form, 'SD Sit Down', this.formatEquipmentExperience(data.equipmentSD))
-    this.setTextField(form, 'SU Stand Up', this.formatEquipmentExperience(data.equipmentSU))
-    this.setTextField(form, 'SUR Stand Up Reach', this.formatEquipmentExperience(data.equipmentSUR))
-    this.setTextField(form, 'CP Cherry Picker', this.formatEquipmentExperience(data.equipmentCP))
-    this.setTextField(form, 'CL Clamps', this.formatEquipmentExperience(data.equipmentCL))
-    this.setTextField(form, 'Riding Jack', this.formatEquipmentExperience(data.equipmentRJ))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.sd, this.formatEquipmentExperience(data.equipmentSD))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.su, this.formatEquipmentExperience(data.equipmentSU))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.sur, this.formatEquipmentExperience(data.equipmentSUR))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.cp, this.formatEquipmentExperience(data.equipmentCP))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.cl, this.formatEquipmentExperience(data.equipmentCL))
+    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.rj, this.formatEquipmentExperience(data.equipmentRJ))
     
     // Skills and Qualifications
     if (data.skillsQualifications && Array.isArray(data.skillsQualifications)) {
+      const skillMappings = [pdfFieldMappings.skills.skill1, pdfFieldMappings.skills.skill2, pdfFieldMappings.skills.skill3]
       data.skillsQualifications.forEach((skill, index) => {
-        if (index < 3) { // Template has 3 skill fields
-          this.setTextField(form, `Applicable Skills  Qualifications ${index + 1}`, skill.skill)
+        if (index < 3 && skillMappings[index]) {
+          this.setTextFieldWithMapping(form, skillMappings[index], skill.skill)
         }
       })
     }
@@ -127,11 +129,14 @@ export class PDFService {
     // Education (if present)
     if (data.education && Array.isArray(data.education)) {
       data.education.forEach((edu, index) => {
-        if (index < 2) { // Template has 2 education sections
-          const suffix = index === 0 ? '' : '_2'
-          this.setTextField(form, `School Name and Location${suffix}`, `${edu.schoolName} - ${edu.location}`)
-          this.setTextField(form, `Year${suffix}`, edu.graduationYear)
-          this.setTextField(form, `Major${suffix}`, edu.degree)
+        if (index === 0) {
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Name, `${edu.schoolName} - ${edu.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Year, edu.graduationYear)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Major, edu.degree)
+        } else if (index === 1) {
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Name, `${edu.schoolName} - ${edu.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Year, edu.graduationYear)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Major, edu.degree)
         }
       })
     }
@@ -139,15 +144,22 @@ export class PDFService {
     // Employment History (if present)
     if (data.employmentHistory && Array.isArray(data.employmentHistory)) {
       data.employmentHistory.forEach((emp, index) => {
-        if (index < 2) { // Template has 2 employment sections
-          const suffix = index === 0 ? '' : '_2'
-          this.setTextField(form, `Company Name and Location${suffix}`, `${emp.companyName} - ${emp.location}`)
-          this.setTextField(form, `Starting Position${suffix}`, emp.startingPosition)
-          this.setTextField(form, `Ending Position${suffix}`, emp.endingPosition)
-          this.setTextField(form, `Telephone Number${suffix}`, emp.phoneNumber)
-          this.setTextField(form, `Supervisor Name${suffix}`, emp.supervisorName)
-          this.setTextField(form, `Responsibilities 1${suffix}`, emp.responsibilities)
-          this.setTextField(form, `Reason for Leaving 1${suffix}`, emp.reasonForLeaving)
+        if (index === 0) {
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Name, `${emp.companyName} - ${emp.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1StartPosition, emp.startingPosition)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1EndPosition, emp.endingPosition)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Phone, emp.phoneNumber)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Supervisor, emp.supervisorName)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Responsibilities, emp.responsibilities)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeaving, emp.reasonForLeaving)
+        } else if (index === 1) {
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Name, `${emp.companyName} - ${emp.location}`)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2StartPosition, emp.startingPosition)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2EndPosition, emp.endingPosition)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Phone, emp.phoneNumber)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Supervisor, emp.supervisorName)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Responsibilities, emp.responsibilities)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeaving, emp.reasonForLeaving)
         }
       })
     }
@@ -164,6 +176,39 @@ export class PDFService {
     } catch (error) {
       console.warn(`Could not set field "${fieldName}":`, error)
     }
+  }
+
+  private setTextFieldWithMapping(form: PDFForm, mapping: FieldMapping, value: string | undefined) {
+    if (!value) return
+
+    // Try primary field name first
+    try {
+      const field = form.getField(mapping.primary) as PDFTextField
+      if (field) {
+        field.setText(value)
+        return
+      }
+    } catch (error) {
+      console.warn(`Primary field "${mapping.primary}" not found:`, error)
+    }
+
+    // Try fallback field names
+    if (mapping.fallbacks) {
+      for (const fallback of mapping.fallbacks) {
+        try {
+          const field = form.getField(fallback) as PDFTextField
+          if (field) {
+            field.setText(value)
+            console.log(`Used fallback field "${fallback}" for value: ${value}`)
+            return
+          }
+        } catch (error) {
+          console.warn(`Fallback field "${fallback}" not found:`, error)
+        }
+      }
+    }
+
+    console.warn(`No working field found for mapping. Primary: "${mapping.primary}", Value: "${value}"`)
   }
 
   private setCheckboxField(form: PDFForm, fieldName: string, checked: boolean) {
@@ -279,81 +324,66 @@ export class PDFService {
   }
 
   private fillI9Fields(form: PDFForm, data: ApplicationData & any) {
-    console.log('Filling I-9 form fields with CORRECT field names...')
+    console.log('Filling I-9 form fields with field mappings...')
     
     // SECTION 1: Employee Information and Attestation
     console.log('Filling Section 1: Employee Information...')
     
-    // Primary employee fields (using CORRECT field names from template analysis)
-    this.setTextField(form, 'Last Name (Family Name)', data.legalLastName)
-    this.setTextField(form, 'First Name Given Name', data.legalFirstName)
-    this.setTextField(form, 'Employee Middle Initial (if any)', data.middleInitial || '')
-    this.setTextField(form, 'Employee Other Last Names Used (if any)', data.otherLastNames || '')
+    // Primary employee fields using mappings
+    this.setTextFieldWithMapping(form, i9FieldMappings.personalInfo.lastName, data.legalLastName)
+    this.setTextFieldWithMapping(form, i9FieldMappings.personalInfo.firstName, data.legalFirstName)
+    this.setTextFieldWithMapping(form, i9FieldMappings.personalInfo.middleInitial, data.middleInitial || '')
+    this.setTextFieldWithMapping(form, i9FieldMappings.personalInfo.otherLastNames, data.otherLastNames || '')
     
-    // Address fields  
-    this.setTextField(form, 'Address Street Number and Name', data.streetAddress)
-    this.setTextField(form, 'Apt Number (if any)', data.aptNumber || '')
-    this.setTextField(form, 'City or Town', data.city)
+    // Address fields using mappings
+    this.setTextFieldWithMapping(form, i9FieldMappings.address.streetAddress, data.streetAddress)
+    this.setTextFieldWithMapping(form, i9FieldMappings.address.aptNumber, data.aptNumber || '')
+    this.setTextFieldWithMapping(form, i9FieldMappings.address.city, data.city)
+    this.setDropdownField(form, i9FieldMappings.address.state.primary, data.state)
+    this.setTextFieldWithMapping(form, i9FieldMappings.address.zipCode, data.zipCode)
     
-    // State field (this is a dropdown!)
-    this.setDropdownField(form, 'State', data.state)
-    
-    this.setTextField(form, 'ZIP Code', data.zipCode)
-    this.setTextField(form, 'Date of Birth mmddyyyy', this.formatDateForI9(data.dateOfBirth))
+    // Identification fields using mappings
+    this.setTextFieldWithMapping(form, i9FieldMappings.identification.dateOfBirth, this.formatDateForI9(data.dateOfBirth))
     
     // Handle SSN with length constraint (9 characters max)
     const ssn = data.socialSecurityNumber?.replace(/[^\d]/g, '').substring(0, 9)
-    this.setTextField(form, 'US Social Security Number', ssn)
+    this.setTextFieldWithMapping(form, i9FieldMappings.identification.socialSecurityNumber, ssn)
     
-    this.setTextField(form, 'Telephone Number', data.phoneNumber)
-    this.setTextField(form, 'Employees E-mail Address', data.email || '')
+    this.setTextFieldWithMapping(form, i9FieldMappings.identification.phoneNumber, data.phoneNumber)
+    this.setTextFieldWithMapping(form, i9FieldMappings.identification.email, data.email || '')
     
-    // Additional Section 1 duplicate fields
-    this.setTextField(form, 'Last Name Family Name from Section 1', data.legalLastName)
-    this.setTextField(form, 'First Name Given Name from Section 1', data.legalFirstName) 
-    this.setTextField(form, 'Middle initial if any from Section 1', data.middleInitial || '')
-    
-    // Handle citizenship status checkboxes (Section 1)
+    // Handle citizenship status checkboxes
     console.log('Setting citizenship status checkboxes...')
     this.setCitizenshipCheckboxes(form, data.citizenshipStatus)
     
-    // CRITICAL: Work authorization text fields (the ones you mentioned!)
+    // Work authorization text fields
     console.log('Filling work authorization text fields...')
     
     if (data.citizenshipStatus === 'permanent_resident' && data.uscisANumber) {
-      // Fill the permanent resident text field
-      this.setTextField(form, '3 A lawful permanent resident Enter USCIS or ANumber', data.uscisANumber)
-      console.log(`  ✅ Set permanent resident field with USCIS A-Number: ${data.uscisANumber}`)
-      
-      // Also fill the separate USCIS A-Number field
-      this.setTextField(form, 'USCIS ANumber', data.uscisANumber)
+      this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumber, data.uscisANumber)
+      console.log(`  ✅ Set permanent resident USCIS A-Number: ${data.uscisANumber}`)
     }
     
-    // For alien authorized to work (CB_4), fill the expiration date AND one of the required fields
+    // For alien authorized to work
     if (data.citizenshipStatus === 'authorized_alien' || data.citizenshipStatus === 'work_authorized') {
-      // Always fill the expiration date for alien authorized
+      // Work authorization expiration date
       if (data.workAuthorizationExpiration) {
-        this.setTextField(form, 'Exp Date mmddyyyy', this.formatDateForI9(data.workAuthorizationExpiration))
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.expirationDate, this.formatDateForI9(data.workAuthorizationExpiration))
         console.log(`  ✅ Set work authorization expiration: ${data.workAuthorizationExpiration}`)
       }
       
-      // For CB_4, must fill ONE of: USCIS A-Number OR I-94 OR Foreign Passport
+      // Fill ONE of: USCIS A-Number OR I-94 OR Foreign Passport
       console.log('  📋 Filling CB_4 associated fields (choose one):')
       
-      // Priority 1: USCIS A-Number (if available for alien authorized)
       if (data.uscisANumber) {
-        this.setTextField(form, 'USCIS ANumber', data.uscisANumber)
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumber, data.uscisANumber)
         console.log(`    ✅ Set USCIS A-Number: ${data.uscisANumber}`)
-      }
-      // Priority 2: Form I-94 Admission Number
-      else if (data.i94AdmissionNumber) {
+      } else if (data.i94AdmissionNumber) {
         const truncatedI94 = data.i94AdmissionNumber.substring(0, 11)
-        this.setTextField(form, 'Form I94 Admission Number', truncatedI94)
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.i94AdmissionNumber, truncatedI94)
         console.log(`    ✅ Set I-94 Admission Number: ${truncatedI94}`)
-      }
-      // Priority 3: Foreign Passport Number and Country
-      else if (data.foreignPassportNumber && data.foreignPassportCountry) {
-        this.setTextField(form, 'Foreign Passport Number and Country of IssuanceRow1', 
+      } else if (data.foreignPassportNumber && data.foreignPassportCountry) {
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.foreignPassportNumber, 
           `${data.foreignPassportNumber} - ${data.foreignPassportCountry}`)
         console.log(`    ✅ Set Foreign Passport: ${data.foreignPassportNumber} - ${data.foreignPassportCountry}`)
       } else {
@@ -361,12 +391,8 @@ export class PDFService {
       }
     }
     
-    // Note: I-94 and Foreign Passport are now handled above in the CB_4 logic
-    
     console.log('✅ Section 1 (Employee Information) completed')
     console.log('📝 Note: Signature fields and Sections 2-3 left blank for HR to complete manually')
-    
-    console.log('I-9 form fields filled successfully')
   }
 
   private formatDateForI9(dateString: string): string {
