@@ -236,14 +236,18 @@ function ApplicationFormContent() {
     sendProgressUpdate()
   }, [sendProgressUpdate])
 
+  // Memoized validation for current step
+  const formValues = form.watch()
+  const formState = form.formState
+
   // Memoized function to get required fields for each step based on schema validation
   const getStepRequiredFields = useMemo(() => {
     return (stepIndex: number): (keyof ValidatedApplicationData)[] => {
       switch (stepIndex) {
         case 0: // Personal Information - Only truly required fields per schema
           return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
-        case 1: // Contact Details - Only address and cellPhone required per schema
-          return ['streetAddress', 'cellPhone']
+        case 1: // Contact Details - Let me check what fields actually exist
+          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
         case 2: // Citizenship - Conditional requirements based on citizenship status
           const citizenshipStatus = formValues.citizenshipStatus
           if (citizenshipStatus === 'lawful_permanent') {
@@ -267,10 +271,6 @@ function ApplicationFormContent() {
       }
     }
   }, [formValues.citizenshipStatus])
-
-  // Memoized validation for current step
-  const formValues = form.watch()
-  const formState = form.formState
   
   const isCurrentStepValid = useMemo(() => {
     const requiredFields = getStepRequiredFields(currentStep)
@@ -295,11 +295,13 @@ function ApplicationFormContent() {
 
   // Memoized validation for form submission readiness
   const isFormReadyForSubmission = useMemo(() => {
-    // Check all required fields based on actual schema requirements
+    // Check all required fields based on actual form UI (what has asterisks and required props)
     let allRequiredFields = [
-      // Required from schema (.min(1) and .regex() validations)
+      // Personal Info - required fields
       'legalFirstName', 'legalLastName', 'socialSecurityNumber',
-      'streetAddress', 'cellPhone',
+      // Contact Info - required fields from form UI
+      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber',
+      // Availability - required fields
       'fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied'
     ]
     
