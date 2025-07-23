@@ -115,7 +115,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           htmlFor={`${day.key}_checkbox`}
                           className="text-sm font-medium text-gray-900 cursor-pointer"
                         >
-                          {t(day.labelKey)}
+                          {t(day.labelKey as any)}
                         </label>
                         
                         {/* Availability Time Input - to the right of label */}

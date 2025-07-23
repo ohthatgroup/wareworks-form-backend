@@ -240,7 +240,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               {certifiedEquipment.map((equipment) => (
                 <div key={equipment.key}>
                   <label className="form-label">
-                    {t(equipment.labelKey)} {t('documents.certification_label')}
+                    {t(equipment.labelKey as any)} {t('documents.certification_label')}
                   </label>
                   <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
                     <Upload className="mx-auto h-12 w-12 text-primary" />
@@ -258,7 +258,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-primary">
-                      {t('documents.official_certification')} {t(equipment.labelKey).split(' - ')[1]}
+                      {t('documents.official_certification')} {t(equipment.labelKey as any).split(' - ')[1]}
                     </p>
                   </div>
                   {uploadedFiles[`${equipment.key}-cert`] && renderFileList(`${equipment.key}-cert`, uploadedFiles[`${equipment.key}-cert`])}

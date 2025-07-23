@@ -81,7 +81,7 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                       htmlFor={equipment.key}
                       className="text-sm font-medium text-gray-900 cursor-pointer"
                     >
-                      {t(equipment.labelKey)}
+                      {t(equipment.labelKey as any)}
                     </label>
                     
                     {/* Experience Level Dropdown - to the right of label */}
