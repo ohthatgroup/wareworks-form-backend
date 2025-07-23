@@ -66,48 +66,52 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              <div className="flex items-start space-x-3">
-                <input
-                  type="checkbox"
-                  id={equipment.key}
-                  checked={isSelected}
-                  onChange={(e) => {
-                    toggleEquipment(equipment.key, e.target.checked)
-                  }}
-                  className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id={equipment.key}
+                    checked={isSelected}
+                    onChange={(e) => {
+                      toggleEquipment(equipment.key, e.target.checked)
+                    }}
+                    className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
+                  />
+                  <div className="flex-1">
                     <label 
                       htmlFor={equipment.key}
-                      className="text-sm font-medium text-gray-900 cursor-pointer"
+                      className="text-sm font-medium text-gray-900 cursor-pointer block"
                     >
                       {t(equipment.labelKey)}
                     </label>
-                    
-                    {/* Experience Level Dropdown - to the right of label */}
-                    {isSelected && (
-                      <select
-                        {...register(equipment.key)}
-                        className="ml-3 flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
-                        defaultValue={currentValue || ''}
-                      >
-                        <option value="">{t('equipment.select_level')}</option>
-                        {experienceLevels.map((level) => (
-                          <option key={level.value} value={level.value}>
-                            {level.label}
-                          </option>
-                        ))}
-                      </select>
-                    )}
                   </div>
-                  
-                  <p className="text-xs text-gray-600 mt-1">
-                    {t(equipment.descriptionKey)}
+                </div>
+                
+                {/* Experience Level Dropdown - full width below label */}
+                {isSelected && (
+                  <div className="ml-8">
+                    <select
+                      {...register(equipment.key)}
+                      className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
+                      defaultValue={currentValue || ''}
+                    >
+                      <option value="">{t('equipment.select_level')}</option>
+                      {experienceLevels.map((level) => (
+                        <option key={level.value} value={level.value}>
+                          {level.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                
+                <div className="ml-8">
+                  <p className="text-xs text-gray-600">
+                    {translateKey(t, equipment.descriptionKey)}
                   </p>
                   
                   {/* Error display */}
-                  {isSelected && errors[equipment.key] && (
+                  {errors[equipment.key] && (
                     <p className="text-xs text-red-500 mt-1">
                       {errors[equipment.key]?.message}
                     </p>

@@ -83,8 +83,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
               { key: 'availabilitySaturday', labelKey: 'availability.saturday', descriptionKey: 'availability.saturday_description' }
             ].map((day) => {
               const currentValue = watch(day.key as keyof ValidatedApplicationData) as string
-              // Consider the day selected if it has any value (including just spaces) or actual text
-              const isSelected = Boolean(currentValue !== undefined && currentValue !== null && currentValue !== '')
+              // Consider the day selected if it has any value (excluding the placeholder)
+              const isSelected = Boolean(currentValue !== undefined && currentValue !== null && currentValue !== '' && currentValue !== 'SELECTED')
               
               return (
                 <div 
@@ -95,53 +95,50 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <div className="flex items-start space-x-3">
-                    <input
-                      type="checkbox"
-                      id={`${day.key}_checkbox`}
-                      checked={isSelected}
-                      onChange={(e) => {
-                        if (!e.target.checked) {
-                          setValue(day.key as keyof ValidatedApplicationData, '')
-                        } else {
-                          // Set a placeholder value to show the time input field (empty but checked)
-                          setValue(day.key as keyof ValidatedApplicationData, 'SELECTED')
-                        }
-                      }}
-                      className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <input
+                        type="checkbox"
+                        id={`${day.key}_checkbox`}
+                        checked={isSelected || currentValue === 'SELECTED'}
+                        onChange={(e) => {
+                          if (!e.target.checked) {
+                            setValue(day.key as keyof ValidatedApplicationData, '')
+                          } else {
+                            // Set empty string to show the time input field
+                            setValue(day.key as keyof ValidatedApplicationData, '')
+                          }
+                        }}
+                        className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
+                      />
+                      <div className="flex-1">
                         <label 
                           htmlFor={`${day.key}_checkbox`}
-                          className="text-sm font-medium text-gray-900 cursor-pointer"
+                          className="text-sm font-medium text-gray-900 cursor-pointer block"
                         >
                           {translateKey(t, day.labelKey)}
                         </label>
-                        
-                        {/* Availability Time Input - to the right of label */}
-                        {isSelected && (
-                          <input
-                            {...register(day.key as keyof ValidatedApplicationData)}
-                            type="text"
-                            className="ml-3 flex-1 min-w-0 text-sm border border-gray-300 rounded-md px-2 py-1 focus:ring-primary focus:border-primary"
-                            placeholder={t('availability.time_placeholder')}
-                            onFocus={(e) => {
-                              // Clear the placeholder value on focus if it's the default
-                              if (e.target.value === 'SELECTED') {
-                                setValue(day.key as keyof ValidatedApplicationData, '')
-                              }
-                            }}
-                          />
-                        )}
                       </div>
-                      
-                      <p className="text-xs text-gray-600 mt-1">
+                    </div>
+                    
+                    {/* Availability Time Input - full width below label */}
+                    {(isSelected || currentValue === 'SELECTED') && (
+                      <div className="ml-8">
+                        <input
+                          {...register(day.key as keyof ValidatedApplicationData)}
+                          type="text"
+                          className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
+                          placeholder={t('availability.time_placeholder')}
+                        />
+                      </div>
+                    )}
+                    <div className="ml-8">                    
+                      <p className="text-xs text-gray-600">
                         {t(day.descriptionKey)}
                       </p>
                       
                       {/* Error display */}
-                      {isSelected && errors[day.key as keyof ValidatedApplicationData] && (
+                      {(isSelected || currentValue === 'SELECTED') && errors[day.key as keyof ValidatedApplicationData] && (
                         <p className="text-xs text-red-500 mt-1">
                           {errors[day.key as keyof ValidatedApplicationData]?.message}
                         </p>
