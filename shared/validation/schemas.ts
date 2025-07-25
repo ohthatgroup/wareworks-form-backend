@@ -19,7 +19,6 @@ export const applicationSchema = z.object({
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
   phoneNumber: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid phone format'),
   homePhone: z.string().optional(),
-  cellPhone: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
   
   // Emergency Contact

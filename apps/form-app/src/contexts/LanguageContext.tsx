@@ -20,6 +20,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
   const [hydrated, setHydrated] = useState(false)
+  
+  console.log('LanguageProvider initialized with language:', language)
 
   useEffect(() => {
     setHydrated(true)
@@ -31,13 +33,29 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       const urlParams = new URLSearchParams(window.location.search)
       const urlLanguage = urlParams.get('lang') as Language | null
       
+      console.log('Language detection:', {
+        urlLanguage,
+        currentLanguage: language,
+        url: window.location.href
+      })
+      
       if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
+        console.log('Setting language from URL:', urlLanguage)
         setLanguageState(urlLanguage)
       } else {
         // Fallback to localStorage
         const savedLanguage = localStorage.getItem('preferred-language') as Language
+        console.log('Checking localStorage language:', savedLanguage)
+        
         if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+          console.log('Setting language from localStorage:', savedLanguage)
           setLanguageState(savedLanguage)
+        } else {
+          // Ensure English is the default if nothing else is set
+          console.log('No language preference found, defaulting to English')
+          setLanguageState('en')
+          // Also save English as the default preference
+          localStorage.setItem('preferred-language', 'en')
         }
       }
     }
