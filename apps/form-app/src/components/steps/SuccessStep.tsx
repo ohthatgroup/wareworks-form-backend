@@ -30,8 +30,8 @@ export function SuccessStep({ result }: SuccessStepProps) {
         link.click()
         document.body.removeChild(link)
       } else {
-        // Request PDF generation/download from backend
-        const response = await fetch(`/api/download-application?submissionId=${result.submissionId}`, {
+        // Request PDF generation/download from unified endpoint
+        const response = await fetch(`/api/submit-application?download=${result.submissionId}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/pdf',
