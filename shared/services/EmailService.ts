@@ -7,10 +7,20 @@ export class EmailService {
       return
     }
 
-    const hrEmail = process.env.HR_EMAIL || 'hr@wareworks.me'
+    // Use testing emails for development/staging, production email for production
+    const hrEmail = process.env.NODE_ENV === 'production' 
+      ? 'admin@wareworks.me'
+      : process.env.HR_EMAIL || 'inbox@ohthatgrp.com'
     const subject = `New Application: ${data.legalFirstName} ${data.legalLastName} - ${data.positionApplied}`
 
     try {
+      console.log('Preparing to send email notification:', {
+        recipient: hrEmail,
+        subject: subject,
+        submissionId: data.submissionId,
+        hasAttachment: !!pdfBuffer
+      })
+
       // Use Netlify's Email Extension (powered by Mailgun)
       const emailData = {
         to: hrEmail,
@@ -33,14 +43,33 @@ export class EmailService {
       })
 
       if (!response.ok) {
-        throw new Error(`Email send failed: ${response.status} ${response.statusText}`)
+        const errorText = await response.text()
+        console.error('Email send failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText
+        })
+        throw new Error(`Email send failed: ${response.status} ${response.statusText} - ${errorText}`)
       }
 
-      console.log('Email sent successfully to:', hrEmail)
+      const result = await response.json()
+      console.log('Email sent successfully:', {
+        to: hrEmail,
+        subject: subject,
+        submissionId: data.submissionId,
+        response: result
+      })
 
     } catch (error) {
-      console.error('Email service error:', error)
-      throw new Error(`Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error('Email service error details:', {
+        error: error instanceof Error ? error.message : error,
+        submissionId: data.submissionId,
+        recipient: hrEmail,
+        environment: process.env.NODE_ENV,
+        mailgunConfigured: !!(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN)
+      })
+      
+      throw new Error(`Failed to send email notification: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 

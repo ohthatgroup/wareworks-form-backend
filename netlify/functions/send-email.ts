@@ -71,22 +71,40 @@ export const handler: Handler = async (event, context) => {
 }
 
 async function sendViaMailgun(emailData: EmailData) {
+  // Use Mailgun US region API endpoint
+  const mailgunUrl = `https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`
+  
   const formData = new FormData()
-  formData.append('from', `Wareworks Application System <noreply@${process.env.MAILGUN_DOMAIN}>`)
+  
+  // Set sender based on environment (testing vs production)
+  const senderEmail = process.env.NODE_ENV === 'production' 
+    ? `Wareworks Application System <admin@wareworks.me>`
+    : `Wareworks Application System <noreply@${process.env.MAILGUN_DOMAIN}>`
+  
+  formData.append('from', senderEmail)
   formData.append('to', emailData.to)
   formData.append('subject', emailData.subject)
   formData.append('text', emailData.text)
+  
+  // Add HTML version for better formatting
+  const htmlText = emailData.text.replace(/\n/g, '<br>')
+  formData.append('html', `<pre style="font-family: monospace; white-space: pre-wrap;">${htmlText}</pre>`)
 
   // Add attachments if present
   if (emailData.attachments) {
     for (const attachment of emailData.attachments) {
-      const buffer = Buffer.from(attachment.content, 'base64')
-      const blob = new Blob([buffer], { type: attachment.contentType })
-      formData.append('attachment', blob, attachment.filename)
+      try {
+        const buffer = Buffer.from(attachment.content, 'base64')
+        const blob = new Blob([buffer], { type: attachment.contentType })
+        formData.append('attachment', blob, attachment.filename)
+      } catch (error) {
+        console.error('Error processing attachment:', attachment.filename, error)
+        // Continue without this attachment rather than failing entirely
+      }
     }
   }
 
-  const response = await fetch(`https://api.mailgun.net/v3/${process.env.MAILGUN_DOMAIN}/messages`, {
+  const response = await fetch(mailgunUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Basic ${Buffer.from(`api:${process.env.MAILGUN_API_KEY}`).toString('base64')}`
@@ -96,9 +114,17 @@ async function sendViaMailgun(emailData: EmailData) {
 
   if (!response.ok) {
     const errorText = await response.text()
+    console.error('Mailgun API response:', response.status, errorText)
     throw new Error(`Mailgun API error: ${response.status} - ${errorText}`)
   }
 
   const result = await response.json()
-  console.log('Email sent via Mailgun:', result.id)
+  console.log('Email sent via Mailgun successfully:', {
+    id: result.id,
+    message: result.message,
+    to: emailData.to,
+    subject: emailData.subject
+  })
+  
+  return result
 }

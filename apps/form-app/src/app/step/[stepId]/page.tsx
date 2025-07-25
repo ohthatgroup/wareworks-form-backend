@@ -20,6 +20,7 @@ import { ReviewStep } from '../../../components/steps/ReviewStep'
 import { SuccessStep } from '../../../components/steps/SuccessStep'
 import { LanguageProvider, useLanguage } from '../../../contexts/LanguageContext'
 import { translateKey, SubmissionResult } from '../../../types/translations'
+import { useCSRFProtectedFetch } from '../../../hooks/useCSRFToken'
 
 const STEPS = [
   { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
@@ -42,6 +43,7 @@ function ApplicationFormContent() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const csrfFetch = useCSRFProtectedFetch()
 
   // Get current step index from URL
   const currentStepId = params.stepId as string
@@ -387,11 +389,8 @@ function ApplicationFormContent() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-      const response = await fetch('/api/submit-application', {
+      const response = await csrfFetch('/api/submit-application', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(submissionData),
         signal: controller.signal
       })

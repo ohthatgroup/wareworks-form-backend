@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withRateLimit, rateLimiters } from '../../../../../../shared/middleware/rateLimiting'
+import { withCSRFProtection } from '../../../../../../shared/middleware/csrfProtection'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 export async function POST(request: NextRequest) {
   return withRateLimit(request, rateLimiters.formSubmission, async () => {
-    console.log('API route called - POST /api/submit-application')
+    return withCSRFProtection(request, async () => {
+      console.log('API route called - POST /api/submit-application')
     
     try {
       // Parse the request body
@@ -64,6 +66,7 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+    })
   })
 }
 
