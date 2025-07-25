@@ -1,4 +1,5 @@
 import { CheckCircle, Download, Home } from 'lucide-react'
+import { useState } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 
 interface SuccessStepProps {
@@ -7,6 +8,58 @@ interface SuccessStepProps {
 
 export function SuccessStep({ result }: SuccessStepProps) {
   const { t } = useLanguage()
+  const [isDownloading, setIsDownloading] = useState(false)
+  
+  const handleDownload = async () => {
+    if (!result?.submissionId) {
+      alert('No submission data available for download')
+      return
+    }
+    
+    setIsDownloading(true)
+    
+    try {
+      // Check if we have a direct PDF URL from the submission result
+      if (result.pdfUrl) {
+        // Direct download from URL
+        const link = document.createElement('a')
+        link.href = result.pdfUrl
+        link.download = `Wareworks_Application_${result.submissionId}.pdf`
+        link.target = '_blank'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      } else {
+        // Request PDF generation/download from backend
+        const response = await fetch(`/api/download-application?submissionId=${result.submissionId}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/pdf',
+          },
+        })
+        
+        if (!response.ok) {
+          throw new Error(`Download failed: ${response.status}`)
+        }
+        
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `Wareworks_Application_${result.submissionId}.pdf`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Failed to download application. Please try again or contact support.')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+  
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="bg-white rounded-lg shadow-lg p-8 text-center">
@@ -47,9 +100,13 @@ export function SuccessStep({ result }: SuccessStepProps) {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="btn-secondary flex items-center justify-center gap-2">
+          <button 
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className="btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Download size={20} />
-            {t('success.download_confirmation')}
+            {isDownloading ? t('success.downloading') || 'Downloading...' : t('success.download_confirmation')}
           </button>
           
           <a 
