@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withRateLimit, rateLimiters } from '../../../../../../shared/middleware/rateLimiting'
 import { withCSRFProtection } from '../../../../../../shared/middleware/csrfProtection'
+import { applicationSchema } from '../../../../../../shared/validation/schemas'
+import { PDFService } from '../../../../../../shared/services/PDFService'
+import { EmailService } from '../../../../../../shared/services/EmailService'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 export async function POST(request: NextRequest) {
@@ -13,10 +16,18 @@ export async function POST(request: NextRequest) {
       const body = await request.json()
       console.log('Request body received, fields:', Object.keys(body).length)
       
-      // Basic validation - check for required fields
-      if (!body.legalFirstName || !body.legalLastName || !body.streetAddress) {
+      // Validate using Zod schema
+      const validationResult = applicationSchema.safeParse(body)
+      if (!validationResult.success) {
+        console.error('Validation errors:', validationResult.error.issues)
         return NextResponse.json(
-          { error: 'Missing required fields' },
+          { 
+            error: 'Validation failed', 
+            details: validationResult.error.issues.map(issue => ({
+              path: issue.path.join('.'),
+              message: issue.message
+            }))
+          },
           { status: 400 }
         )
       }
@@ -26,7 +37,7 @@ export async function POST(request: NextRequest) {
       const submittedAt = new Date().toISOString()
       
       const submissionData = {
-        ...body,
+        ...validationResult.data,
         submissionId,
         submittedAt
       }
@@ -34,16 +45,54 @@ export async function POST(request: NextRequest) {
       console.log('Form submission processed:', {
         submissionId,
         submittedAt,
-        applicantName: `${body.legalFirstName} ${body.legalLastName}`,
-        fieldsReceived: Object.keys(body).length
+        applicantName: `${submissionData.legalFirstName} ${submissionData.legalLastName}`,
+        fieldsReceived: Object.keys(submissionData).length
       })
 
-      // Store submission data temporarily for PDF generation
+      // Generate PDF
+      let pdfBuffer: Buffer | null = null
+      try {
+        const pdfService = new PDFService()
+        const pdfResult = await pdfService.generateApplicationPDF(submissionData)
+        
+        // Handle different return types from PDFService
+        if (Buffer.isBuffer(pdfResult)) {
+          pdfBuffer = pdfResult
+        } else if (pdfResult && typeof pdfResult === 'object' && 'applicationPDF' in pdfResult) {
+          pdfBuffer = pdfResult.applicationPDF
+        }
+        
+        if (pdfBuffer) {
+          console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes')
+        }
+      } catch (pdfError) {
+        console.error('PDF generation failed:', pdfError)
+        // Continue without PDF - don't fail the entire submission
+      }
+
+      // Send email notification
+      try {
+        if (process.env.ENABLE_EMAIL_NOTIFICATIONS === 'true') {
+          const emailService = new EmailService()
+          await emailService.sendApplicationNotification(submissionData, pdfBuffer)
+          console.log('Email notification sent successfully')
+        } else {
+          console.log('Email notifications disabled')
+        }
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError)
+        // Continue without email - don't fail the entire submission
+      }
+
+      // Store submission data temporarily for PDF download
       // In production, this would be in a database
       if (typeof global !== 'undefined') {
         const globalAny = global as any
         globalAny.submissionStore = globalAny.submissionStore || new Map()
-        globalAny.submissionStore.set(submissionId, submissionData)
+        globalAny.submissionStore.set(submissionId, { 
+          ...submissionData, 
+          pdfBuffer: pdfBuffer?.toString('base64') // Store as base64 for retrieval
+        })
       }
 
       // Return success response with download capability

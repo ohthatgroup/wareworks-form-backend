@@ -83,7 +83,7 @@ export class PDFService {
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.state, data.state)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.zipCode, data.zipCode)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.homePhone, data.homePhone || data.phoneNumber)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.cellPhone, data.cellPhone || data.phoneNumber)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.cellPhone, data.homePhone || data.phoneNumber)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.socialSecurityNumber, data.socialSecurityNumber)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.email, data.email || '')
     
