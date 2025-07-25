@@ -32,31 +32,31 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       // Read language from URL parameter (from webflow embed)
       const urlParams = new URLSearchParams(window.location.search)
       const urlLanguage = urlParams.get('lang') as Language | null
+      const savedLanguage = localStorage.getItem('preferred-language') as Language
       
       console.log('Language detection:', {
         urlLanguage,
+        savedLanguage,
         currentLanguage: language,
         url: window.location.href
       })
       
+      // Priority 1: URL parameter (highest priority - overrides saved preference)
       if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
-        console.log('Setting language from URL:', urlLanguage)
+        console.log('Setting language from URL parameter:', urlLanguage)
         setLanguageState(urlLanguage)
-      } else {
-        // Fallback to localStorage
-        const savedLanguage = localStorage.getItem('preferred-language') as Language
-        console.log('Checking localStorage language:', savedLanguage)
-        
-        if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
-          console.log('Setting language from localStorage:', savedLanguage)
-          setLanguageState(savedLanguage)
-        } else {
-          // Ensure English is the default if nothing else is set
-          console.log('No language preference found, defaulting to English')
-          setLanguageState('en')
-          // Also save English as the default preference
-          localStorage.setItem('preferred-language', 'en')
-        }
+        localStorage.setItem('preferred-language', urlLanguage)
+      } 
+      // Priority 2: User's saved preference
+      else if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+        console.log('Using saved language preference:', savedLanguage)
+        setLanguageState(savedLanguage)
+      }
+      // Priority 3: Default to English for new users
+      else {
+        console.log('New user - defaulting to English')
+        setLanguageState('en')
+        localStorage.setItem('preferred-language', 'en')
       }
     }
   }, [hydrated])

@@ -7,8 +7,16 @@ export function LanguageDebug() {
   
   const clearLanguagePreferences = () => {
     localStorage.removeItem('preferred-language')
+    localStorage.setItem('preferred-language', 'en')
     setLanguage('en')
     console.log('Language preferences cleared, set to English')
+    window.location.reload() // Force page reload to ensure clean state
+  }
+  
+  const forceEnglish = () => {
+    localStorage.setItem('preferred-language', 'en')
+    setLanguage('en')
+    console.log('Forced language to English')
   }
   
   const checkCurrentSettings = () => {
@@ -30,10 +38,10 @@ export function LanguageDebug() {
         <div><strong>Current Language:</strong> {language}</div>
         <div className="space-x-2">
           <button 
-            onClick={() => setLanguage('en')} 
+            onClick={forceEnglish} 
             className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
           >
-            Set English
+            Force English
           </button>
           <button 
             onClick={() => setLanguage('es')} 
