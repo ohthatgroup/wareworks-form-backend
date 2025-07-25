@@ -20,8 +20,6 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
   const [hydrated, setHydrated] = useState(false)
-  
-  console.log('LanguageProvider initialized with language:', language)
 
   useEffect(() => {
     setHydrated(true)
@@ -34,27 +32,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       const urlLanguage = urlParams.get('lang') as Language | null
       const savedLanguage = localStorage.getItem('preferred-language') as Language
       
-      console.log('Language detection:', {
-        urlLanguage,
-        savedLanguage,
-        currentLanguage: language,
-        url: window.location.href
-      })
-      
       // Priority 1: URL parameter (highest priority - overrides saved preference)
       if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
-        console.log('Setting language from URL parameter:', urlLanguage)
         setLanguageState(urlLanguage)
         localStorage.setItem('preferred-language', urlLanguage)
       } 
       // Priority 2: User's saved preference
       else if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
-        console.log('Using saved language preference:', savedLanguage)
         setLanguageState(savedLanguage)
       }
       // Priority 3: Default to English for new users
       else {
-        console.log('New user - defaulting to English')
         setLanguageState('en')
         localStorage.setItem('preferred-language', 'en')
       }

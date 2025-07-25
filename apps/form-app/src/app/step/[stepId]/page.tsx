@@ -21,7 +21,6 @@ import { SuccessStep } from '../../../components/steps/SuccessStep'
 import { LanguageProvider, useLanguage } from '../../../contexts/LanguageContext'
 import { translateKey, SubmissionResult } from '../../../types/translations'
 import { useCSRFProtectedFetch } from '../../../hooks/useCSRFToken'
-import { LanguageDebug } from '../../../components/LanguageDebug'
 
 const STEPS = [
   { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
@@ -504,7 +503,6 @@ function ApplicationFormContent() {
         </form>
       </FormStep>
       
-      {process.env.NODE_ENV === 'development' && <LanguageDebug />}
     </div>
   )
 }
