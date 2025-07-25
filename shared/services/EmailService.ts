@@ -72,24 +72,3 @@ This is an automated notification from the Wareworks application system.
     `.trim()
   }
 }
-
-export class PDFService {
-  async generateApplicationPDF(data: ValidatedApplicationData): Promise<Buffer> {
-    if (!process.env.ENABLE_PDF_GENERATION || process.env.ENABLE_PDF_GENERATION !== 'true') {
-      throw new Error('PDF generation disabled')
-    }
-
-    try {
-      // TODO: Implement actual PDF generation
-      // For now, just create a simple placeholder
-      console.log('Would generate PDF for:', data.submissionId)
-      
-      // Return a simple buffer as placeholder
-      return Buffer.from(`PDF placeholder for ${data.submissionId}`)
-
-    } catch (error) {
-      console.error('PDF generation error:', error)
-      throw new Error(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-}
