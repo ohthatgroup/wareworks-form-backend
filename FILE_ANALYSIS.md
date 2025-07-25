@@ -212,4 +212,169 @@ This document provides a comprehensive analysis of each file in the project, doc
 
 ---
 
-*This analysis is being updated systematically. Each file will be examined for functionality, dependencies, and recommendations.*
+## Unimplemented Features & Technical Debt
+
+This section cross-references TODO-IMPLEMENTATIONS.md tasks with their architectural impact on the file system, showing implementation requirements, security risks, and operational concerns.
+
+### 🔥 HIGH PRIORITY - Security & Critical Features
+
+#### **Rate Limiting & CSRF Protection**
+- **TODO Reference**: Security Implementation (lines 139-161)
+- **Files to Create/Modify**:
+  - `shared/middleware/rateLimiting.ts` - Redis-based rate limiting
+  - `shared/middleware/csrfProtection.ts` - CSRF token validation
+  - `netlify/functions/submit-application.ts` - Add middleware integration
+  - `apps/form-app/src/app/api/*/route.ts` - Apply security middleware
+- **Dependencies**: Redis instance, CSRF token library
+- **Security Risk**: **CRITICAL** - No protection against abuse, DoS attacks, or CSRF exploits
+- **Operational Risk**: Production vulnerability to automated attacks
+
+#### **Email Service Implementation**  
+- **TODO Reference**: Email Service Implementation (lines 54-84)
+- **Files to Create/Modify**:
+  - `shared/services/EmailService.ts` - Replace stub with Mailgun integration
+  - `shared/templates/hrNotification.ts` - Email template
+  - `netlify/functions/send-email.ts` - Update with actual SMTP
+- **Dependencies**: Mailgun API keys, Netlify Email Extension
+- **Business Risk**: **HIGH** - HR team not receiving application notifications
+- **Operational Risk**: Manual process required, applications may be missed
+
+#### **File Upload & Storage Service**
+- **TODO Reference**: File Upload & Storage (lines 102-135)
+- **Files to Create/Modify**:
+  - `shared/services/FileUploadService.ts` - Netlify Blobs integration
+  - `shared/utils/fileValidation.ts` - File type/size validation
+  - `shared/utils/virusScanning.ts` - Security scanning
+  - `apps/form-app/src/components/steps/DocumentsStep.tsx` - Connect to upload service
+- **Dependencies**: Netlify Blobs API, virus scanning service
+- **Security Risk**: **HIGH** - Malicious file uploads, storage overflow
+- **Data Risk**: Document loss, incomplete applications
+
+### 🧪 MEDIUM PRIORITY - Quality & Performance
+
+#### **Testing Infrastructure**
+- **TODO Reference**: Testing Implementation (lines 181-205) 
+- **Files to Create**:
+  - `apps/form-app/__tests__/` - Unit test directory
+  - `apps/form-app/cypress/` or `apps/form-app/playwright/` - E2E tests
+  - `shared/services/__tests__/` - Service unit tests
+  - `jest.config.js` or `playwright.config.ts` - Test configuration
+- **Dependencies**: Jest, Playwright/Cypress, testing libraries
+- **Quality Risk**: **MEDIUM** - No automated quality assurance
+- **Development Risk**: Regression bugs, deployment failures
+
+#### **Performance Optimization**
+- **TODO Reference**: Performance Issues (lines 354-358, 312-328)
+- **Files to Modify**:
+  - `apps/form-app/src/components/steps/DocumentsStep.tsx` - Fix Base64 blocking
+  - `apps/form-app/next.config.js` - Bundle optimization
+  - `apps/form-app/src/components/ui/*.tsx` - Image optimization
+- **Dependencies**: Web Workers for file processing, Next.js Image component
+- **User Risk**: **MEDIUM** - Poor user experience, browser freezing
+- **Business Risk**: User abandonment during form completion
+
+#### **Error Tracking & Monitoring**
+- **TODO Reference**: Analytics & Monitoring (lines 225-249)
+- **Files to Create**:
+  - `shared/utils/errorTracking.ts` - Sentry integration
+  - `shared/utils/performanceMonitoring.ts` - Performance tracking
+  - `apps/form-app/src/app/layout.tsx` - Add monitoring providers
+- **Dependencies**: Sentry, performance monitoring service
+- **Operational Risk**: **MEDIUM** - No visibility into production issues
+- **Support Risk**: Cannot diagnose or fix user-reported problems
+
+### 🌐 LOW PRIORITY - User Experience Enhancements
+
+#### **Internationalization (Spanish Support)**
+- **TODO Reference**: Internationalization (lines 251-267)
+- **Files to Create/Modify**:
+  - `apps/form-app/src/translations/es.ts` - Spanish translations
+  - `apps/form-app/src/hooks/useTranslation.ts` - Translation hook
+  - `shared/validation/schemas.ts` - Multilingual error messages
+- **Dependencies**: Translation management system
+- **User Risk**: **LOW** - Limited accessibility for Spanish speakers
+- **Business Risk**: Reduced applicant pool
+
+#### **Google Maps Address Autocomplete**
+- **TODO Reference**: Google Maps Integration (lines 163-179)
+- **Files to Create/Modify**:
+  - `apps/form-app/src/components/ui/AddressAutocomplete.tsx` - New component
+  - `apps/form-app/src/hooks/useGoogleMaps.ts` - Maps API integration
+  - `apps/form-app/src/components/steps/ContactInfoStep.tsx` - Replace address fields
+- **Dependencies**: Google Maps API key, Places API
+- **User Risk**: **LOW** - Manual address entry less convenient
+- **Data Risk**: Address accuracy issues
+
+### 📊 Architecture Impact Summary
+
+#### **Files That Don't Exist But Should**:
+```
+shared/
+├── middleware/
+│   ├── rateLimiting.ts          [CRITICAL - Security]
+│   └── csrfProtection.ts        [CRITICAL - Security]  
+├── utils/
+│   ├── fileValidation.ts        [HIGH - Data Integrity]
+│   ├── virusScanning.ts         [HIGH - Security]
+│   ├── errorTracking.ts         [MEDIUM - Operations]
+│   └── performanceMonitoring.ts [MEDIUM - Operations]
+└── templates/
+    └── hrNotification.ts        [HIGH - Business Process]
+
+apps/form-app/
+├── __tests__/                   [MEDIUM - Quality]
+├── cypress/ or playwright/      [MEDIUM - Quality] 
+└── src/
+    ├── components/ui/
+    │   └── AddressAutocomplete.tsx [LOW - UX]
+    ├── hooks/
+    │   ├── useGoogleMaps.ts     [LOW - UX]
+    │   └── useTranslation.ts    [LOW - Accessibility]
+    └── translations/
+        └── es.ts                [LOW - Accessibility]
+```
+
+#### **Critical Dependencies Missing**:
+- **Redis instance** (rate limiting)
+- **Mailgun configuration** (email delivery)
+- **Netlify Blobs setup** (file storage)
+- **Sentry account** (error tracking)
+- **Google Maps API** (address autocomplete)
+
+#### **Security Risk Matrix**:
+| Feature Missing | Risk Level | Attack Vector | Business Impact |
+|----------------|------------|---------------|-----------------|
+| Rate Limiting | **CRITICAL** | DoS, API abuse | Service downtime |
+| CSRF Protection | **CRITICAL** | Cross-site attacks | Data breach |
+| File Validation | **HIGH** | Malicious uploads | System compromise |
+| Input Sanitization | **HIGH** | Code injection | Data corruption |
+| Error Tracking | **MEDIUM** | Information disclosure | Data leakage |
+
+#### **Operational Risk Matrix**:
+| Feature Missing | Risk Level | Failure Mode | Business Impact |
+|----------------|------------|--------------|-----------------|
+| Email Service | **HIGH** | Silent failures | Missed applications |
+| File Storage | **HIGH** | Data loss | Incomplete records |
+| Performance Monitoring | **MEDIUM** | Degraded UX | User abandonment |
+| Testing | **MEDIUM** | Regression bugs | Service instability |
+
+### 🔧 Implementation Priority Recommendations
+
+#### **Phase 1 (Immediate - Security)**:
+1. **Rate Limiting** - Prevent abuse attacks
+2. **CSRF Protection** - Secure form submissions  
+3. **Email Service** - Enable HR notifications
+
+#### **Phase 2 (Short-term - Stability)**:
+1. **File Upload Service** - Complete document handling
+2. **Error Tracking** - Production monitoring
+3. **Performance Fixes** - UI thread blocking
+
+#### **Phase 3 (Long-term - Enhancement)**:
+1. **Testing Infrastructure** - Quality assurance
+2. **Internationalization** - Spanish support
+3. **Address Autocomplete** - UX improvement
+
+---
+
+*This analysis cross-references TODO-IMPLEMENTATIONS.md (last updated July 23, 2025) with current file structure to identify critical gaps in security, functionality, and operational readiness.*
