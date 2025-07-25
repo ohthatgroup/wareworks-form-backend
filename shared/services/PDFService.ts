@@ -31,7 +31,7 @@ export class PDFService {
       console.log('Generating PDF for application:', data.submissionId)
       
       // Load the Wareworks Application PDF template
-      const templatePath = path.join(process.cwd(), 'Templates', 'Wareworks Application.pdf')
+      const templatePath = path.join(process.cwd(), 'apps', 'form-app', 'public', 'templates', 'Wareworks Application.pdf')
       const templateBytes = await fs.readFile(templatePath)
       
       // Load the PDF document
@@ -287,7 +287,7 @@ export class PDFService {
   private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData): Promise<Buffer | null> {
     try {
       console.log('Creating separate filled I-9 form for non-citizen applicant...')
-      const i9TemplatePath = path.join(process.cwd(), 'Templates', 'i-9.pdf')
+      const i9TemplatePath = path.join(process.cwd(), 'apps', 'form-app', 'public', 'templates', 'i-9.pdf')
       const i9TemplateBytes = await fs.readFile(i9TemplatePath)
       const i9Doc = await PDFDocument.load(i9TemplateBytes)
       
