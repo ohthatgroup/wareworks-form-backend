@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../shared/validation/schemas'
+import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { EquipmentExperience } from '../ui/EquipmentExperience'
 import { SkillsQualifications } from '../ui/SkillsQualifications'
