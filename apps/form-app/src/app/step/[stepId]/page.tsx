@@ -155,6 +155,20 @@ function ApplicationFormContent() {
 
   // Check if we're in an embedded context
   const isEmbedded = typeof window !== 'undefined' && window.parent !== window
+  
+  // Debug iframe detection
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('🔍 Iframe Detection Debug:', {
+        isEmbedded,
+        windowParent: window.parent,
+        windowSelf: window,
+        areEqual: window.parent === window,
+        location: window.location.href,
+        parentLocation: window.parent !== window ? 'Different window' : 'Same window'
+      })
+    }
+  }, [isEmbedded])
 
   // Optimized iframe height communication
   useEffect(() => {
@@ -227,18 +241,34 @@ function ApplicationFormContent() {
         ? 'https://www.wareworks.me'
         : window.location.origin
       
+      console.log('📤 Sending postMessage to parent:', {
+        type: 'step_change',
+        currentStep: currentStep,
+        completedSteps: completedSteps,
+        totalSteps: STEPS.length,
+        targetOrigin
+      })
+      
       window.parent.postMessage({
         type: 'step_change',
         currentStep: currentStep,
         completedSteps: completedSteps,
         totalSteps: STEPS.length
       }, targetOrigin)
+    } else {
+      console.log('📤 Not embedded - skipping postMessage')
     }
   }, [isEmbedded, currentStep, completedSteps])
 
   // Listen for navigation messages from parent
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      console.log('📨 Received message:', {
+        origin: event.origin,
+        data: event.data,
+        type: event.data?.type
+      })
+      
       const allowedOrigins = [
         'http://localhost:3000',
         'https://wareworks-backend.netlify.app',
@@ -253,9 +283,11 @@ function ApplicationFormContent() {
       }
 
       if (event.data.type === 'navigate_to_step') {
+        console.log('🎯 Navigation message received:', event.data)
         const stepIndex = event.data.stepIndex
         if (typeof stepIndex === 'number' && stepIndex >= 0 && stepIndex < STEPS.length) {
           const stepId = STEPS[stepIndex].id
+          console.log('🚀 Parent-triggered navigation to:', stepId)
           router.push(`/step/${stepId}`)
         }
       }
@@ -379,17 +411,35 @@ function ApplicationFormContent() {
   }, [formValues, formState.errors])
 
   const nextStep = useCallback(() => {
+    console.log('🔄 Next Step Debug:', {
+      currentStep,
+      isCurrentStepValid,
+      isEmbedded,
+      canProceed: currentStep < STEPS.length - 1,
+      targetStep: currentStep < STEPS.length - 1 ? STEPS[currentStep + 1].id : 'none'
+    })
+    
     if (currentStep < STEPS.length - 1) {
       if (isCurrentStepValid) {
+        console.log('✅ Marking step as completed:', currentStep)
         setCompletedSteps(prev => {
           const uniqueSteps = new Set([...prev, currentStep])
           return Array.from(uniqueSteps).sort((a, b) => a - b)
         })
       }
       const nextStepId = STEPS[currentStep + 1].id
-      router.push(`/step/${nextStepId}`)
+      console.log('🚀 Attempting navigation to:', `/step/${nextStepId}`)
+      
+      try {
+        router.push(`/step/${nextStepId}`)
+        console.log('✅ Navigation initiated successfully')
+      } catch (error) {
+        console.error('❌ Navigation failed:', error)
+      }
+    } else {
+      console.log('⚠️ Cannot proceed - already at last step')
     }
-  }, [currentStep, isCurrentStepValid, router])
+  }, [currentStep, isCurrentStepValid, router, isEmbedded])
 
   const prevStep = useCallback(() => {
     if (currentStep > 0) {
