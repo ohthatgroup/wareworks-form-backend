@@ -98,21 +98,10 @@ function ApplicationFormContent() {
     }
   })
 
-  // Load form data from session storage on mount
+  // Only load submission result on mount (not form data - let page reload clear form)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedData = sessionStorage.getItem(FORM_DATA_KEY)
       const savedResult = sessionStorage.getItem(SUBMISSION_RESULT_KEY)
-      
-      if (savedData) {
-        try {
-          const parsedData = JSON.parse(savedData)
-          form.reset(parsedData.formData)
-          setCompletedSteps(parsedData.completedSteps || [])
-        } catch (error) {
-          console.error('Error loading saved form data:', error)
-        }
-      }
       
       if (savedResult) {
         try {
@@ -125,52 +114,6 @@ function ApplicationFormContent() {
     }
   }, [])
 
-  // Listen for storage events to reset form when manually cleared
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      // Detect when sessionStorage is cleared manually
-      if (e.storageArea === sessionStorage && e.key === null) {
-        console.log('🧹 SessionStorage cleared - resetting form')
-        form.reset()
-        setCompletedSteps([])
-        setSubmissionResult(null)
-      }
-      // Detect when specific form data is removed
-      else if (e.key === FORM_DATA_KEY && e.newValue === null) {
-        console.log('🧹 Form data cleared - resetting form')
-        form.reset()
-        setCompletedSteps([])
-      }
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [form])
-
-  // Manual storage check for DevTools clearing (storage events don't fire for same-origin clears)
-  useEffect(() => {
-    const checkStorageCleared = () => {
-      if (typeof window !== 'undefined') {
-        const currentData = sessionStorage.getItem(FORM_DATA_KEY)
-        const hasFormData = Object.values(form.getValues()).some(value => 
-          value !== '' && value !== undefined && value !== null && 
-          !(Array.isArray(value) && value.length === 0)
-        )
-        
-        // If form has data but storage is empty, storage was cleared manually
-        if (!currentData && hasFormData) {
-          console.log('🧹 Storage cleared detected - resetting form')
-          form.reset()
-          setCompletedSteps([])
-          setSubmissionResult(null)
-        }
-      }
-    }
-
-    // Check every 2 seconds for manual storage clearing
-    const interval = setInterval(checkStorageCleared, 2000)
-    return () => clearInterval(interval)
-  }, [form])
 
   // Stable save function using useRef to prevent re-render disruption
   const saveTimeoutRef = useRef<NodeJS.Timeout>()
