@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { Upload, X, Eye, Download } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translateKey } from '../../types/translations'

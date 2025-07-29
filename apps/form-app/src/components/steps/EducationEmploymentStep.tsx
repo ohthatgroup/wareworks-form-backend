@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { UseFormReturn, useFieldArray } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { Plus, Trash2 } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
