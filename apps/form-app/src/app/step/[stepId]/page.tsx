@@ -516,7 +516,6 @@ function ApplicationFormContent() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <CurrentStepComponent 
             form={form}
-            isSubmitting={isSubmitting}
             onEditStep={currentStep === STEPS.length - 1 ? (stepIndex: number) => {
               const stepId = STEPS[stepIndex].id
               router.push(`/step/${stepId}`)
