@@ -179,7 +179,8 @@ export interface I9FieldMappings {
     authorizedAlienCheckbox: FieldMapping
   }
   workAuthorization: {
-    uscisANumber: FieldMapping
+    uscisANumberCB3: FieldMapping  // For permanent residents (CB_3)
+    uscisANumberCB4: FieldMapping  // For authorized aliens (CB_4)
     expirationDate: FieldMapping
     i94AdmissionNumber: FieldMapping
     foreignPassportNumber: FieldMapping
@@ -213,7 +214,8 @@ export const i9FieldMappings: I9FieldMappings = {
     authorizedAlienCheckbox: { primary: 'CB_4', fallbacks: ['Authorized Alien', 'Work Authorized'] }
   },
   workAuthorization: {
-    uscisANumber: { primary: 'USCIS ANumber', fallbacks: ['3 A lawful permanent resident Enter USCIS or ANumber', 'A-Number'] },
+    uscisANumberCB3: { primary: '3 A lawful permanent resident Enter USCIS or ANumber', fallbacks: ['CB_3 USCIS', 'Permanent Resident A-Number'] },
+    uscisANumberCB4: { primary: 'USCIS ANumber', fallbacks: ['CB_4 USCIS', 'A-Number'] },
     expirationDate: { primary: 'Exp Date mmddyyyy', fallbacks: ['Expiration Date', 'Exp Date'] },
     i94AdmissionNumber: { primary: 'Form I94 Admission Number', fallbacks: ['I-94 Number', 'Admission Number'] },
     foreignPassportNumber: { primary: 'Foreign Passport Number and Country of IssuanceRow1', fallbacks: ['Passport Number', 'Foreign Passport'] }

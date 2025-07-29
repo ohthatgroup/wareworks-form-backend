@@ -354,8 +354,9 @@ export class PDFService {
     console.log('Filling work authorization text fields...')
     
     if (data.citizenshipStatus === 'permanent_resident' && data.uscisANumber) {
-      this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumber, data.uscisANumber)
-      console.log(`  ✅ Set permanent resident USCIS A-Number: ${data.uscisANumber}`)
+      // Use CB_3 specific field for permanent residents
+      this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB3, data.uscisANumber)
+      console.log(`  ✅ Set permanent resident USCIS A-Number (CB_3 field): ${data.uscisANumber}`)
     }
     
     // For alien authorized to work
@@ -370,8 +371,9 @@ export class PDFService {
       console.log('  📋 Filling CB_4 associated fields (choose one):')
       
       if (data.uscisANumber) {
-        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumber, data.uscisANumber)
-        console.log(`    ✅ Set USCIS A-Number: ${data.uscisANumber}`)
+        // Use CB_4 specific field for authorized aliens
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB4, data.uscisANumber)
+        console.log(`    ✅ Set USCIS A-Number (CB_4 field): ${data.uscisANumber}`)
       } else if (data.i94AdmissionNumber) {
         const truncatedI94 = data.i94AdmissionNumber.substring(0, 11)
         this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.i94AdmissionNumber, truncatedI94)
