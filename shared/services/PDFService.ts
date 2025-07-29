@@ -16,8 +16,9 @@ export class PDFService {
       const analysisPath = path.join(process.cwd(), 'Archive', 'template-analysis.json')
       const analysisData = await fs.readFile(analysisPath, 'utf-8')
       this.templateAnalysis = JSON.parse(analysisData)
+      console.log('✅ Template analysis loaded successfully')
     } catch (error) {
-      console.warn('Could not load template analysis:', error)
+      // This is expected if the analysis file doesn't exist - it's optional
       this.templateAnalysis = null
     }
   }
@@ -43,7 +44,11 @@ export class PDFService {
       
       // Merge uploaded documents if any
       if (data.documents && data.documents.length > 0) {
+        console.log(`📎 Merging ${data.documents.length} uploaded documents...`)
         await this.mergeUploadedDocuments(pdfDoc, data.documents)
+        console.log('✅ Document merging completed')
+      } else {
+        console.log('📄 No uploaded documents to merge')
       }
       
       // Generate separate I-9 form if needed
@@ -400,22 +405,38 @@ export class PDFService {
   private async mergeUploadedDocuments(pdfDoc: PDFDocument, documents: any[]) {
     for (const doc of documents) {
       try {
+        console.log(`📋 Processing document: ${doc.name} (${doc.mimeType}, ${doc.size} bytes)`)
+        
         if (doc.mimeType === 'application/pdf') {
+          console.log('  📄 Merging PDF document...')
           // Convert base64 to buffer
           const docBuffer = Buffer.from(doc.data, 'base64')
+          console.log(`  📦 Decoded buffer size: ${docBuffer.length} bytes`)
+          
           const uploadedDoc = await PDFDocument.load(docBuffer)
+          const pageCount = uploadedDoc.getPageCount()
+          console.log(`  📑 PDF has ${pageCount} pages`)
           
           // Copy pages from uploaded document
           const pages = await pdfDoc.copyPages(uploadedDoc, uploadedDoc.getPageIndices())
           pages.forEach((page) => pdfDoc.addPage(page))
+          console.log(`  ✅ Added ${pages.length} pages to main document`)
+          
         } else if (doc.mimeType.startsWith('image/')) {
-          // Handle image documents by embedding them in a new page
+          console.log('  🖼️ Embedding image document...')
           await this.addImageToDocument(pdfDoc, doc)
+          console.log('  ✅ Image embedded on new page')
+          
+        } else {
+          console.warn(`  ⚠️ Unsupported document type: ${doc.mimeType}`)
         }
       } catch (error) {
-        console.warn(`Could not merge document ${doc.name}:`, error)
+        console.warn(`❌ Could not merge document ${doc.name}:`, error)
       }
     }
+    
+    const finalPageCount = pdfDoc.getPageCount()
+    console.log(`📊 Final document has ${finalPageCount} total pages`)
   }
 
   private async addImageToDocument(pdfDoc: PDFDocument, doc: any) {

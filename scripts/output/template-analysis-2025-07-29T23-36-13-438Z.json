@@ -1,0 +1,1788 @@
+{
+  "summary": {
+    "generatedAt": "2025-07-29T23:36:13.436Z",
+    "wareWorksTemplate": {
+      "totalFields": 66,
+      "textFieldNames": [
+        "Legal First Name",
+        "Legal Last Name",
+        "Street Address",
+        "City",
+        "State",
+        "Zip Code",
+        "Home Phone",
+        "Cell Phone Number",
+        "Social Security Number",
+        "undefined",
+        "undefined_2",
+        "Email",
+        "Name",
+        "Number",
+        "Relationship",
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Position Applied For",
+        "How did you discover this job opening",
+        "Have you previously applied at WareWorks  Yes  No",
+        "If yes please specify when and where",
+        "Expected Salary",
+        "SD Sit Down",
+        "SU Stand Up",
+        "SUR Stand Up Reach",
+        "CP Cherry Picker",
+        "CL Clamps",
+        "Riding Jack",
+        "Applicable Skills  Qualifications 1",
+        "Applicable Skills  Qualifications 2",
+        "Applicable Skills  Qualifications 3",
+        "School Name and Location",
+        "Year",
+        "Major",
+        "School Name and Location_2",
+        "Year_2",
+        "Major_2",
+        "Company Name and Location",
+        "undefined_3",
+        "Starting Position",
+        "undefined_4",
+        "Telephone Number",
+        "Ending Position",
+        "Supervisor Name",
+        "Responsibilities 1",
+        "Responsibilities 2",
+        "Reason for Leaving 1",
+        "Reason for Leaving 2",
+        "Company Name and Location_2",
+        "undefined_5",
+        "Starting Position_2",
+        "undefined_6",
+        "Telephone Number_2",
+        "Ending Position_2",
+        "Supervisor Name_2",
+        "Responsibilities 1_2",
+        "Responsibilities 2_2",
+        "Reason for Leaving 1_2",
+        "Reason for Leaving 2_2",
+        "undefined_7"
+      ],
+      "checkboxFieldNames": [],
+      "dropdownFieldNames": [],
+      "fieldAnalysis": {
+        "nameFields": [
+          "Legal First Name",
+          "Legal Last Name",
+          "Name",
+          "School Name and Location",
+          "School Name and Location_2",
+          "Company Name and Location",
+          "Supervisor Name",
+          "Company Name and Location_2",
+          "Supervisor Name_2"
+        ],
+        "addressFields": [
+          "Street Address",
+          "City",
+          "State",
+          "Zip Code"
+        ],
+        "contactFields": [
+          "Home Phone",
+          "Cell Phone Number",
+          "Email",
+          "Telephone Number",
+          "Telephone Number_2"
+        ],
+        "employmentFields": [
+          "Position Applied For",
+          "How did you discover this job opening",
+          "Company Name and Location",
+          "Starting Position",
+          "Ending Position",
+          "Company Name and Location_2",
+          "Starting Position_2",
+          "Ending Position_2"
+        ]
+      }
+    },
+    "i9Template": {
+      "totalFields": 128,
+      "textFieldNames": [
+        "3 A lawful permanent resident Enter USCIS or ANumber",
+        "Signature of Employee",
+        "Last Name Family Name from Section 1",
+        "First Name Given Name from Section 1",
+        "Middle initial if any from Section 1",
+        "First Name Given Name",
+        "Employee Middle Initial (if any)",
+        "Employee Other Last Names Used (if any)",
+        "Today's Date mmddyyy",
+        "List A.  Document 2. Expiration Date (if any)",
+        "List A.   Document Title 3.  If any",
+        "List A. Document 3.  Enter Issuing Authority",
+        "List A.  Document 3 Number.  If any",
+        "List B Document 1 Title",
+        "Additional Information",
+        "Middle initial if any from Section 1-2",
+        "Sig Date mmddyyyy 1",
+        "Sig Date mmddyyyy 0",
+        "Sig Date mmddyyyy 2",
+        "Sig Date mmddyyyy 3",
+        "Signature of Preparer or Translator 0",
+        "Signature of Preparer or Translator 1",
+        "Signature of Preparer or Translator 2",
+        "Signature of Preparer or Translator 3",
+        "Preparer or Translator Last Name (Family Name) 0",
+        "Preparer or Translator Last Name (Family Name) 2",
+        "Preparer or Translator Last Name (Family Name) 3",
+        "Preparer or Translator Address (Street Number and Name) 0",
+        "Preparer or Translator Address (Street Number and Name) 1",
+        "Preparer or Translator Address (Street Number and Name) 2",
+        "Preparer or Translator Address (Street Number and Name) 3",
+        "Preparer or Translator First Name (Given Name) 0",
+        "Preparer or Translator Last Name (Family Name) 1",
+        "Preparer or Translator First Name (Given Name) 2",
+        "Preparer or Translator First Name (Given Name) 3",
+        "Preparer or Translator City or Town 0",
+        "Preparer or Translator City or Town 1",
+        "Preparer or Translator City or Town 2",
+        "Preparer or Translator City or Town 3",
+        "Zip Code 0",
+        "Zip Code 1",
+        "Zip Code 2",
+        "Zip Code 3",
+        "Date of Rehire 0",
+        "Date of Rehire 1",
+        "Date of Rehire 2",
+        "Todays Date 0",
+        "Todays Date 1",
+        "Todays Date 2",
+        "Last Name 0",
+        "Last Name 1",
+        "Last Name 2",
+        "First Name 0",
+        "First Name 1",
+        "First Name 2",
+        "Middle Initial 0",
+        "Middle Initial 1",
+        "Middle Initial 2",
+        "PT Middle Initial 0",
+        "PT Middle Initial 1",
+        "PT Middle Initial 2",
+        "PT Middle Initial 3",
+        "Document Title 0",
+        "Document Title 2",
+        "Document Number 0",
+        "Document Number 1",
+        "Document Number 2",
+        "Expiration Date 0",
+        "Expiration Date 2",
+        "Expiration Date 1",
+        "Name of Emp or Auth Rep 0",
+        "Name of Emp or Auth Rep 1",
+        "Name of Emp or Auth Rep 2",
+        "Signature of Emp Rep 0",
+        "Signature of Emp Rep 1",
+        "Signature of Emp Rep 2",
+        "Addtl Info 0",
+        "Addtl Info 2",
+        "Addtl Info 1",
+        "Last Name Family Name from Section 1-2",
+        "First Name Given Name from Section 1-2",
+        "ZIP Code",
+        "Date of Birth mmddyyyy",
+        "US Social Security Number",
+        "Telephone Number",
+        "Last Name (Family Name)",
+        "Address Street Number and Name",
+        "Apt Number (if any)",
+        "City or Town",
+        "Employees E-mail Address",
+        "Exp Date mmddyyyy",
+        "USCIS ANumber",
+        "Form I94 Admission Number",
+        "Foreign Passport Number and Country of IssuanceRow1",
+        "Document Title 1",
+        "Issuing Authority 1",
+        "Document Number 0 (if any)",
+        "Document Title 2 If any",
+        "Issuing Authority_2",
+        "Document Number If any_2",
+        "Document Number if any_3",
+        "List C Expiration Date 1",
+        "List C Document Number 1",
+        "List C Issuing Authority 1",
+        "List C Document Title 1",
+        "FirstDayEmployed mmddyyyy",
+        "S2 Todays Date mmddyyyy",
+        "Last Name First Name and Title of Employer or Authorized Representative",
+        "Signature of Employer or AR",
+        "Employers Business or Org Name",
+        "Employers Business or Org Address",
+        "Expiration Date if any",
+        "List B Issuing Authority 1",
+        "List B Document Number 1",
+        "List B Expiration Date 1"
+      ],
+      "checkboxFieldNames": [
+        "CB_1",
+        "CB_2",
+        "CB_3",
+        "CB_4",
+        "CB_Alt_0",
+        "CB_Alt_1",
+        "CB_Alt_2",
+        "CB_Alt"
+      ],
+      "dropdownFieldNames": [
+        "Preparer State 0",
+        "Preparer State 1",
+        "Preparer State 2",
+        "Preparer State 3",
+        "State"
+      ]
+    },
+    "notes": []
+  },
+  "detailedAnalysis": {
+    "wareWorks": {
+      "templateName": "WareWorks Application",
+      "templatePath": "C:\\Github\\wareworks-form-backend\\apps\\form-app\\public\\templates\\Wareworks Application.pdf",
+      "totalFields": 66,
+      "textFields": [
+        {
+          "index": 1,
+          "name": "Legal First Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 2,
+          "name": "Legal Last Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 3,
+          "name": "Street Address",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 4,
+          "name": "City",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 5,
+          "name": "State",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 6,
+          "name": "Zip Code",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 7,
+          "name": "Home Phone",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 8,
+          "name": "Cell Phone Number",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 9,
+          "name": "Social Security Number",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 10,
+          "name": "undefined",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 11,
+          "name": "undefined_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 12,
+          "name": "Email",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 13,
+          "name": "Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 14,
+          "name": "Number",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 15,
+          "name": "Relationship",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 16,
+          "name": "Sunday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 17,
+          "name": "Monday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 18,
+          "name": "Tuesday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 19,
+          "name": "Wednesday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 20,
+          "name": "Thursday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 21,
+          "name": "Friday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 22,
+          "name": "Saturday",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 23,
+          "name": "Position Applied For",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 24,
+          "name": "How did you discover this job opening",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 25,
+          "name": "Have you previously applied at WareWorks  Yes  No",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 26,
+          "name": "If yes please specify when and where",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 27,
+          "name": "Expected Salary",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 28,
+          "name": "SD Sit Down",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 29,
+          "name": "SU Stand Up",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 30,
+          "name": "SUR Stand Up Reach",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 31,
+          "name": "CP Cherry Picker",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 32,
+          "name": "CL Clamps",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 33,
+          "name": "Riding Jack",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 34,
+          "name": "Applicable Skills  Qualifications 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 35,
+          "name": "Applicable Skills  Qualifications 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 36,
+          "name": "Applicable Skills  Qualifications 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 37,
+          "name": "School Name and Location",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 38,
+          "name": "Year",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 39,
+          "name": "Major",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 40,
+          "name": "School Name and Location_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 41,
+          "name": "Year_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 42,
+          "name": "Major_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 43,
+          "name": "Company Name and Location",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 44,
+          "name": "undefined_3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 45,
+          "name": "Starting Position",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 46,
+          "name": "undefined_4",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 47,
+          "name": "Telephone Number",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 48,
+          "name": "Ending Position",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 49,
+          "name": "Supervisor Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 50,
+          "name": "Responsibilities 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 51,
+          "name": "Responsibilities 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 52,
+          "name": "Reason for Leaving 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 53,
+          "name": "Reason for Leaving 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 54,
+          "name": "Company Name and Location_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 55,
+          "name": "undefined_5",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 56,
+          "name": "Starting Position_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 57,
+          "name": "undefined_6",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 58,
+          "name": "Telephone Number_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 59,
+          "name": "Ending Position_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 60,
+          "name": "Supervisor Name_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 61,
+          "name": "Responsibilities 1_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 62,
+          "name": "Responsibilities 2_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 63,
+          "name": "Reason for Leaving 1_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 64,
+          "name": "Reason for Leaving 2_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 66,
+          "name": "undefined_7",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        }
+      ],
+      "checkboxFields": [],
+      "dropdownFields": [],
+      "buttonFields": [],
+      "unknownFields": [
+        {
+          "index": 65,
+          "name": "Signature",
+          "type": "PDFSignature",
+          "isReadOnly": false
+        }
+      ],
+      "analysisDate": "2025-07-29T23:36:13.194Z"
+    },
+    "i9": {
+      "templateName": "I-9 Form",
+      "templatePath": "C:\\Github\\wareworks-form-backend\\apps\\form-app\\public\\templates\\i-9.pdf",
+      "totalFields": 128,
+      "textFields": [
+        {
+          "index": 1,
+          "name": "3 A lawful permanent resident Enter USCIS or ANumber",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 2,
+          "name": "Signature of Employee",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 3,
+          "name": "Last Name Family Name from Section 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 4,
+          "name": "First Name Given Name from Section 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 5,
+          "name": "Middle initial if any from Section 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 6,
+          "name": "First Name Given Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 7,
+          "name": "Employee Middle Initial (if any)",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 8,
+          "name": "Employee Other Last Names Used (if any)",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 9,
+          "name": "Today's Date mmddyyy",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 10,
+          "name": "List A.  Document 2. Expiration Date (if any)",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 11,
+          "name": "List A.   Document Title 3.  If any",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 12,
+          "name": "List A. Document 3.  Enter Issuing Authority",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 13,
+          "name": "List A.  Document 3 Number.  If any",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 14,
+          "name": "List B Document 1 Title",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 15,
+          "name": "Additional Information",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 16,
+          "name": "Middle initial if any from Section 1-2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 17,
+          "name": "Sig Date mmddyyyy 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 18,
+          "name": "Sig Date mmddyyyy 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 19,
+          "name": "Sig Date mmddyyyy 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 20,
+          "name": "Sig Date mmddyyyy 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 21,
+          "name": "Signature of Preparer or Translator 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 22,
+          "name": "Signature of Preparer or Translator 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 23,
+          "name": "Signature of Preparer or Translator 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 24,
+          "name": "Signature of Preparer or Translator 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 25,
+          "name": "Preparer or Translator Last Name (Family Name) 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 26,
+          "name": "Preparer or Translator Last Name (Family Name) 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 27,
+          "name": "Preparer or Translator Last Name (Family Name) 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 28,
+          "name": "Preparer or Translator Address (Street Number and Name) 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 29,
+          "name": "Preparer or Translator Address (Street Number and Name) 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 30,
+          "name": "Preparer or Translator Address (Street Number and Name) 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 31,
+          "name": "Preparer or Translator Address (Street Number and Name) 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 32,
+          "name": "Preparer or Translator First Name (Given Name) 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 33,
+          "name": "Preparer or Translator Last Name (Family Name) 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 34,
+          "name": "Preparer or Translator First Name (Given Name) 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 35,
+          "name": "Preparer or Translator First Name (Given Name) 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 36,
+          "name": "Preparer or Translator City or Town 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 37,
+          "name": "Preparer or Translator City or Town 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 38,
+          "name": "Preparer or Translator City or Town 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 39,
+          "name": "Preparer or Translator City or Town 3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 44,
+          "name": "Zip Code 0",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 6
+        },
+        {
+          "index": 45,
+          "name": "Zip Code 1",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 6
+        },
+        {
+          "index": 46,
+          "name": "Zip Code 2",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 6
+        },
+        {
+          "index": 47,
+          "name": "Zip Code 3",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 6
+        },
+        {
+          "index": 52,
+          "name": "Date of Rehire 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 53,
+          "name": "Date of Rehire 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 54,
+          "name": "Date of Rehire 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 55,
+          "name": "Todays Date 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 56,
+          "name": "Todays Date 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 57,
+          "name": "Todays Date 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 58,
+          "name": "Last Name 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 59,
+          "name": "Last Name 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 60,
+          "name": "Last Name 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 61,
+          "name": "First Name 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 62,
+          "name": "First Name 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 63,
+          "name": "First Name 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 64,
+          "name": "Middle Initial 0",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 65,
+          "name": "Middle Initial 1",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 66,
+          "name": "Middle Initial 2",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 67,
+          "name": "PT Middle Initial 0",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 68,
+          "name": "PT Middle Initial 1",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 69,
+          "name": "PT Middle Initial 2",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 70,
+          "name": "PT Middle Initial 3",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 1
+        },
+        {
+          "index": 71,
+          "name": "Document Title 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 72,
+          "name": "Document Title 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 73,
+          "name": "Document Number 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 74,
+          "name": "Document Number 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 75,
+          "name": "Document Number 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 76,
+          "name": "Expiration Date 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 77,
+          "name": "Expiration Date 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 78,
+          "name": "Expiration Date 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 79,
+          "name": "Name of Emp or Auth Rep 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 80,
+          "name": "Name of Emp or Auth Rep 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 81,
+          "name": "Name of Emp or Auth Rep 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 82,
+          "name": "Signature of Emp Rep 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 83,
+          "name": "Signature of Emp Rep 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 84,
+          "name": "Signature of Emp Rep 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 88,
+          "name": "Addtl Info 0",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 89,
+          "name": "Addtl Info 2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 90,
+          "name": "Addtl Info 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 92,
+          "name": "Last Name Family Name from Section 1-2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 93,
+          "name": "First Name Given Name from Section 1-2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 95,
+          "name": "ZIP Code",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 6
+        },
+        {
+          "index": 96,
+          "name": "Date of Birth mmddyyyy",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 97,
+          "name": "US Social Security Number",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 9
+        },
+        {
+          "index": 98,
+          "name": "Telephone Number",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 99,
+          "name": "Last Name (Family Name)",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 100,
+          "name": "Address Street Number and Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 101,
+          "name": "Apt Number (if any)",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 102,
+          "name": "City or Town",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 103,
+          "name": "Employees E-mail Address",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 104,
+          "name": "Exp Date mmddyyyy",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 105,
+          "name": "USCIS ANumber",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 10
+        },
+        {
+          "index": 106,
+          "name": "Form I94 Admission Number",
+          "type": "PDFTextField",
+          "isReadOnly": false,
+          "maxLength": 11
+        },
+        {
+          "index": 107,
+          "name": "Foreign Passport Number and Country of IssuanceRow1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 108,
+          "name": "Document Title 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 109,
+          "name": "Issuing Authority 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 110,
+          "name": "Document Number 0 (if any)",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 111,
+          "name": "Document Title 2 If any",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 112,
+          "name": "Issuing Authority_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 113,
+          "name": "Document Number If any_2",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 114,
+          "name": "Document Number if any_3",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 115,
+          "name": "List C Expiration Date 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 116,
+          "name": "List C Document Number 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 117,
+          "name": "List C Issuing Authority 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 118,
+          "name": "List C Document Title 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 119,
+          "name": "FirstDayEmployed mmddyyyy",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 120,
+          "name": "S2 Todays Date mmddyyyy",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 121,
+          "name": "Last Name First Name and Title of Employer or Authorized Representative",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 122,
+          "name": "Signature of Employer or AR",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 123,
+          "name": "Employers Business or Org Name",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 124,
+          "name": "Employers Business or Org Address",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 125,
+          "name": "Expiration Date if any",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 126,
+          "name": "List B Issuing Authority 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 127,
+          "name": "List B Document Number 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        },
+        {
+          "index": 128,
+          "name": "List B Expiration Date 1",
+          "type": "PDFTextField",
+          "isReadOnly": false
+        }
+      ],
+      "checkboxFields": [
+        {
+          "index": 48,
+          "name": "CB_1",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 49,
+          "name": "CB_2",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 50,
+          "name": "CB_3",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 51,
+          "name": "CB_4",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 85,
+          "name": "CB_Alt_0",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 86,
+          "name": "CB_Alt_1",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 87,
+          "name": "CB_Alt_2",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        },
+        {
+          "index": 91,
+          "name": "CB_Alt",
+          "type": "PDFCheckBox",
+          "isReadOnly": false,
+          "isChecked": false
+        }
+      ],
+      "dropdownFields": [
+        {
+          "index": 40,
+          "name": "Preparer State 0",
+          "type": "PDFDropdown",
+          "isReadOnly": false,
+          "options": [
+            " ",
+            "AK",
+            "AL",
+            "AR",
+            "AS",
+            "AZ",
+            "CA",
+            "CO",
+            "CT",
+            "DC",
+            "DE",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "IA",
+            "ID",
+            "IL",
+            "IN",
+            "KS",
+            "KY",
+            "LA",
+            "MA",
+            "MD",
+            "ME",
+            "MI",
+            "MN",
+            "MO",
+            "MP",
+            "MS",
+            "MT",
+            "NC",
+            "ND",
+            "NE",
+            "NH",
+            "NJ",
+            "NM",
+            "NV",
+            "NY",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VA",
+            "VI",
+            "VT",
+            "WA",
+            "WI",
+            "WV",
+            "WY",
+            "CAN",
+            "MEX"
+          ],
+          "selectedValue": [
+            " "
+          ]
+        },
+        {
+          "index": 41,
+          "name": "Preparer State 1",
+          "type": "PDFDropdown",
+          "isReadOnly": false,
+          "options": [
+            " ",
+            "AK",
+            "AL",
+            "AR",
+            "AS",
+            "AZ",
+            "CA",
+            "CO",
+            "CT",
+            "DC",
+            "DE",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "IA",
+            "ID",
+            "IL",
+            "IN",
+            "KS",
+            "KY",
+            "LA",
+            "MA",
+            "MD",
+            "ME",
+            "MI",
+            "MN",
+            "MO",
+            "MP",
+            "MS",
+            "MT",
+            "NC",
+            "ND",
+            "NE",
+            "NH",
+            "NJ",
+            "NM",
+            "NV",
+            "NY",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VA",
+            "VI",
+            "VT",
+            "WA",
+            "WI",
+            "WV",
+            "WY",
+            "CAN",
+            "MEX"
+          ],
+          "selectedValue": [
+            " "
+          ]
+        },
+        {
+          "index": 42,
+          "name": "Preparer State 2",
+          "type": "PDFDropdown",
+          "isReadOnly": false,
+          "options": [
+            " ",
+            "AK",
+            "AL",
+            "AR",
+            "AS",
+            "AZ",
+            "CA",
+            "CO",
+            "CT",
+            "DC",
+            "DE",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "IA",
+            "ID",
+            "IL",
+            "IN",
+            "KS",
+            "KY",
+            "LA",
+            "MA",
+            "MD",
+            "ME",
+            "MI",
+            "MN",
+            "MO",
+            "MP",
+            "MS",
+            "MT",
+            "NC",
+            "ND",
+            "NE",
+            "NH",
+            "NJ",
+            "NM",
+            "NV",
+            "NY",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VA",
+            "VI",
+            "VT",
+            "WA",
+            "WI",
+            "WV",
+            "WY",
+            "CAN",
+            "MEX"
+          ],
+          "selectedValue": [
+            " "
+          ]
+        },
+        {
+          "index": 43,
+          "name": "Preparer State 3",
+          "type": "PDFDropdown",
+          "isReadOnly": false,
+          "options": [
+            " ",
+            "AK",
+            "AL",
+            "AR",
+            "AS",
+            "AZ",
+            "CA",
+            "CO",
+            "CT",
+            "DC",
+            "DE",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "IA",
+            "ID",
+            "IL",
+            "IN",
+            "KS",
+            "KY",
+            "LA",
+            "MA",
+            "MD",
+            "ME",
+            "MI",
+            "MN",
+            "MO",
+            "MP",
+            "MS",
+            "MT",
+            "NC",
+            "ND",
+            "NE",
+            "NH",
+            "NJ",
+            "NM",
+            "NV",
+            "NY",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VA",
+            "VI",
+            "VT",
+            "WA",
+            "WI",
+            "WV",
+            "WY",
+            "CAN",
+            "MEX"
+          ],
+          "selectedValue": [
+            " "
+          ]
+        },
+        {
+          "index": 94,
+          "name": "State",
+          "type": "PDFDropdown",
+          "isReadOnly": false,
+          "options": [
+            " ",
+            "AK",
+            "AL",
+            "AR",
+            "AS",
+            "AZ",
+            "CA",
+            "CO",
+            "CT",
+            "DC",
+            "DE",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "IA",
+            "ID",
+            "IL",
+            "IN",
+            "KS",
+            "KY",
+            "LA",
+            "MA",
+            "MD",
+            "ME",
+            "MI",
+            "MN",
+            "MO",
+            "MP",
+            "MS",
+            "MT",
+            "NC",
+            "ND",
+            "NE",
+            "NH",
+            "NJ",
+            "NM",
+            "NV",
+            "NY",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VA",
+            "VI",
+            "VT",
+            "WA",
+            "WI",
+            "WV",
+            "WY",
+            "CAN",
+            "MEX"
+          ],
+          "selectedValue": [
+            " "
+          ]
+        }
+      ],
+      "buttonFields": [],
+      "unknownFields": [],
+      "analysisDate": "2025-07-29T23:36:13.429Z"
+    }
+  }
+}

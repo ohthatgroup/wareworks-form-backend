@@ -1,59 +1,63 @@
-# Deployment Configuration
+# WareWorks Application - Quick Deployment Reference
 
-## Required Environment Variables
+> **📚 For comprehensive deployment instructions, see [netlify-setup.md](./netlify-setup.md)**
 
-### API Configuration
-```
-NEXT_PUBLIC_API_URL=http://localhost:8888  # For development
-NEXT_PUBLIC_API_URL=https://your-domain.com  # For production
-```
+## 🚀 Quick Production Deployment
 
-### Email Configuration (Mailgun)
-```
-MAILGUN_API_KEY=your_mailgun_api_key
-MAILGUN_DOMAIN=your_mailgun_domain.mailgun.org
-HR_EMAIL=your_hr_email@company.com
-ADMIN_EMAIL=your_admin_email@company.com
+### Required Environment Variables
+
+**Core Configuration:**
+```bash
+NODE_VERSION=20
+NEXT_PUBLIC_API_URL=https://apply.wareworks.me
+ALLOWED_ORIGINS=https://wareworks.me,https://apply.wareworks.me
 ```
 
-### Feature Flags
-```
+**Feature Flags:**
+```bash
 ENABLE_PDF_GENERATION=true
 ENABLE_EMAIL_NOTIFICATIONS=true
 ENABLE_FILE_UPLOADS=true
 ```
 
-### File Upload Configuration (Optional - Netlify Blobs)
-```
-NETLIFY_BLOBS_URL=https://your-site.netlify.app
-NETLIFY_ACCESS_TOKEN=your_netlify_access_token
-```
-
-### Security
-```
-ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
-```
-
-## Deployment Instructions
-
-### Netlify
-1. Go to Site Settings → Environment Variables
-2. Add each variable listed above
-3. Deploy from your repository
-
-### Vercel
+**Email Service (Mailgun):**
 ```bash
-vercel env add MAILGUN_API_KEY
-vercel env add HR_EMAIL
-vercel env add ADMIN_EMAIL
-# Add all other variables
+MAILGUN_API_KEY=key-xxxxxxxxxxxxxxxxx
+MAILGUN_DOMAIN=apply.wareworks.me
+HR_EMAIL=hr@wareworks.me
+ADMIN_EMAIL=admin@wareworks.me
 ```
 
-### Other Platforms
-Use your platform's environment variable configuration to set all required variables.
+### Netlify Deployment Steps
 
-## Security Notes
-- Never commit real credentials to git
-- Use HTTPS in production
-- Restrict ALLOWED_ORIGINS to your actual domains
-- Keep API keys secure and rotate them regularly
+1. **Connect Repository** to Netlify
+2. **Build Settings** (auto-detected):
+   - Base directory: `apps/form-app`
+   - Build command: `npm ci && npm run build`
+   - Publish directory: `.next`
+3. **Environment Variables**: Add all variables above
+4. **Custom Domain**: Configure `apply.wareworks.me`
+5. **Deploy**: Push to main branch
+
+### Post-Deployment Checklist
+
+- [ ] Site accessible at custom domain
+- [ ] HTTPS redirect working
+- [ ] Form submission functional
+- [ ] PDF generation working
+- [ ] Email notifications sent
+- [ ] File uploads working
+
+## 🔗 Documentation Links
+
+- **[Complete Setup Guide](./netlify-setup.md)** - Full deployment instructions
+- **[Development Setup](./DEVELOPMENT-SETUP.md)** - Local development guide
+- **[Component Documentation](./COMPONENTS-DOCUMENTATION.md)** - Frontend components
+- **[Implementation Status](./TODO-IMPLEMENTATIONS.md)** - Pending features
+
+## 🚨 Security Notes
+
+- Never commit credentials to git
+- Use environment variables for all API keys
+- Restrict ALLOWED_ORIGINS to actual domains
+- Enable HTTPS in production

@@ -402,8 +402,10 @@ npm run build
 
 - [📖 Development Setup Guide](./DEVELOPMENT-SETUP.md) - Local development instructions
 - [🚀 Netlify Deployment Guide](./netlify-setup.md) - Production deployment steps  
+- [⚡ Quick Deployment Reference](./DEPLOYMENT.md) - Quick deployment checklist
 - [🔧 Component Documentation](./COMPONENTS-DOCUMENTATION.md) - Frontend component guide
 - [📋 File Analysis Report](./FILE_ANALYSIS.md) - Complete codebase analysis
+- [📝 Implementation Status](./TODO-IMPLEMENTATIONS.md) - Pending features and roadmap
 
 ## 🆘 Support & Troubleshooting
 
