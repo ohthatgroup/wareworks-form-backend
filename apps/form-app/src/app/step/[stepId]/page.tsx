@@ -129,14 +129,18 @@ function ApplicationFormContent() {
   const formValues = form.watch()
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const dataToSave = {
-        formData: formValues,
-        completedSteps,
-        timestamp: new Date().toISOString()
-      }
-      localStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave))
-      // Also save to sessionStorage as backup
-      sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave))
+      const timeoutId = setTimeout(() => {
+        const dataToSave = {
+          formData: formValues,
+          completedSteps,
+          timestamp: new Date().toISOString()
+        }
+        localStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave))
+        // Also save to sessionStorage as backup
+        sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave))
+      }, 500)
+      
+      return () => clearTimeout(timeoutId)
     }
   }, [formValues, completedSteps])
 
@@ -277,7 +281,7 @@ function ApplicationFormContent() {
         case 0: // Personal Information
           return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
         case 1: // Contact Details
-          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
+          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'email']
         case 2: // Citizenship
           const citizenshipStatus = formValues.citizenshipStatus
           if (citizenshipStatus === 'lawful_permanent') {
@@ -285,11 +289,11 @@ function ApplicationFormContent() {
           } else if (citizenshipStatus === 'alien_authorized') {
             return ['citizenshipStatus', 'workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry']
           }
-          return ['citizenshipStatus']
+          return []
         case 3: // Position & Experience
           return []
         case 4: // Availability
-          return ['fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied']
+          return []
         case 5: // Education & Employment
           return []
         case 6: // Documents
@@ -326,8 +330,7 @@ function ApplicationFormContent() {
   const isFormReadyForSubmission = useMemo(() => {
     let allRequiredFields = [
       'legalFirstName', 'legalLastName', 'socialSecurityNumber',
-      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber',
-      'fullTimeEmployment', 'swingShifts', 'graveyardShifts', 'previouslyApplied'
+      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'email'
     ]
     
     if (formValues.citizenshipStatus === 'lawful_permanent') {
@@ -344,6 +347,35 @@ function ApplicationFormContent() {
       const hasNoError = !formState.errors[field as keyof ValidatedApplicationData]
       return hasValue && hasNoError
     })
+    
+    // Only log when submit is blocked (can't submit) and state changes
+    if (!requiredFieldsValid) {
+      const missingFields = allRequiredFields.filter(field => {
+        const value = formValues[field as keyof ValidatedApplicationData]
+        return value === undefined || value === null || value === ''
+      })
+      
+      const errorFields = Object.keys(formState.errors)
+      const currentState = JSON.stringify({ missingFields, errorFields })
+      
+      // Only log if the blocking state has changed
+      if (typeof window !== 'undefined') {
+        const lastState = sessionStorage.getItem('debug-state')
+        if (lastState !== currentState) {
+          console.log('🚫 SUBMIT BLOCKED - Here\'s why:')
+          console.log('Required fields:', allRequiredFields)
+          console.log('Missing fields:', missingFields)
+          console.log('Fields with errors:', errorFields)
+          console.log('================================')
+          sessionStorage.setItem('debug-state', currentState)
+        }
+      }
+    } else {
+      // Clear debug state when form becomes valid
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('debug-state')
+      }
+    }
     
     return requiredFieldsValid
   }, [formValues, formState.errors])

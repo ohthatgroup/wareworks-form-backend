@@ -1,33 +1,33 @@
 import { z } from 'zod'
 
-export const applicationSchema = z.object({
+const baseSchema = z.object({
   submissionId: z.string(),
   
-  // Personal Information
+  // Personal Information - REQUIRED: Name, SSN
   legalFirstName: z.string().min(1, 'First name is required'),
   middleInitial: z.string().optional(),
   legalLastName: z.string().min(1, 'Last name is required'),
   otherLastNames: z.string().optional(),
-  dateOfBirth: z.string().min(1, 'Date of birth is required'),
+  dateOfBirth: z.string().optional(),
   socialSecurityNumber: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, 'Invalid SSN format'),
   
-  // Contact Information
+  // Contact Information - REQUIRED: Address, Phone, Email
   streetAddress: z.string().min(1, 'Street address is required'),
   aptNumber: z.string().optional(),
   city: z.string().min(1, 'City is required'),
-  state: z.string().length(2, 'State must be 2 characters'),
-  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code'),
-  phoneNumber: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid phone format'),
+  state: z.string().min(1, 'State is required'),
+  zipCode: z.string().min(1, 'ZIP code is required'),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
   homePhone: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
+  email: z.string().min(1, 'Email is required'),
   
-  // Emergency Contact
-  emergencyName: z.string().min(1, 'Emergency contact name is required'),
-  emergencyPhone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Invalid emergency contact phone format'),
-  emergencyRelationship: z.string().min(1, 'Emergency contact relationship is required'),
+  // Emergency Contact - NOT REQUIRED
+  emergencyName: z.string().optional(),
+  emergencyPhone: z.string().optional(),
+  emergencyRelationship: z.string().optional(),
   
-  // Work Authorization
-  citizenshipStatus: z.string().min(1, 'Citizenship status is required'),
+  // Work Authorization - NOT REQUIRED
+  citizenshipStatus: z.string().optional(),
   workAuthorization: z.string().optional(),
   uscisANumber: z.string().optional(),
   workAuthExpiration: z.string().optional(),
@@ -35,15 +35,15 @@ export const applicationSchema = z.object({
   alienDocumentNumber: z.string().optional(),
   documentCountry: z.string().optional(),
   
-  // Basic Eligibility
-  age18: z.string().min(1, 'Age verification is required'),
-  transportation: z.string().min(1, 'Transportation question is required'),
-  workAuthorizationConfirm: z.string().min(1, 'Work authorization confirmation is required'),
+  // Basic Eligibility - NOT REQUIRED
+  age18: z.string().optional(),
+  transportation: z.string().optional(),
+  workAuthorizationConfirm: z.string().optional(),
   
-  // Position & Experience
-  positionApplied: z.string().min(1, 'Position applied for is required'),
+  // Position & Experience - NOT REQUIRED
+  positionApplied: z.string().optional(),
   expectedSalary: z.string().optional(),
-  jobDiscovery: z.string().min(1, 'How you discovered this job is required'),
+  jobDiscovery: z.string().optional(),
   
   // Equipment Experience
   equipmentSD: z.string().optional(),
@@ -59,9 +59,9 @@ export const applicationSchema = z.object({
   skills3: z.string().optional(),
   
   // Work Preferences
-  fullTimeEmployment: z.string().min(1, 'Full-time employment preference is required'),
-  swingShifts: z.string().min(1, 'Swing shift availability is required'),
-  graveyardShifts: z.string().min(1, 'Graveyard shift availability is required'),
+  fullTimeEmployment: z.string().optional(),
+  swingShifts: z.string().optional(),
+  graveyardShifts: z.string().optional(),
   
   // Weekly Availability
   availabilitySunday: z.string().optional(),
@@ -73,7 +73,7 @@ export const applicationSchema = z.object({
   availabilitySaturday: z.string().optional(),
   
   // Previous Application
-  previouslyApplied: z.string().min(1, 'Previous application question is required'),
+  previouslyApplied: z.string().optional(),
   previousApplicationWhen: z.string().optional(),
   
   // Education History
@@ -114,7 +114,34 @@ export const applicationSchema = z.object({
   submittedAt: z.string()
 })
 
-export type ValidatedApplicationData = z.infer<typeof applicationSchema>
+export const applicationSchema = baseSchema.refine((data) => {
+  // If lawful permanent resident, USCIS A-Number is required
+  if (data.citizenshipStatus === 'lawful_permanent') {
+    return data.uscisANumber && data.uscisANumber.length > 0
+  }
+  return true
+}, {
+  message: "USCIS A-Number is required for lawful permanent residents",
+  path: ["uscisANumber"]
+}).refine((data) => {
+  // If alien authorized to work, additional fields are required
+  if (data.citizenshipStatus === 'alien_authorized') {
+    return data.workAuthExpiration && 
+           data.alienDocumentType && 
+           data.alienDocumentNumber && 
+           data.documentCountry &&
+           data.workAuthExpiration.length > 0 &&
+           data.alienDocumentType.length > 0 &&
+           data.alienDocumentNumber.length > 0 &&
+           data.documentCountry.length > 0
+  }
+  return true
+}, {
+  message: "All work authorization fields are required for alien authorized to work",
+  path: ["alienDocumentType"]
+})
+
+export type ValidatedApplicationData = z.infer<typeof baseSchema>
 
 export function validateApplication(data: unknown) {
   return applicationSchema.safeParse(data)

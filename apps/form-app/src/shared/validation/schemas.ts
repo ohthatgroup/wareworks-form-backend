@@ -11,19 +11,15 @@ const baseSchema = z.object({
   dateOfBirth: z.string().optional(),
   socialSecurityNumber: z.string().regex(/^\d{3}-\d{2}-\d{4}$/, 'Invalid SSN format'),
   
-  // Contact Information - REQUIRED: Address, Cell Number
+  // Contact Information - REQUIRED: Address, Phone, Email
   streetAddress: z.string().min(1, 'Street address is required'),
   aptNumber: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  phoneNumber: z.string().optional(),
-  primaryPhoneNumber1: z.boolean().optional(),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  zipCode: z.string().min(1, 'ZIP code is required'),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
   homePhone: z.string().optional(),
-  primaryPhoneNumber2: z.boolean().optional(),
-  // cellPhone: z.string().regex(/^\(\d{3}\) \d{3}-\d{4}$/, 'Cell phone number is required'),
-  // cellPhone: z.string().optional(),
-  email: z.string().optional(),
+  email: z.string().min(1, 'Email is required'),
   
   // Emergency Contact - NOT REQUIRED
   emergencyName: z.string().optional(),
@@ -63,9 +59,9 @@ const baseSchema = z.object({
   skills3: z.string().optional(),
   
   // Work Preferences
-  fullTimeEmployment: z.string().min(1, 'Full-time employment preference is required'),
-  swingShifts: z.string().min(1, 'Swing shift availability is required'),
-  graveyardShifts: z.string().min(1, 'Graveyard shift availability is required'),
+  fullTimeEmployment: z.string().optional(),
+  swingShifts: z.string().optional(),
+  graveyardShifts: z.string().optional(),
   
   // Weekly Availability
   availabilitySunday: z.string().optional(),
@@ -77,7 +73,7 @@ const baseSchema = z.object({
   availabilitySaturday: z.string().optional(),
   
   // Previous Application
-  previouslyApplied: z.string().min(1, 'Previous application question is required'),
+  previouslyApplied: z.string().optional(),
   previousApplicationWhen: z.string().optional(),
   
   // Education History

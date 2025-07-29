@@ -35,7 +35,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     state: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     zipCode: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     phoneNumber: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
-    cellPhone: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    email: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     emergencyName: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     emergencyPhone: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     citizenshipStatus: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
