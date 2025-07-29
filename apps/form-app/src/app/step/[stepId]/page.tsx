@@ -147,10 +147,11 @@ function ApplicationFormContent() {
   // Check if we're in an embedded context
   const isEmbedded = typeof window !== 'undefined' && window.parent !== window
 
-  // Robust iframe height communication
+  // Optimized iframe height communication
   useEffect(() => {
     if (!isEmbedded) return;
 
+    let lastHeight = 0;
     let timeoutId: NodeJS.Timeout;
     
     const sendHeightToParent = () => {
@@ -160,53 +161,41 @@ function ApplicationFormContent() {
         try {
           const bodyHeight = document.body.scrollHeight;
           const htmlHeight = document.documentElement.scrollHeight;
-          const windowHeight = window.innerHeight;
-          const height = Math.max(bodyHeight, htmlHeight, windowHeight);
+          const height = Math.max(bodyHeight, htmlHeight);
           
-          window.parent.postMessage({
-            type: 'iframe-resize',
-            height: height,
-            source: 'wareworks-form'
-          }, '*');
+          // Only send if height actually changed
+          if (height !== lastHeight) {
+            lastHeight = height;
+            window.parent.postMessage({
+              type: 'iframe-resize',
+              height: height,
+              source: 'wareworks-form'
+            }, '*');
+          }
         } catch (error) {
           console.warn('Could not send height to parent:', error);
         }
-      }, 100);
+      }, 300);
     };
 
+    // Initial height send
     sendHeightToParent();
-    const handleResize = () => sendHeightToParent();
-    window.addEventListener('resize', handleResize);
 
+    // Only observe the main form container for content changes
     const resizeObserver = new ResizeObserver(() => {
       sendHeightToParent();
     });
 
-    if (document.body) {
-      resizeObserver.observe(document.body);
+    const formContainer = document.querySelector('.mx-auto');
+    if (formContainer) {
+      resizeObserver.observe(formContainer);
     }
-
-    const mutationObserver = new MutationObserver(() => {
-      sendHeightToParent();
-    });
-
-    mutationObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['style', 'class']
-    });
-
-    const interval = setInterval(sendHeightToParent, 2000);
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
-      clearInterval(interval);
-      window.removeEventListener('resize', handleResize);
       resizeObserver.disconnect();
-      mutationObserver.disconnect();
     };
-  }, [isEmbedded]);
+  }, [isEmbedded, currentStep]); // Re-run when step changes
 
   // Add embedded class to body when in iframe
   useEffect(() => {
