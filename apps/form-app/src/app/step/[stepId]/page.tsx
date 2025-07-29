@@ -98,10 +98,22 @@ function ApplicationFormContent() {
     }
   })
 
-  // Only load submission result on mount (not form data - let page reload clear form)
+  // Load form data from sessionStorage (for navigation) and submission result
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const savedData = sessionStorage.getItem(FORM_DATA_KEY)
       const savedResult = sessionStorage.getItem(SUBMISSION_RESULT_KEY)
+      
+      if (savedData) {
+        try {
+          const parsedData = JSON.parse(savedData)
+          console.log('🔄 Restoring form data from sessionStorage:', Object.keys(parsedData.formData || {}))
+          form.reset(parsedData.formData)
+          setCompletedSteps(parsedData.completedSteps || [])
+        } catch (error) {
+          console.error('Error loading saved form data:', error)
+        }
+      }
       
       if (savedResult) {
         try {
