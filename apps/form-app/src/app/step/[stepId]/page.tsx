@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import React from 'react'
 import { useForm } from 'react-hook-form'
@@ -98,10 +98,10 @@ function ApplicationFormContent() {
     }
   })
 
-  // Load form data from storage on mount
+  // Load form data from session storage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedData = localStorage.getItem(FORM_DATA_KEY)
+      const savedData = sessionStorage.getItem(FORM_DATA_KEY)
       const savedResult = localStorage.getItem(SUBMISSION_RESULT_KEY)
       
       if (savedData) {
@@ -125,24 +125,33 @@ function ApplicationFormContent() {
     }
   }, [form])
 
-  // Save form data to storage whenever it changes
-  const formValues = form.watch()
-  useEffect(() => {
+  // Stable save function using useRef to prevent re-render disruption
+  const saveTimeoutRef = useRef<NodeJS.Timeout>()
+  
+  const saveFormData = useCallback(() => {
     if (typeof window !== 'undefined') {
-      const timeoutId = setTimeout(() => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+      
+      saveTimeoutRef.current = setTimeout(() => {
+        const currentValues = form.getValues()
         const dataToSave = {
-          formData: formValues,
+          formData: currentValues,
           completedSteps,
           timestamp: new Date().toISOString()
         }
-        localStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave))
-        // Also save to sessionStorage as backup
+        // Session-only storage - removed localStorage
         sessionStorage.setItem(FORM_DATA_KEY, JSON.stringify(dataToSave))
       }, 500)
-      
-      return () => clearTimeout(timeoutId)
     }
-  }, [formValues, completedSteps])
+  }, [form, completedSteps])
+
+  // Watch form changes for saving without disrupting renders
+  const formValues = form.watch()
+  useEffect(() => {
+    saveFormData()
+  }, [formValues, saveFormData])
 
   // Check if we're in an embedded context
   const isEmbedded = typeof window !== 'undefined' && window.parent !== window
