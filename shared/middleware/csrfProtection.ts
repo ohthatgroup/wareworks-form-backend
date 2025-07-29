@@ -133,31 +133,18 @@ export class CSRFProtection {
         return null
       }
 
-      // Get token from header or body
-      const tokenFromHeader = request.headers.get(this.config.headerName)
-      let tokenFromBody = null
-      
-      try {
-        if (request.headers.get('content-type')?.includes('application/json')) {
-          const body = await request.json()
-          tokenFromBody = body[this.config.tokenName]
-          // Re-create request with parsed body for next handler
-          const newRequest = new Request(request.url, {
-            method: request.method,
-            headers: request.headers,
-            body: JSON.stringify(body)
-          })
-          Object.setPrototypeOf(newRequest, NextRequest.prototype)
-          request = newRequest as NextRequest
-        }
-      } catch (error) {
-        // Body parsing failed, continue without token from body
-      }
-
-      const token = tokenFromHeader || tokenFromBody
+      // Only get token from header (don't parse body to avoid request corruption)
+      const token = request.headers.get(this.config.headerName)
       
       // Get secret from cookie
       const secret = request.cookies.get(this.config.cookieName)?.value
+
+      console.log('CSRF Middleware Debug:', {
+        hasToken: !!token,
+        hasSecret: !!secret,
+        method: request.method,
+        contentType: request.headers.get('content-type')
+      })
 
       if (!token || !secret) {
         return NextResponse.json(
@@ -194,8 +181,18 @@ export class CSRFProtection {
       return { valid: true }
     }
 
+    // Only check header-based token (don't parse body)
     const tokenFromHeader = request.headers.get(this.config.headerName)
     const secret = request.cookies.get(this.config.cookieName)?.value
+
+    console.log('CSRF Validation Debug:', {
+      hasToken: !!tokenFromHeader,
+      hasSecret: !!secret,
+      tokenPreview: tokenFromHeader ? tokenFromHeader.substring(0, 8) + '...' : 'none',
+      secretPreview: secret ? secret.substring(0, 8) + '...' : 'none',
+      method: request.method,
+      url: request.url
+    })
 
     if (!tokenFromHeader || !secret) {
       return { 

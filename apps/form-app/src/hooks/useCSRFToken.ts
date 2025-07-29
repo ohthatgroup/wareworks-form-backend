@@ -66,13 +66,22 @@ export function useCSRFToken(): UseCSRFTokenReturn {
   // Get headers for API requests
   const getHeaders = useCallback((): Record<string, string> => {
     if (!tokenData) {
+      console.log('🚫 No CSRF token data available for headers')
       return {}
     }
 
-    return {
+    const headers = {
       [tokenData.headerName]: tokenData.token,
       'Content-Type': 'application/json'
     }
+
+    console.log('📤 CSRF Headers:', {
+      headerName: tokenData.headerName,
+      tokenPreview: tokenData.token.substring(0, 8) + '...',
+      hasToken: !!tokenData.token
+    })
+
+    return headers
   }, [tokenData])
 
   // Auto-refresh token periodically (every 45 minutes)
