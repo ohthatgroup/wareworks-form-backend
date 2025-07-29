@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
 import { Input } from '../ui/Input'
 import { RadioGroup } from '../ui/RadioGroup'
 import { useLanguage } from '../../contexts/LanguageContext'
