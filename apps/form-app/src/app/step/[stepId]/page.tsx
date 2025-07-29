@@ -239,12 +239,6 @@ function ApplicationFormContent() {
         targetOrigin
       })
       
-      window.parent.postMessage({
-        type: 'step_change',
-        currentStep: currentStep,
-        completedSteps: completedSteps,
-        totalSteps: STEPS.length
-      }, targetOrigin)
     } else {
       console.log('📤 Not embedded - skipping postMessage')
     }
