@@ -30,12 +30,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       // Read language from URL parameter (from webflow embed)
       const urlParams = new URLSearchParams(window.location.search)
       const urlLanguage = urlParams.get('lang') as Language | null
-      const savedLanguage = localStorage.getItem('preferred-language') as Language
+      const savedLanguage = sessionStorage.getItem('preferred-language') as Language
       
       // Priority 1: URL parameter (highest priority - overrides saved preference)
       if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
         setLanguageState(urlLanguage)
-        localStorage.setItem('preferred-language', urlLanguage)
+        sessionStorage.setItem('preferred-language', urlLanguage)
       } 
       // Priority 2: User's saved preference
       else if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
@@ -44,7 +44,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       // Priority 3: Default to English for new users
       else {
         setLanguageState('en')
-        localStorage.setItem('preferred-language', 'en')
+        sessionStorage.setItem('preferred-language', 'en')
       }
     }
   }, [hydrated])
@@ -53,7 +53,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLanguageState(newLanguage)
     
     if (hydrated && typeof window !== 'undefined') {
-      localStorage.setItem('preferred-language', newLanguage)
+      sessionStorage.setItem('preferred-language', newLanguage)
     }
   }
 

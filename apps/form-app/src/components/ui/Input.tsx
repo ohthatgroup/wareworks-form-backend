@@ -20,6 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={`form-input ${error ? 'border-red-500 focus:border-red-500' : ''} ${className}`}
+          autoComplete="off"
           {...registration}
           {...props}
         />

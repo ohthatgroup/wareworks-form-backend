@@ -112,6 +112,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           </label>
           <select
             className={`form-input ${errors.state ? 'border-red-500 focus:border-red-500' : ''}`}
+            autoComplete="off"
             {...register('state')}
           >
             <option value="">{t('contact_info.select_state')}</option>
@@ -144,6 +145,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           <input
             type="tel"
             className={`form-input ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''}`}
+            autoComplete="off"
             {...register('phoneNumber')}
             onChange={(e) => {
               const formatted = formatPhoneNumber(e.target.value)
@@ -162,6 +164,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           <input
             type="tel"
             className={`form-input ${errors.homePhone ? 'border-red-500 focus:border-red-500' : ''}`}
+            autoComplete="off"
             {...register('homePhone')}
             onChange={(e) => {
               const formatted = formatPhoneNumber(e.target.value)
@@ -202,6 +205,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             <input
               type="tel"
               className={`form-input ${errors.emergencyPhone ? 'border-red-500 focus:border-red-500' : ''}`}
+              autoComplete="off"
               {...register('emergencyPhone')}
               onChange={(e) => {
                 const formatted = formatPhoneNumber(e.target.value)
