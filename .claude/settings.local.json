@@ -21,7 +21,8 @@
       "Bash(npm run dev:*)",
       "Bash(netlify dev:*)",
       "Bash(curl:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
