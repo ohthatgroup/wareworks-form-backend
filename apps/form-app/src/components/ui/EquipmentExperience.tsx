@@ -1,5 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '@/shared/validation/schemas'
+import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translateKey, EquipmentLabelKey, EquipmentDescriptionKey } from '../../types/translations'
 
