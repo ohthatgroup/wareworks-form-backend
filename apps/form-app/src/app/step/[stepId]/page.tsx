@@ -123,7 +123,7 @@ function ApplicationFormContent() {
         }
       }
     }
-  }, [form])
+  }, [])
 
   // Stable save function using useRef to prevent re-render disruption
   const saveTimeoutRef = useRef<NodeJS.Timeout>()
