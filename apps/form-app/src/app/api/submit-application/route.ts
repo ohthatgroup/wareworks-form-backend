@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withRateLimit, rateLimiters } from '../../../../../../shared/middleware/rateLimiting'
-import { withCSRFProtection } from '../../../../../../shared/middleware/csrfProtection'
 import { applicationSchema } from '../../../../../../shared/validation/schemas'
 import { PDFService } from '../../../../../../shared/services/PDFService'
 import { EmailService } from '../../../../../../shared/services/EmailService'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 export async function POST(request: NextRequest) {
-  return withRateLimit(request, rateLimiters.formSubmission, async () => {
-    return withCSRFProtection(request, async () => {
-      console.log('API route called - POST /api/submit-application')
+  console.log('API route called - POST /api/submit-application')
     
     try {
       // Parse the request body
@@ -115,14 +111,11 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-    })
-  })
 }
 
 // Handle PDF downloads
 export async function GET(request: NextRequest) {
-  return withRateLimit(request, rateLimiters.download, async () => {
-    try {
+  try {
       const { searchParams } = request.nextUrl
       const submissionId = searchParams.get('download')
       
@@ -161,14 +154,13 @@ export async function GET(request: NextRequest) {
         },
       })
 
-    } catch (error) {
-      console.error('Download error:', error)
-      return NextResponse.json(
-        { error: 'Failed to generate PDF' },
-        { status: 500 }
-      )
-    }
-  })
+  } catch (error) {
+    console.error('Download error:', error)
+    return NextResponse.json(
+      { error: 'Failed to generate PDF' },
+      { status: 500 }
+    )
+  }
 }
 
 async function generateApplicationPDF(submissionData: any, submissionId: string): Promise<Buffer> {
