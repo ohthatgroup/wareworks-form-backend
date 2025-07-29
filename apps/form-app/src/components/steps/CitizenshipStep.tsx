@@ -1,6 +1,6 @@
 import { UseFormReturn } from 'react-hook-form'
 import { useEffect } from 'react'
-import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '../../../../../../shared/validation/schemas'
 import { Select } from '../ui/Select'
 import { Input } from '../ui/Input'
 import { RadioGroup } from '../ui/RadioGroup'
@@ -8,7 +8,6 @@ import { useLanguage } from '../../contexts/LanguageContext'
 
 interface CitizenshipStepProps {
   form: UseFormReturn<ValidatedApplicationData>
-  isSubmitting: boolean
 }
 
 // Options will be generated inside the component to use translations

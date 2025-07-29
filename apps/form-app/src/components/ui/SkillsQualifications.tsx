@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '../../../../../../shared/validation/schemas'
 import { Plus, X } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
 

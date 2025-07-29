@@ -1,11 +1,10 @@
 import { UseFormReturn } from 'react-hook-form'
-import { ValidatedApplicationData } from '../../../../../shared/validation/schemas'
+import { ValidatedApplicationData } from '../../../../../../shared/validation/schemas'
 import { CheckCircle, AlertCircle, Edit, Eye, Download } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
 
 interface ReviewStepProps {
   form: UseFormReturn<ValidatedApplicationData>
-  isSubmitting: boolean
   onEditStep?: (stepIndex: number) => void
 }
 
