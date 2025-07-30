@@ -12,26 +12,10 @@ export async function POST(request: NextRequest) {
       const body = await request.json()
       console.log('Request body received, fields:', Object.keys(body).length)
       
-      // DEBUG: Log form data before validation
-      console.log('🔍 Form data for validation:')
-      console.log('  citizenshipStatus:', body.citizenshipStatus)
-      if (body.citizenshipStatus === 'alien_authorized') {
-        console.log('  workAuthExpiration:', body.workAuthExpiration)
-        console.log('  alienDocumentType:', body.alienDocumentType) 
-        console.log('  alienDocumentNumber:', body.alienDocumentNumber)
-        console.log('  documentCountry:', body.documentCountry)
-      }
-      
       // Validate using Zod schema
       const validationResult = applicationSchema.safeParse(body)
       if (!validationResult.success) {
-        console.error('❌ Validation errors:', validationResult.error.issues)
-        
-        // DEBUG: Show detailed validation failures
-        validationResult.error.issues.forEach(issue => {
-          console.error(`  - ${issue.path.join('.')}: ${issue.message}`)
-        })
-        
+        console.error('Validation errors:', validationResult.error.issues)
         return NextResponse.json(
           { 
             error: 'Validation failed', 

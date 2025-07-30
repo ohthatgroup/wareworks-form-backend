@@ -262,18 +262,16 @@ export class PDFService {
     
     // Set the appropriate checkbox based on status
     switch (citizenshipStatus) {
-      case 'citizen':
+      case 'us_citizen':
         this.setCheckboxField(form, 'CB_1', true) // US Citizen
         break
-      case 'non_citizen_national':
+      case 'noncitizen_national':
         this.setCheckboxField(form, 'CB_2', true) // Non-citizen national
         break
-      case 'permanent_resident':
       case 'lawful_permanent':
         this.setCheckboxField(form, 'CB_3', true) // Lawful permanent resident
         break
-      case 'authorized_alien':
-      case 'work_authorized':
+      case 'alien_authorized':
         this.setCheckboxField(form, 'CB_4', true) // Alien authorized to work
         break
       default:
@@ -379,37 +377,37 @@ export class PDFService {
     // Work authorization text fields
     console.log('Filling work authorization text fields...')
     
-    if ((data.citizenshipStatus === 'permanent_resident' || data.citizenshipStatus === 'lawful_permanent') && data.uscisANumber) {
+    if (data.citizenshipStatus === 'lawful_permanent' && data.uscisANumber) {
       // Use CB_3 specific field for permanent residents
       this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB3, data.uscisANumber)
       console.log(`  ✅ Set permanent resident USCIS A-Number (CB_3 field): ${data.uscisANumber}`)
     }
     
     // For alien authorized to work
-    if (data.citizenshipStatus === 'authorized_alien' || data.citizenshipStatus === 'work_authorized') {
+    if (data.citizenshipStatus === 'alien_authorized') {
       // Work authorization expiration date
       if (data.workAuthorizationExpiration) {
         this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.expirationDate, this.formatDateForI9(data.workAuthorizationExpiration))
         console.log(`  ✅ Set work authorization expiration: ${data.workAuthorizationExpiration}`)
       }
       
-      // Fill ONE of: USCIS A-Number OR I-94 OR Foreign Passport
-      console.log('  📋 Filling CB_4 associated fields (choose one):')
+      // Fill the appropriate field based on document type
+      console.log('  📋 Filling CB_4 associated fields based on document type:')
       
-      if (data.uscisANumber) {
-        // Use CB_4 specific field for authorized aliens
-        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB4, data.uscisANumber)
-        console.log(`    ✅ Set USCIS A-Number (CB_4 field): ${data.uscisANumber}`)
-      } else if (data.i94AdmissionNumber) {
+      if (data.alienDocumentType === 'uscis_a_number' && data.alienDocumentNumber) {
+        // Use CB_4 specific field for authorized aliens with USCIS A-Number
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB4, data.alienDocumentNumber)
+        console.log(`    ✅ Set USCIS A-Number (CB_4 field): ${data.alienDocumentNumber}`)
+      } else if (data.alienDocumentType === 'form_i94' && data.i94AdmissionNumber) {
         const truncatedI94 = data.i94AdmissionNumber.substring(0, 11)
         this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.i94AdmissionNumber, truncatedI94)
         console.log(`    ✅ Set I-94 Admission Number: ${truncatedI94}`)
-      } else if (data.foreignPassportNumber && data.foreignPassportCountry) {
+      } else if (data.alienDocumentType === 'foreign_passport' && data.foreignPassportNumber && data.foreignPassportCountry) {
         this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.foreignPassportNumber, 
           `${data.foreignPassportNumber} - ${data.foreignPassportCountry}`)
         console.log(`    ✅ Set Foreign Passport: ${data.foreignPassportNumber} - ${data.foreignPassportCountry}`)
       } else {
-        console.warn('    ⚠️ CB_4 checked but no USCIS A-Number, I-94, or Foreign Passport provided')
+        console.warn(`    ⚠️ CB_4 checked but missing required fields for document type: ${data.alienDocumentType}`)
       }
     }
     

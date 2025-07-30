@@ -27,8 +27,23 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
       setValue('alienDocumentType', '')
       setValue('alienDocumentNumber', '')
       setValue('documentCountry', '')
+      setValue('i94AdmissionNumber', '')
+      setValue('foreignPassportNumber', '')
+      setValue('foreignPassportCountry', '')
     }
   }, [citizenshipStatus, setValue])
+  
+  // Clear alien document fields when document type changes
+  const alienDocumentType = watch('alienDocumentType')
+  useEffect(() => {
+    if (citizenshipStatus === 'alien_authorized' && alienDocumentType) {
+      // Clear all alien document fields first
+      setValue('alienDocumentNumber', '')
+      setValue('i94AdmissionNumber', '')
+      setValue('foreignPassportNumber', '')
+      setValue('foreignPassportCountry', '')
+    }
+  }, [alienDocumentType, citizenshipStatus, setValue])
   
   const citizenshipOptions = [
     { value: 'us_citizen', label: t('citizenship.us_citizen') },
@@ -92,15 +107,17 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
               registration={register('alienDocumentNumber')}
               error={errors.alienDocumentNumber?.message}
               placeholder={t('citizenship.a_number_placeholder')}
+              required
             />
           )}
           
           {watch('alienDocumentType') === 'form_i94' && (
             <Input
               label={t('citizenship.form_i94_admission')}
-              registration={register('alienDocumentNumber')}
-              error={errors.alienDocumentNumber?.message}
+              registration={register('i94AdmissionNumber')}
+              error={errors.i94AdmissionNumber?.message}
               placeholder={t('citizenship.i94_placeholder')}
+              required
             />
           )}
           
@@ -108,15 +125,17 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
             <div className="space-y-4">
               <Input
                 label={t('citizenship.foreign_passport_number')}
-                registration={register('alienDocumentNumber')}
-                error={errors.alienDocumentNumber?.message}
+                registration={register('foreignPassportNumber')}
+                error={errors.foreignPassportNumber?.message}
                 placeholder={t('citizenship.passport_placeholder')}
+                required
               />
               <Input
                 label={t('citizenship.country_of_issuance')}
-                registration={register('documentCountry')}
-                error={errors.documentCountry?.message}
+                registration={register('foreignPassportCountry')}
+                error={errors.foreignPassportCountry?.message}
                 placeholder={t('citizenship.country_placeholder')}
+                required
               />
             </div>
           )}
