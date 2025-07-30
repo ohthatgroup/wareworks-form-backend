@@ -12,10 +12,26 @@ export async function POST(request: NextRequest) {
       const body = await request.json()
       console.log('Request body received, fields:', Object.keys(body).length)
       
+      // DEBUG: Log form data before validation
+      console.log('🔍 Form data for validation:')
+      console.log('  citizenshipStatus:', body.citizenshipStatus)
+      if (body.citizenshipStatus === 'alien_authorized') {
+        console.log('  workAuthExpiration:', body.workAuthExpiration)
+        console.log('  alienDocumentType:', body.alienDocumentType) 
+        console.log('  alienDocumentNumber:', body.alienDocumentNumber)
+        console.log('  documentCountry:', body.documentCountry)
+      }
+      
       // Validate using Zod schema
       const validationResult = applicationSchema.safeParse(body)
       if (!validationResult.success) {
-        console.error('Validation errors:', validationResult.error.issues)
+        console.error('❌ Validation errors:', validationResult.error.issues)
+        
+        // DEBUG: Show detailed validation failures
+        validationResult.error.issues.forEach(issue => {
+          console.error(`  - ${issue.path.join('.')}: ${issue.message}`)
+        })
+        
         return NextResponse.json(
           { 
             error: 'Validation failed', 
@@ -85,10 +101,17 @@ export async function POST(request: NextRequest) {
       if (typeof global !== 'undefined') {
         const globalAny = global as any
         globalAny.submissionStore = globalAny.submissionStore || new Map()
-        globalAny.submissionStore.set(submissionId, { 
+        
+        // Store submission data for download access
+        console.log('📁 Storing submission data for download access')
+        
+        const dataToStore = { 
           ...submissionData, 
           pdfBuffer: pdfBuffer?.toString('base64') // Store as base64 for retrieval
-        })
+        }
+        
+        globalAny.submissionStore.set(submissionId, dataToStore)
+        console.log('✅ Submission data stored for download:', submissionId)
       }
 
       // Return success response with download capability
@@ -142,8 +165,49 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      // Generate PDF
-      const pdfBuffer = await generateApplicationPDF(submissionData, submissionId)
+      // Generate PDF using the same PDFService as POST request
+      console.log(`📄 Generating download PDF for submission: ${submissionId}`)
+      let pdfBuffer: Buffer | null = null
+      
+      try {
+        const pdfService = new PDFService()
+        const pdfResult = await pdfService.generateApplicationPDF(submissionData)
+        
+        // Handle different return types from PDFService
+        if (Buffer.isBuffer(pdfResult)) {
+          pdfBuffer = pdfResult
+          console.log('📄 Download PDF: Single application PDF generated')
+        } else if (pdfResult && typeof pdfResult === 'object' && 'applicationPDF' in pdfResult) {
+          console.log('📄 Download PDF: Multi-PDF result detected')
+          
+          if (pdfResult.i9PDF) {
+            console.log('🔗 Merging application + I-9 PDFs for download...')
+            try {
+              pdfBuffer = await mergeApplicationAndI9PDFs(pdfResult.applicationPDF, pdfResult.i9PDF)
+              console.log('✅ Download PDF: Successfully merged application + I-9 PDFs')
+            } catch (mergeError) {
+              console.error('❌ Merge failed:', mergeError)
+              pdfBuffer = pdfResult.applicationPDF
+              console.log('⚠️ Using application PDF only due to merge failure')
+            }
+          } else {
+            pdfBuffer = pdfResult.applicationPDF
+            console.log('📄 Download PDF: Application PDF only (no I-9)')
+          }
+        }
+        
+        if (!pdfBuffer) {
+          throw new Error('PDF generation returned no buffer')
+        }
+        
+        console.log(`✅ Download PDF generated: ${pdfBuffer.length} bytes`)
+        
+      } catch (pdfError) {
+        console.error('❌ Download PDF generation failed:', pdfError)
+        // Fallback to basic PDF if PDFService fails
+        pdfBuffer = await generateBasicApplicationPDF(submissionData, submissionId)
+        console.log('⚠️ Using basic PDF fallback for download')
+      }
       
       return new NextResponse(pdfBuffer, {
         status: 200,
@@ -163,7 +227,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function generateApplicationPDF(submissionData: any, submissionId: string): Promise<Buffer> {
+async function generateBasicApplicationPDF(submissionData: any, submissionId: string): Promise<Buffer> {
   try {
     const pdfDoc = await PDFDocument.create()
     const page = pdfDoc.addPage([612, 792])
@@ -255,5 +319,34 @@ async function generateApplicationPDF(submissionData: any, submissionId: string)
   } catch (error) {
     console.error('PDF generation error:', error)
     throw new Error('Failed to generate PDF')
+  }
+}
+
+async function mergeApplicationAndI9PDFs(applicationPDFBuffer: Buffer, i9PDFBuffer: Buffer): Promise<Buffer> {
+  try {
+    console.log('🔗 Merging application PDF with I-9 PDF for download...')
+    
+    // Load both PDFs
+    const applicationDoc = await PDFDocument.load(applicationPDFBuffer)
+    const i9Doc = await PDFDocument.load(i9PDFBuffer)
+    
+    console.log(`📋 Application PDF: ${applicationDoc.getPageCount()} pages`)
+    console.log(`📋 I-9 PDF: ${i9Doc.getPageCount()} pages`)
+    
+    // Copy all pages from I-9 into the application document
+    const i9Pages = await applicationDoc.copyPages(i9Doc, i9Doc.getPageIndices())
+    i9Pages.forEach((page) => applicationDoc.addPage(page))
+    
+    const totalPages = applicationDoc.getPageCount()
+    console.log(`📄 Final merged PDF: ${totalPages} pages`)
+    
+    // Save the merged document
+    const mergedPdfBytes = await applicationDoc.save()
+    return Buffer.from(mergedPdfBytes)
+    
+  } catch (error) {
+    console.error('❌ Failed to merge application and I-9 PDFs:', error)
+    console.log('⚠️ Falling back to application PDF only')
+    return applicationPDFBuffer
   }
 }

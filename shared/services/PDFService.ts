@@ -32,7 +32,19 @@ export class PDFService {
       console.log('Generating PDF for application:', data.submissionId)
       
       // Load the Wareworks Application PDF template
-      const templatePath = path.join(process.cwd(), 'apps', 'form-app', 'public', 'templates', 'Wareworks Application.pdf')
+      // Handle path resolution for both standalone and Next.js contexts
+      const baseDir = process.cwd()
+      let templatePath: string
+      
+      // Check if we're in Next.js context (already in apps/form-app)
+      if (baseDir.endsWith('form-app') || baseDir.includes('form-app') && !baseDir.endsWith('wareworks-form-backend')) {
+        templatePath = path.join(baseDir, 'public', 'templates', 'Wareworks Application.pdf')
+      } else {
+        // We're in root directory context
+        templatePath = path.join(baseDir, 'apps', 'form-app', 'public', 'templates', 'Wareworks Application.pdf')
+      }
+      
+      console.log(`📁 Loading template from: ${templatePath}`)
       const templateBytes = await fs.readFile(templatePath)
       
       // Load the PDF document
@@ -257,6 +269,7 @@ export class PDFService {
         this.setCheckboxField(form, 'CB_2', true) // Non-citizen national
         break
       case 'permanent_resident':
+      case 'lawful_permanent':
         this.setCheckboxField(form, 'CB_3', true) // Lawful permanent resident
         break
       case 'authorized_alien':
@@ -292,7 +305,20 @@ export class PDFService {
   private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData): Promise<Buffer | null> {
     try {
       console.log('Creating separate filled I-9 form for non-citizen applicant...')
-      const i9TemplatePath = path.join(process.cwd(), 'apps', 'form-app', 'public', 'templates', 'i-9.pdf')
+      
+      // Handle path resolution for both standalone and Next.js contexts
+      const baseDir = process.cwd()
+      let i9TemplatePath: string
+      
+      // Check if we're in Next.js context (already in apps/form-app)
+      if (baseDir.endsWith('form-app') || baseDir.includes('form-app') && !baseDir.endsWith('wareworks-form-backend')) {
+        i9TemplatePath = path.join(baseDir, 'public', 'templates', 'i-9.pdf')
+      } else {
+        // We're in root directory context
+        i9TemplatePath = path.join(baseDir, 'apps', 'form-app', 'public', 'templates', 'i-9.pdf')
+      }
+      
+      console.log(`📁 Loading I-9 template from: ${i9TemplatePath}`)
       const i9TemplateBytes = await fs.readFile(i9TemplatePath)
       const i9Doc = await PDFDocument.load(i9TemplateBytes)
       
@@ -353,7 +379,7 @@ export class PDFService {
     // Work authorization text fields
     console.log('Filling work authorization text fields...')
     
-    if (data.citizenshipStatus === 'permanent_resident' && data.uscisANumber) {
+    if ((data.citizenshipStatus === 'permanent_resident' || data.citizenshipStatus === 'lawful_permanent') && data.uscisANumber) {
       // Use CB_3 specific field for permanent residents
       this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB3, data.uscisANumber)
       console.log(`  ✅ Set permanent resident USCIS A-Number (CB_3 field): ${data.uscisANumber}`)
