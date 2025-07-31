@@ -68,54 +68,60 @@ export function ProgressBar({
 
         {/* Fluid Segmented Progress Bar */}
         <div className="relative">
-          <div className="flex w-full bg-secondary rounded-full h-8 overflow-hidden">
-            {steps.map((step, index) => {
-              const state = getStepState(index)
-              const isClickable = isStepClickable(index)
-              const stepWidth = 100 / totalSteps
-              
-              return (
-                <div
-                  key={index}
-                  className={`
-                    relative flex-1 transition-all duration-300 ease-out group
-                    ${isClickable ? 'cursor-pointer' : 'cursor-default'}
-                    ${state === 'completed' ? 'bg-green-500' 
-                      : state === 'current' ? 'bg-primary' 
-                      : state === 'passed' ? 'bg-primary' 
-                      : 'bg-secondary'
-                    }
-                    ${isClickable ? 'hover:brightness-110' : ''}
-                  `}
-                  onClick={() => handleStepClick(index)}
-                  style={{ width: `${stepWidth}%` }}
-                >
-                  {/* Step Content */}
-                  <div className="absolute inset-0 flex items-center justify-center px-1">
-                    {/* Step Number (default visible) */}
-                    <span className={`
-                      text-sm font-bold group-hover:opacity-0 transition-opacity duration-200
-                      ${state === 'completed' || state === 'current' || state === 'passed' ? 'text-white' : 'text-gray-600'}
-                    `}>
-                      {index + 1}
-                    </span>
+          {/* Background Bar */}
+          <div className="w-full bg-secondary rounded-full h-8 relative overflow-hidden">
+            
+            {/* Fluid Progress Fill */}
+            <div 
+              className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+            
+            {/* Segment Overlays */}
+            <div className="absolute inset-0 flex">
+              {steps.map((step, index) => {
+                const state = getStepState(index)
+                const isClickable = isStepClickable(index)
+                const stepWidth = 100 / totalSteps
+                
+                return (
+                  <div
+                    key={index}
+                    className={`
+                      relative flex-1 transition-all duration-300 ease-out group
+                      ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+                      ${isClickable ? 'hover:bg-white/10' : ''}
+                    `}
+                    onClick={() => handleStepClick(index)}
+                    style={{ width: `${stepWidth}%` }}
+                  >
+                    {/* Step Content */}
+                    <div className="absolute inset-0 flex items-center justify-center px-1">
+                      {/* Step Number (default visible) */}
+                      <span className={`
+                        text-sm font-bold group-hover:opacity-0 transition-opacity duration-200 z-10
+                        ${state === 'completed' || state === 'current' || state === 'passed' ? 'text-white' : 'text-gray-600'}
+                      `}>
+                        {index + 1}
+                      </span>
+                      
+                      {/* Step Name (visible on hover) */}
+                      <span className={`
+                        absolute inset-x-1 text-xs font-medium text-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate z-10
+                        ${state === 'completed' || state === 'current' || state === 'passed' ? 'text-white' : 'text-gray-600'}
+                      `}>
+                        {step}
+                      </span>
+                    </div>
                     
-                    {/* Step Name (visible on hover) */}
-                    <span className={`
-                      absolute inset-x-1 text-xs font-medium text-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 truncate
-                      ${state === 'completed' || state === 'current' || state === 'passed' ? 'text-white' : 'text-gray-600'}
-                    `}>
-                      {step}
-                    </span>
+                    {/* Segment Divider */}
+                    {index < steps.length - 1 && (
+                      <div className="absolute right-0 top-0 bottom-0 w-px bg-white/30 z-20" />
+                    )}
                   </div>
-                  
-                  {/* Segment Divider */}
-                  {index < steps.length - 1 && (
-                    <div className="absolute right-0 top-0 bottom-0 w-px bg-white/30" />
-                  )}
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       </div>
