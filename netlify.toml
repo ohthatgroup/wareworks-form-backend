@@ -1,12 +1,15 @@
 [build]
-  base = "apps/form-app"
-  command = "npm ci && npm run build"
-  publish = ".next"
+  base = "."
+  command = "npm ci && cd apps/form-app && npm run build"
+  publish = "apps/form-app/.next"
 
 # Functions handled by Next.js App Router
 # [functions]
 #   directory = "netlify/functions"
 #   node_bundler = "nft"
+
+[[plugins]]
+  package = "@netlify/plugin-emails"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
