@@ -273,6 +273,7 @@ export const translations = {
     // Common
     'common.yes': 'Yes',
     'common.no': 'No',
+    'common.complete': 'Complete',
   },
   es: {
     // Step titles
@@ -547,6 +548,7 @@ export const translations = {
     // Common
     'common.yes': 'Sí',
     'common.no': 'No',
+    'common.complete': 'Completo',
   }
 } as const;
 
