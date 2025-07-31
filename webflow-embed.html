@@ -28,7 +28,7 @@
           flex: 1;
           background: #131f5b;
           color: white;
-          border: none;
+          border: 1px solid #131f5b;
           padding: 1rem;
           font-weight: 600;
           cursor: pointer;
@@ -199,68 +199,6 @@
           <span id="privacy-notice-en">By continuing, you consent to the collection, use, and verification of all information provided including personal details, Social Security number, employment history, education records, and references. Information will be used for employment consideration, background verification, I-9 compliance, and maintained confidentially per applicable employment laws. Reference contacts and previous employers may be contacted for verification purposes.</span>
           <span id="privacy-notice-es" style="display: none;">Al continuar, usted consiente a la recopilación, uso y verificación de toda la información proporcionada incluyendo detalles personales, número de Seguro Social, historial laboral, registros educativos y referencias. La información será utilizada para consideración de empleo, verificación de antecedentes, cumplimiento I-9, y mantenida confidencialmente según las leyes laborales aplicables. Los contactos de referencia y empleadores anteriores pueden ser contactados para propósitos de verificación.</span>
         </p>
-      </div>
-    </div>
-    
-    <!-- Language Selection -->
-    <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb;">
-      <p style="
-        color: #374151; 
-        font-weight: 500; 
-        margin: 0 0 0.75rem 0; 
-        text-align: center;
-        font-size: 0.9rem;
-      ">
-        <span id="language-prompt-en">Please select your preferred language:</span>
-        <span id="language-prompt-es" style="display: none;">Por favor seleccione su idioma preferido:</span>
-      </p>
-      <div style="display: flex; gap: 0.75rem; justify-content: center;">
-        <button
-          id="english-button"
-          onclick="selectLanguage('en')"
-          aria-label="Select English"
-          style="
-            background: #131f5b; 
-            color: white; 
-            border: none;
-            padding: 0.75rem 1.5rem; 
-            border-radius: 0.375rem; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: all 0.2s ease;
-            font-family: 'Figtree', sans-serif;
-            box-shadow: 0 2px 4px rgba(19, 31, 91, 0.2);
-          "
-          onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(19, 31, 91, 0.3)'"
-          onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 4px rgba(19, 31, 91, 0.2)'"
-          onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
-          onblur="this.style.outline='none'"
-        >
-          English
-        </button>
-        <button
-          id="spanish-button"
-          onclick="selectLanguage('es')"
-          aria-label="Seleccionar Español"
-          style="
-            background: #6b7280; 
-            color: white; 
-            border: none;
-            padding: 0.75rem 1.5rem; 
-            border-radius: 0.375rem; 
-            font-weight: 500; 
-            cursor: pointer; 
-            transition: all 0.2s ease;
-            font-family: 'Figtree', sans-serif;
-            box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
-          "
-          onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(107, 114, 128, 0.3)'"
-          onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 4px rgba(107, 114, 128, 0.2)'"
-          onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
-          onblur="this.style.outline='none'"
-        >
-          Español
-        </button>
       </div>
     </div>
 
@@ -452,15 +390,43 @@ Accept & Continue
     const esElements = document.querySelectorAll('[id$="-es"]');
     
     if (language === 'en') {
+      // English tab active
       englishBtn.style.background = '#131f5b';
-      spanishBtn.style.background = '#6b7280';
+      englishBtn.style.color = 'white';
+      englishBtn.style.borderBottom = '3px solid #131f5b';
+      englishBtn.style.borderLeft = '1px solid #131f5b';
+      englishBtn.style.borderRight = '1px solid #131f5b';
+      englishBtn.style.borderTop = '1px solid #131f5b';
+      
+      // Spanish tab inactive  
+      spanishBtn.style.background = '#ffffff';
+      spanishBtn.style.color = '#6b7280';
+      spanishBtn.style.borderBottom = '3px solid #e5e7eb';
+      spanishBtn.style.borderLeft = 'none';
+      spanishBtn.style.borderRight = '1px solid #e5e7eb';
+      spanishBtn.style.borderTop = '1px solid #e5e7eb';
+      
       continueBtn.textContent = 'Accept & Continue';
       
       enElements.forEach(el => el.style.display = '');
       esElements.forEach(el => el.style.display = 'none');
     } else {
-      englishBtn.style.background = '#6b7280';
+      // Spanish tab active
       spanishBtn.style.background = '#131f5b';
+      spanishBtn.style.color = 'white';
+      spanishBtn.style.borderBottom = '3px solid #131f5b';
+      spanishBtn.style.borderLeft = 'none';
+      spanishBtn.style.borderRight = '1px solid #131f5b';
+      spanishBtn.style.borderTop = '1px solid #131f5b';
+      
+      // English tab inactive
+      englishBtn.style.background = '#ffffff';
+      englishBtn.style.color = '#6b7280';
+      englishBtn.style.borderBottom = '3px solid #e5e7eb';
+      englishBtn.style.borderLeft = '1px solid #e5e7eb';
+      englishBtn.style.borderRight = 'none';
+      englishBtn.style.borderTop = '1px solid #e5e7eb';
+      
       continueBtn.textContent = 'Aceptar y Continuar';
       
       enElements.forEach(el => el.style.display = 'none');
