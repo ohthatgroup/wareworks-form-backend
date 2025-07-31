@@ -21,54 +21,30 @@ export class EmailService {
     const subject = `New Application [${data.submissionId}]: ${data.legalFirstName} ${data.legalLastName} - ${data.positionApplied || 'Position Not Specified'}`
 
     try {
-      // Prepare all attachments
-      const attachments: EmailAttachment[] = []
+      // Merge all PDFs into a single attachment
+      let mergedPDF: Buffer | null = null
       
-      // Add PDF attachments
       if (pdfResult) {
         if (Buffer.isBuffer(pdfResult)) {
-          // Single application PDF
-          attachments.push({
-            filename: `${data.legalFirstName}_${data.legalLastName}_Application.pdf`,
-            content: pdfResult.toString('base64'),
-            contentType: 'application/pdf'
-          })
+          // Single application PDF - use as is
+          mergedPDF = pdfResult
         } else {
-          // Multiple PDFs (application + I-9)
-          attachments.push({
-            filename: `${data.legalFirstName}_${data.legalLastName}_Application.pdf`,
-            content: pdfResult.applicationPDF.toString('base64'),
-            contentType: 'application/pdf'
-          })
-          
-          attachments.push({
-            filename: `${data.legalFirstName}_${data.legalLastName}_I9_Form.pdf`,
-            content: pdfResult.i9PDF.toString('base64'),
-            contentType: 'application/pdf'
-          })
+          // Multiple PDFs (application + I-9) - merge them
+          console.log('Merging application + I-9 PDFs for email attachment...')
+          mergedPDF = await this.mergeAllPDFs(pdfResult.applicationPDF, pdfResult.i9PDF, data.documents)
         }
       }
+
+      // Prepare single merged attachment
+      const attachments: EmailAttachment[] = []
       
-      // Add uploaded document attachments
-      if (data.documents && data.documents.length > 0) {
-        data.documents.forEach((doc, index) => {
-          let filename = doc.name
-          
-          // Add type prefix to filename for clarity
-          if (doc.type === 'identification') {
-            filename = `ID_${filename}`
-          } else if (doc.type === 'resume') {
-            filename = `Resume_${filename}`
-          } else if (doc.type === 'certification') {
-            filename = `Certification_${filename}`
-          }
-          
-          attachments.push({
-            filename: filename,
-            content: doc.data, // Already base64 encoded
-            contentType: doc.mimeType
-          })
+      if (mergedPDF) {
+        attachments.push({
+          filename: `${data.legalFirstName}_${data.legalLastName}_Complete_Application.pdf`,
+          content: mergedPDF.toString('base64'),
+          contentType: 'application/pdf'
         })
+        console.log(`📎 Single merged PDF attachment created: ${mergedPDF.length} bytes`)
       }
 
       console.log('Preparing to send email notification:', {
@@ -171,6 +147,58 @@ export class EmailService {
       })
       
       throw new Error(`Failed to send email notification: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  private async mergeAllPDFs(applicationPDF: Buffer, i9PDF: Buffer, uploadedDocs?: any[]): Promise<Buffer> {
+    try {
+      const { PDFDocument } = await import('pdf-lib')
+      
+      console.log('🔗 Merging all PDFs into single document...')
+      
+      // Load the application PDF as the base document
+      const mergedDoc = await PDFDocument.load(applicationPDF)
+      console.log(`📋 Application PDF: ${mergedDoc.getPageCount()} pages`)
+      
+      // Add I-9 PDF pages
+      if (i9PDF) {
+        const i9Doc = await PDFDocument.load(i9PDF)
+        const i9Pages = await mergedDoc.copyPages(i9Doc, i9Doc.getPageIndices())
+        i9Pages.forEach((page) => mergedDoc.addPage(page))
+        console.log(`📋 Added I-9 PDF: ${i9Doc.getPageCount()} pages`)
+      }
+      
+      // Add uploaded document pages (if PDFs)
+      if (uploadedDocs && uploadedDocs.length > 0) {
+        for (const doc of uploadedDocs) {
+          if (doc.mimeType === 'application/pdf') {
+            try {
+              const docBuffer = Buffer.from(doc.data, 'base64')
+              const uploadedDoc = await PDFDocument.load(docBuffer)
+              const uploadedPages = await mergedDoc.copyPages(uploadedDoc, uploadedDoc.getPageIndices())
+              uploadedPages.forEach((page) => mergedDoc.addPage(page))
+              console.log(`📋 Added uploaded PDF "${doc.name}": ${uploadedDoc.getPageCount()} pages`)
+            } catch (error) {
+              console.error(`❌ Failed to merge uploaded PDF "${doc.name}":`, error)
+              // Continue with other documents
+            }
+          } else {
+            console.log(`⏭️ Skipping non-PDF document "${doc.name}" (${doc.mimeType})`)
+          }
+        }
+      }
+      
+      const totalPages = mergedDoc.getPageCount()
+      console.log(`📄 Final merged PDF: ${totalPages} pages total`)
+      
+      // Save the merged document
+      const mergedPdfBytes = await mergedDoc.save()
+      return Buffer.from(mergedPdfBytes)
+      
+    } catch (error) {
+      console.error('❌ Failed to merge PDFs:', error)
+      console.log('⚠️ Falling back to application PDF only')
+      return applicationPDF
     }
   }
 
