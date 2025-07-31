@@ -105,7 +105,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
           required
         />
         
-        <div>
+        <div className="space-y-2">
           <label className="form-label">
             {t('contact_info.state')}
             <span className="text-red-500 ml-1">*</span>

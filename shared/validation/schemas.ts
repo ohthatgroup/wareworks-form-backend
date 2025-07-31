@@ -86,6 +86,11 @@ const baseSchema = z.object({
   skills2: z.string().optional(),
   skills3: z.string().optional(),
   
+  // Skills Certification Status - Optional
+  skills1Certified: z.boolean().optional(),
+  skills2Certified: z.boolean().optional(),
+  skills3Certified: z.boolean().optional(),
+  
   // Work Preferences - Optional
   fullTimeEmployment: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   swingShifts: z.enum(['yes', 'no']).or(z.literal('')).optional(),
@@ -129,6 +134,7 @@ const baseSchema = z.object({
   // Documents - Optional
   documents: z.array(z.object({
     type: z.enum(['identification', 'resume', 'certification']),
+    category: z.string(), // Upload category: 'id', 'resume', 'equipmentSD-cert', 'skills1-cert', etc.
     name: z.string(),
     size: z.number(),
     mimeType: z.string(),

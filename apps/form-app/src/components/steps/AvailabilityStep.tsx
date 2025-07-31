@@ -68,7 +68,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-primary mb-4">{t('availability.weekly_availability_title')}</h3>
           <p className="text-sm text-gray-600 mb-4">
-            {t('availability.weekly_availability_description')}
+            {t('availability.weekly_description')}
           </p>
         
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
@@ -102,8 +102,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                         checked={isSelected}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            // Set a placeholder value to show the time input field
-                            setValue(day.key as keyof ValidatedApplicationData, 'SELECTED' as any)
+                            // Set empty string to show the time input field without prefilling
+                            setValue(day.key as keyof ValidatedApplicationData, '' as any)
                           } else {
                             // Clear the value
                             setValue(day.key as keyof ValidatedApplicationData, '' as any)
@@ -129,7 +129,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           type="text"
                           className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
                           placeholder={t('availability.time_placeholder')}
-                          value={currentValue === 'SELECTED' ? '' : currentValue || ''}
+                          value={currentValue || ''}
                           onChange={(e) => {
                             setValue(day.key as keyof ValidatedApplicationData, e.target.value as any)
                           }}

@@ -23,11 +23,14 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
     const skill1 = watch('skills1')
     const skill2 = watch('skills2')
     const skill3 = watch('skills3')
+    const skill1Certified = watch('skills1Certified')
+    const skill2Certified = watch('skills2Certified')
+    const skill3Certified = watch('skills3Certified')
     
     const existingSkills: Skill[] = []
-    if (skill1) existingSkills.push({ id: 'skill1', value: skill1, isCertified: false })
-    if (skill2) existingSkills.push({ id: 'skill2', value: skill2, isCertified: false })
-    if (skill3) existingSkills.push({ id: 'skill3', value: skill3, isCertified: false })
+    if (skill1) existingSkills.push({ id: 'skill1', value: skill1, isCertified: skill1Certified || false })
+    if (skill2) existingSkills.push({ id: 'skill2', value: skill2, isCertified: skill2Certified || false })
+    if (skill3) existingSkills.push({ id: 'skill3', value: skill3, isCertified: skill3Certified || false })
     
     return existingSkills.length > 0 ? existingSkills : [{ id: 'skill1', value: '', isCertified: false }]
   })
@@ -37,12 +40,22 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
     setValue('skills1', '')
     setValue('skills2', '')
     setValue('skills3', '')
+    setValue('skills1Certified', false)
+    setValue('skills2Certified', false)
+    setValue('skills3Certified', false)
     
     // Set values based on array order
     updatedSkills.forEach((skill, index) => {
-      if (index === 0) setValue('skills1', skill.value)
-      else if (index === 1) setValue('skills2', skill.value)
-      else if (index === 2) setValue('skills3', skill.value)
+      if (index === 0) {
+        setValue('skills1', skill.value)
+        setValue('skills1Certified', skill.isCertified)
+      } else if (index === 1) {
+        setValue('skills2', skill.value)
+        setValue('skills2Certified', skill.isCertified)
+      } else if (index === 2) {
+        setValue('skills3', skill.value)
+        setValue('skills3Certified', skill.isCertified)
+      }
     })
   }
 

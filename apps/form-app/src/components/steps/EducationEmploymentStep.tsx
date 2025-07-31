@@ -10,8 +10,23 @@ interface EducationEmploymentStepProps {
 }
 
 export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) {
-  const { register, control, formState: { errors } } = form
+  const { register, control, setValue, formState: { errors } } = form
   const { t } = useLanguage()
+
+  // Phone number formatting function (same as ContactInfoStep)
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, '')
+    
+    // Format as (XXX) XXX-XXXX
+    if (digits.length <= 3) {
+      return digits
+    } else if (digits.length <= 6) {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    } else {
+      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+    }
+  }
 
   const {
     fields: educationFields,
@@ -31,31 +46,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
     name: 'employment',
   })
 
-  // Initialize with 1 education and 1 employment entry if empty
-  useEffect(() => {
-    if (educationFields.length === 0) {
-      appendEducation({
-        schoolName: '',
-        graduationYear: '',
-        fieldOfStudy: '',
-        degreeReceived: ''
-      })
-    }
-    if (employmentFields.length === 0) {
-      appendEmployment({
-        companyName: '',
-        startDate: '',
-        endDate: '',
-        startingPosition: '',
-        endingPosition: '',
-        supervisorName: '',
-        supervisorPhone: '',
-        responsibilities: '',
-        reasonForLeaving: '',
-        mayContact: ''
-      })
-    }
-  }, [educationFields.length, employmentFields.length, appendEducation, appendEmployment])
+  // Don't auto-initialize entries - let users add them when needed
 
   const addEducation = () => {
     if (educationFields.length < 3) {
@@ -104,6 +95,12 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
         </div>
 
 
+        {educationFields.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p>{t('education.no_entries_message') || 'Click "Add Education" to add your educational background.'}</p>
+          </div>
+        ) : null}
+
         {educationFields.map((field, index) => (
           <div key={field.id} className="bg-gray-50 rounded-lg p-6 mb-4">
             <div className="flex justify-between items-center mb-4">
@@ -127,9 +124,12 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
               
               <Input
                 label={t('education.graduation_year')}
+                type="number"
                 registration={register(`education.${index}.graduationYear`)}
                 error={errors.education?.[index]?.graduationYear?.message}
                 placeholder={t('education.graduation_placeholder')}
+                min="1950"
+                max="2030"
               />
               
               <Input
@@ -139,29 +139,16 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                 placeholder={t('education.field_placeholder')}
               />
               
-              <div>
-                <label className="form-label">{t('education.degree_received')}</label>
-                <div className="flex gap-4 mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="yes"
-                      {...register(`education.${index}.degreeReceived`)}
-                      className="mr-2"
-                    />
-                    {t('common.yes')}
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="no"
-                      {...register(`education.${index}.degreeReceived`)}
-                      className="mr-2"
-                    />
-                    {t('common.no')}
-                  </label>
-                </div>
-              </div>
+              <RadioGroup
+                label={t('education.degree_received')}
+                name={`education.${index}.degreeReceived`}
+                options={[
+                  { value: 'yes', label: t('common.yes') },
+                  { value: 'no', label: t('common.no') }
+                ]}
+                registration={register(`education.${index}.degreeReceived`)}
+                error={errors.education?.[index]?.degreeReceived?.message}
+              />
             </div>
           </div>
         ))}
@@ -182,6 +169,12 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
           </button>
         </div>
 
+
+        {employmentFields.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p>{t('employment.no_entries_message') || 'Click "Add Employment" to add your work history.'}</p>
+          </div>
+        ) : null}
 
         {employmentFields.map((field, index) => (
           <div key={field.id} className="bg-gray-50 rounded-lg p-6 mb-4">
@@ -244,13 +237,26 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                   placeholder={t('employment.supervisor_placeholder')}
                 />
                 
-                <Input
-                  label={t('employment.supervisor_phone')}
-                  type="tel"
-                  registration={register(`employment.${index}.supervisorPhone`)}
-                  error={errors.employment?.[index]?.supervisorPhone?.message}
-                  placeholder={t('employment.phone_placeholder')}
-                />
+                <div className="space-y-2">
+                  <label className="form-label">
+                    {t('employment.supervisor_phone')}
+                  </label>
+                  <input
+                    type="tel"
+                    className={`form-input ${errors.employment?.[index]?.supervisorPhone ? 'border-red-500 focus:border-red-500' : ''}`}
+                    autoComplete="off"
+                    {...register(`employment.${index}.supervisorPhone`)}
+                    onChange={(e) => {
+                      const formatted = formatPhoneNumber(e.target.value)
+                      setValue(`employment.${index}.supervisorPhone`, formatted)
+                    }}
+                    placeholder={t('employment.phone_placeholder')}
+                    maxLength={14}
+                  />
+                  {errors.employment?.[index]?.supervisorPhone && (
+                    <p className="form-error">{errors.employment[index]?.supervisorPhone?.message}</p>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -277,29 +283,16 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                 )}
               </div>
 
-              <div>
-                <label className="form-label">{t('employment.may_contact')}</label>
-                <div className="flex gap-4 mt-2">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="yes"
-                      {...register(`employment.${index}.mayContact`)}
-                      className="mr-2"
-                    />
-                    {t('common.yes')}
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      value="no"
-                      {...register(`employment.${index}.mayContact`)}
-                      className="mr-2"
-                    />
-                    {t('common.no')}
-                  </label>
-                </div>
-              </div>
+              <RadioGroup
+                label={t('employment.may_contact')}
+                name={`employment.${index}.mayContact`}
+                options={[
+                  { value: 'yes', label: t('common.yes') },
+                  { value: 'no', label: t('common.no') }
+                ]}
+                registration={register(`employment.${index}.mayContact`)}
+                error={errors.employment?.[index]?.mayContact?.message}
+              />
             </div>
           </div>
         ))}
