@@ -38,8 +38,8 @@
           border-bottom: 3px solid #131f5b;
           position: relative;
         "
-        onmouseover="if(this.style.background !== '#131f5b') this.style.background='#f3f4f6'"
-        onmouseout="if(this.style.background !== '#131f5b') this.style.background='#ffffff'"
+        onmouseover="if(this.style.background !== 'rgb(19, 31, 91)') { this.style.background='#f3f4f6'; this.style.color='#374151'; }"
+        onmouseout="if(this.style.background !== 'rgb(19, 31, 91)') { this.style.background='#ffffff'; this.style.color='#6b7280'; }"
         onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
         onblur="this.style.outline='none'"
       >
@@ -64,8 +64,8 @@
           border-top-right-radius: 0.75rem;
           position: relative;
         "
-        onmouseover="if(this.style.background !== '#131f5b') this.style.background='#f3f4f6'"
-        onmouseout="if(this.style.background !== '#131f5b') this.style.background='#ffffff'"
+        onmouseover="if(this.style.background !== 'rgb(19, 31, 91)') { this.style.background='#f3f4f6'; this.style.color='#374151'; }"
+        onmouseout="if(this.style.background !== 'rgb(19, 31, 91)') { this.style.background='#ffffff'; this.style.color='#6b7280'; }"
         onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
         onblur="this.style.outline='none'"
       >
@@ -391,16 +391,16 @@ Accept & Continue
     
     if (language === 'en') {
       // English tab active
-      englishBtn.style.background = '#131f5b';
-      englishBtn.style.color = 'white';
+      englishBtn.style.setProperty('background', '#131f5b', 'important');
+      englishBtn.style.setProperty('color', 'white', 'important');
       englishBtn.style.borderBottom = '3px solid #131f5b';
       englishBtn.style.borderLeft = '1px solid #131f5b';
       englishBtn.style.borderRight = '1px solid #131f5b';
       englishBtn.style.borderTop = '1px solid #131f5b';
       
       // Spanish tab inactive  
-      spanishBtn.style.background = '#ffffff';
-      spanishBtn.style.color = '#6b7280';
+      spanishBtn.style.setProperty('background', '#ffffff', 'important');
+      spanishBtn.style.setProperty('color', '#6b7280', 'important');
       spanishBtn.style.borderBottom = '3px solid #e5e7eb';
       spanishBtn.style.borderLeft = 'none';
       spanishBtn.style.borderRight = '1px solid #e5e7eb';
@@ -412,16 +412,16 @@ Accept & Continue
       esElements.forEach(el => el.style.display = 'none');
     } else {
       // Spanish tab active
-      spanishBtn.style.background = '#131f5b';
-      spanishBtn.style.color = 'white';
+      spanishBtn.style.setProperty('background', '#131f5b', 'important');
+      spanishBtn.style.setProperty('color', 'white', 'important');
       spanishBtn.style.borderBottom = '3px solid #131f5b';
       spanishBtn.style.borderLeft = 'none';
       spanishBtn.style.borderRight = '1px solid #131f5b';
       spanishBtn.style.borderTop = '1px solid #131f5b';
       
       // English tab inactive
-      englishBtn.style.background = '#ffffff';
-      englishBtn.style.color = '#6b7280';
+      englishBtn.style.setProperty('background', '#ffffff', 'important');
+      englishBtn.style.setProperty('color', '#6b7280', 'important');
       englishBtn.style.borderBottom = '3px solid #e5e7eb';
       englishBtn.style.borderLeft = '1px solid #e5e7eb';
       englishBtn.style.borderRight = 'none';
