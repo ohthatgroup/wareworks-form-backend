@@ -14,13 +14,77 @@
     max-width: 600px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   ">
+    <!-- Language Tab Selector -->
+    <div style="
+      display: flex;
+      margin-bottom: 0;
+      border-bottom: none;
+    ">
+      <button
+        id="english-button"
+        onclick="selectLanguage('en')"
+        aria-label="Select English"
+        style="
+          flex: 1;
+          background: #131f5b;
+          color: white;
+          border: none;
+          padding: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-family: 'Figtree', sans-serif;
+          border-top-left-radius: 0.75rem;
+          border-bottom: 3px solid #131f5b;
+          position: relative;
+        "
+        onmouseover="if(this.style.background !== '#131f5b') this.style.background='#f3f4f6'"
+        onmouseout="if(this.style.background !== '#131f5b') this.style.background='#ffffff'"
+        onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
+        onblur="this.style.outline='none'"
+      >
+        English
+      </button>
+      <button
+        id="spanish-button"
+        onclick="selectLanguage('es')"
+        aria-label="Seleccionar Español"
+        style="
+          flex: 1;
+          background: #ffffff;
+          color: #6b7280;
+          border: 1px solid #e5e7eb;
+          border-left: none;
+          border-bottom: 3px solid #e5e7eb;
+          padding: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-family: 'Figtree', sans-serif;
+          border-top-right-radius: 0.75rem;
+          position: relative;
+        "
+        onmouseover="if(this.style.background !== '#131f5b') this.style.background='#f3f4f6'"
+        onmouseout="if(this.style.background !== '#131f5b') this.style.background='#ffffff'"
+        onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
+        onblur="this.style.outline='none'"
+      >
+        Español
+      </button>
+    </div>
     
     <!-- Scrollable Content Container -->
     <div class="scrollable-content" style="
       max-height: 400px;
       overflow-y: auto;
       margin-bottom: 1.5rem;
-      padding-right: 0.5rem;
+      padding: 2rem;
+      padding-right: 2.5rem;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-top: none;
+      border-bottom-left-radius: 0.75rem;
+      border-bottom-right-radius: 0.75rem;
     ">
       <!-- Employment Application Information -->
       <div style="margin-bottom: 1.5rem;">
