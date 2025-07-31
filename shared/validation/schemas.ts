@@ -4,6 +4,7 @@ import { z } from 'zod'
  * Complete rebuild of application schema based on actual UI requirements
  * Only fields with red asterisks in UI are marked as required
  * All other fields are optional with conditional validation via refine
+ * Updated: submissionId and submittedAt are optional (server-generated)
  */
 
 // US States enum for validation
