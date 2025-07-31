@@ -14,75 +14,138 @@
     max-width: 600px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   ">
-    <!-- Title -->
-    <h2 id="disclaimer-title" style="
-      font-size: 1.5rem; 
-      font-weight: 700; 
-      color: #131f5b; 
-      margin: 0 0 1.5rem 0; 
-      text-align: center;
-      font-family: 'Bricolage Grotesque', sans-serif;
-    ">
-      <span id="title-en">Welcome to WareWorks</span>
-      <span id="title-es" style="display: none;">Bienvenido a WareWorks</span>
-    </h2>
     
-    <!-- Employment Eligibility Requirements -->
-    <div style="margin-bottom: 1.5rem;">
-      <h3 style="
-        font-size: 1.125rem; 
-        font-weight: 600; 
-        color: #131f5b; 
-        margin: 0 0 0.75rem 0;
-      ">
-        <span id="requirements-title-en">Employment Eligibility Requirements</span>
-        <span id="requirements-title-es" style="display: none;">Requisitos de Elegibilidad para el Empleo</span>
-      </h3>
-      <p style="
-        color: #374151; 
-        line-height: 1.6; 
-        margin: 0 0 1rem 0;
-      ">
-        <span id="requirements-text-en">All employees must be eligible to work in the United States. You will be required to provide documentation to verify your eligibility as part of the I-9 process. Federal law requires all employers to verify the identity and employment eligibility of all employees. You will need to provide acceptable documentation within three (3) business days of starting employment.</span>
-        <span id="requirements-text-es" style="display: none;">Todos los empleados deben ser elegibles para trabajar en los Estados Unidos. Se le requerirá proporcionar documentación para verificar su elegibilidad como parte del proceso I-9. La ley federal requiere que todos los empleadores verifiquen la identidad y elegibilidad de empleo de todos los empleados. Necesitará proporcionar documentación aceptable dentro de tres (3) días hábiles de comenzar el empleo.</span>
-      </p>
-      
-      <p style="
-        color: #374151; 
-        line-height: 1.6; 
-        margin: 0;
-      ">
-        <span id="doc-requirements-en"><strong>Document Requirements:</strong> Accepted formats include PDF, JPG, JPEG, PNG. Maximum file size is 10MB per file. Documents must be clear and legible with personal information visible.</span>
-        <span id="doc-requirements-es" style="display: none;"><strong>Requisitos de Documentos:</strong> Los formatos aceptados incluyen PDF, JPG, JPEG, PNG. El tamaño máximo de archivo es de 10MB por archivo. Los documentos deben ser claros y legibles con información personal visible.</span>
-      </p>
-    </div>
-    
-    <!-- Privacy Notice -->
-    <div style="
-      background: #f9fafb; 
-      border: 1px solid #e5e7eb; 
-      border-radius: 0.5rem; 
-      padding: 1rem; 
+    <!-- Scrollable Content Container -->
+    <div class="scrollable-content" style="
+      max-height: 400px;
+      overflow-y: auto;
       margin-bottom: 1.5rem;
+      padding-right: 0.5rem;
     ">
-      <p style="
-        color: #374151; 
-        line-height: 1.6; 
-        margin: 0;
-        font-size: 0.875rem;
+      <!-- Employment Application Information -->
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="
+          font-size: 1.125rem; 
+          font-weight: 600; 
+          color: #131f5b; 
+          margin: 0 0 0.75rem 0;
+        ">
+          <span id="requirements-title-en">Employment Application Process</span>
+          <span id="requirements-title-es" style="display: none;">Proceso de Solicitud de Empleo</span>
+        </h3>
+        <p style="
+          color: #374151; 
+          line-height: 1.6; 
+          margin: 0 0 1rem 0;
+        ">
+          <span id="requirements-text-en">This comprehensive employment application will collect your personal information, work authorization status, employment history, education background, and required documentation. All information is necessary for employment consideration and legal compliance.</span>
+          <span id="requirements-text-es" style="display: none;">Esta solicitud de empleo integral recopilará su información personal, estado de autorización de trabajo, historial laboral, antecedentes educativos y documentación requerida. Toda la información es necesaria para la consideración de empleo y el cumplimiento legal.</span>
+        </p>
+      </div>
+
+      <!-- Work Authorization & I-9 Requirements -->
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="
+          font-size: 1rem; 
+          font-weight: 600; 
+          color: #131f5b; 
+          margin: 0 0 0.5rem 0;
+        ">
+          <span id="i9-title-en">Work Authorization & I-9 Verification</span>
+          <span id="i9-title-es" style="display: none;">Autorización de Trabajo y Verificación I-9</span>
+        </h4>
+        <p style="
+          color: #374151; 
+          line-height: 1.6; 
+          margin: 0 0 1rem 0;
+          font-size: 0.9rem;
+        ">
+          <span id="i9-text-en">Federal law requires verification of identity and work authorization for all employees. You must provide acceptable I-9 documentation within three (3) business days of starting employment. This includes government-issued photo identification and proof of work authorization.</span>
+          <span id="i9-text-es" style="display: none;">La ley federal requiere verificación de identidad y autorización de trabajo para todos los empleados. Debe proporcionar documentación I-9 aceptable dentro de tres (3) días hábiles de comenzar el empleo. Esto incluye identificación con foto emitida por el gobierno y prueba de autorización de trabajo.</span>
+        </p>
+      </div>
+
+      <!-- Background Verification -->
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="
+          font-size: 1rem; 
+          font-weight: 600; 
+          color: #131f5b; 
+          margin: 0 0 0.5rem 0;
+        ">
+          <span id="background-title-en">Background Verification Process</span>
+          <span id="background-title-es" style="display: none;">Proceso de Verificación de Antecedentes</span>
+        </h4>
+        <p style="
+          color: #374151; 
+          line-height: 1.6; 
+          margin: 0 0 1rem 0;
+          font-size: 0.9rem;
+        ">
+          <span id="background-text-en">We will conduct comprehensive background checks including employment history verification, reference checks, and criminal background screening. Previous employers and supervisors may be contacted to verify your work experience, job performance, and eligibility for rehire.</span>
+          <span id="background-text-es" style="display: none;">Realizaremos verificaciones exhaustivas de antecedentes incluyendo verificación del historial laboral, verificación de referencias y verificación de antecedentes penales. Los empleadores anteriores y supervisores pueden ser contactados para verificar su experiencia laboral, desempeño en el trabajo y elegibilidad para recontratación.</span>
+        </p>
+      </div>
+
+      <!-- Document Requirements -->
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="
+          font-size: 1rem; 
+          font-weight: 600; 
+          color: #131f5b; 
+          margin: 0 0 0.5rem 0;
+        ">
+          <span id="doc-title-en">Required Documentation</span>
+          <span id="doc-title-es" style="display: none;">Documentación Requerida</span>
+        </h4>
+        <p style="
+          color: #374151; 
+          line-height: 1.6; 
+          margin: 0;
+          font-size: 0.9rem;
+        ">
+          <span id="doc-requirements-en">You will need to upload: (1) Government-issued photo ID, (2) Current resume, and (3) Any relevant certifications. Accepted formats: PDF, JPG, JPEG, PNG. Maximum file size: 10MB per file. All documents must be clear, legible, and show complete information.</span>
+          <span id="doc-requirements-es" style="display: none;">Deberá subir: (1) Identificación con foto emitida por el gobierno, (2) Currículum actual, y (3) Cualquier certificación relevante. Formatos aceptados: PDF, JPG, JPEG, PNG. Tamaño máximo de archivo: 10MB por archivo. Todos los documentos deben ser claros, legibles y mostrar información completa.</span>
+        </p>
+      </div>
+
+      <!-- Privacy Notice -->
+      <div style="
+        background: #f9fafb; 
+        border: 1px solid #e5e7eb; 
+        border-radius: 0.5rem; 
+        padding: 1rem; 
+        margin-bottom: 0;
       ">
-        <span id="privacy-notice-en"><strong>Privacy Notice:</strong> By continuing, you acknowledge that the information you provide will be used for employment purposes and will be kept confidential according to applicable laws. All information provided will be verified during the background check process.</span>
-        <span id="privacy-notice-es" style="display: none;"><strong>Aviso de Privacidad:</strong> Al continuar, usted reconoce que la información que proporciona será utilizada para propósitos de empleo y se mantendrá confidencial de acuerdo con las leyes aplicables. Toda la información proporcionada será verificada durante el proceso de verificación de antecedentes.</span>
-      </p>
+        <h4 style="
+          font-size: 1rem; 
+          font-weight: 600; 
+          color: #131f5b; 
+          margin: 0 0 0.5rem 0;
+        ">
+          <span id="privacy-title-en">Privacy & Data Use Notice</span>
+          <span id="privacy-title-es" style="display: none;">Aviso de Privacidad y Uso de Datos</span>
+        </h4>
+        <p style="
+          color: #374151; 
+          line-height: 1.6; 
+          margin: 0;
+          font-size: 0.875rem;
+        ">
+          <span id="privacy-notice-en">By continuing, you consent to the collection, use, and verification of all information provided including personal details, Social Security number, employment history, education records, and references. Information will be used for employment consideration, background verification, I-9 compliance, and maintained confidentially per applicable employment laws. Reference contacts and previous employers may be contacted for verification purposes.</span>
+          <span id="privacy-notice-es" style="display: none;">Al continuar, usted consiente a la recopilación, uso y verificación de toda la información proporcionada incluyendo detalles personales, número de Seguro Social, historial laboral, registros educativos y referencias. La información será utilizada para consideración de empleo, verificación de antecedentes, cumplimiento I-9, y mantenida confidencialmente según las leyes laborales aplicables. Los contactos de referencia y empleadores anteriores pueden ser contactados para propósitos de verificación.</span>
+        </p>
+      </div>
     </div>
     
     <!-- Language Selection -->
-    <div style="margin-bottom: 1.5rem;">
+    <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e5e7eb;">
       <p style="
         color: #374151; 
         font-weight: 500; 
         margin: 0 0 0.75rem 0; 
         text-align: center;
+        font-size: 0.9rem;
       ">
         <span id="language-prompt-en">Please select your preferred language:</span>
         <span id="language-prompt-es" style="display: none;">Por favor seleccione su idioma preferido:</span>
@@ -91,6 +154,7 @@
         <button
           id="english-button"
           onclick="selectLanguage('en')"
+          aria-label="Select English"
           style="
             background: #131f5b; 
             color: white; 
@@ -101,13 +165,19 @@
             cursor: pointer; 
             transition: all 0.2s ease;
             font-family: 'Figtree', sans-serif;
+            box-shadow: 0 2px 4px rgba(19, 31, 91, 0.2);
           "
+          onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(19, 31, 91, 0.3)'"
+          onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 4px rgba(19, 31, 91, 0.2)'"
+          onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
+          onblur="this.style.outline='none'"
         >
           English
         </button>
         <button
           id="spanish-button"
           onclick="selectLanguage('es')"
+          aria-label="Seleccionar Español"
           style="
             background: #6b7280; 
             color: white; 
@@ -118,7 +188,12 @@
             cursor: pointer; 
             transition: all 0.2s ease;
             font-family: 'Figtree', sans-serif;
+            box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
           "
+          onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(107, 114, 128, 0.3)'"
+          onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 4px rgba(107, 114, 128, 0.2)'"
+          onfocus="this.style.outline='2px solid #60a5fa'; this.style.outlineOffset='2px'"
+          onblur="this.style.outline='none'"
         >
           Español
         </button>
@@ -149,7 +224,7 @@
       onmouseover="this.style.background='#1e308e'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 20px rgba(19, 31, 91, 0.25)'" 
       onmouseout="this.style.background='#131f5b'; this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(19, 31, 91, 0.15)'"
     >
-      Accept & Continue in English
+Accept & Continue
     </button>
   </div>
   
@@ -220,9 +295,40 @@
   }
   
   @media (max-width: 480px) {
-    #disclaimer-title {
-      font-size: 1.21rem !important;
+    #language-disclaimer {
+      margin: 0 0.5rem 1.25rem !important;
+      padding: 1.25rem !important;
     }
+    
+    .scrollable-content {
+      max-height: 300px !important;
+    }
+  }
+  
+  /* Custom scrollbar styling */
+  .scrollable-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollable-content::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 4px;
+  }
+  
+  .scrollable-content::-webkit-scrollbar-thumb {
+    background: #c1c7cd;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+  
+  .scrollable-content::-webkit-scrollbar-thumb:hover {
+    background: #a8aeb4;
+  }
+  
+  /* Firefox scrollbar styling */
+  .scrollable-content {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c7cd #f1f3f4;
   }
 </style>
 
@@ -284,14 +390,14 @@
     if (language === 'en') {
       englishBtn.style.background = '#131f5b';
       spanishBtn.style.background = '#6b7280';
-      continueBtn.textContent = 'Accept & Continue in English';
+      continueBtn.textContent = 'Accept & Continue';
       
       enElements.forEach(el => el.style.display = '');
       esElements.forEach(el => el.style.display = 'none');
     } else {
       englishBtn.style.background = '#6b7280';
       spanishBtn.style.background = '#131f5b';
-      continueBtn.textContent = 'Aceptar y Continuar en Español';
+      continueBtn.textContent = 'Aceptar y Continuar';
       
       enElements.forEach(el => el.style.display = 'none');
       esElements.forEach(el => el.style.display = '');
