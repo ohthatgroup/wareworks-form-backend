@@ -21,7 +21,7 @@ const PHONE_REGEX = /^\(\d{3}\) \d{3}-\d{4}$/
 const ZIP_REGEX = /^\d{5}(-\d{4})?$/
 
 const baseSchema = z.object({
-  submissionId: z.string(),
+  submissionId: z.string().optional(),
   
   // REQUIRED FIELDS (have red asterisks in UI)
   legalFirstName: z.string().min(1, 'First name is required'),
@@ -138,7 +138,7 @@ const baseSchema = z.object({
   language: z.string().optional(),
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
-  submittedAt: z.string()
+  submittedAt: z.string().optional()
 })
 
 // Apply conditional validation
