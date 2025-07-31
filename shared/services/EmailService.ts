@@ -18,7 +18,7 @@ export class EmailService {
 
     // HR email - will eventually change to admin@wareworks.me
     const hrEmail = process.env.HR_EMAIL || 'inbox@ohthatgrp.com'
-    const subject = `New Application [${data.submissionId}]: ${data.legalFirstName} ${data.legalLastName} - ${data.positionApplied || 'Position Not Specified'}`
+    const subject = `New Application [${data.submissionId}]`
 
     try {
       // Merge all PDFs into a single attachment
