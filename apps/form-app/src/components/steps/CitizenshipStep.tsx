@@ -24,9 +24,8 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
     }
     if (citizenshipStatus !== 'alien_authorized') {
       setValue('workAuthExpiration', '')
-      setValue('alienDocumentType', '')
+      setValue('alienDocumentType', undefined)
       setValue('alienDocumentNumber', '')
-      setValue('documentCountry', '')
       setValue('i94AdmissionNumber', '')
       setValue('foreignPassportNumber', '')
       setValue('foreignPassportCountry', '')

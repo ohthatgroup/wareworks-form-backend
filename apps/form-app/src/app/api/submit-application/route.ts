@@ -46,32 +46,30 @@ export async function POST(request: NextRequest) {
       })
 
       // Generate PDF
-      let pdfBuffer: Buffer | null = null
+      let pdfResult: Buffer | { applicationPDF: Buffer; i9PDF: Buffer } | null = null
       try {
         const pdfService = new PDFService()
-        const pdfResult = await pdfService.generateApplicationPDF(submissionData)
+        pdfResult = await pdfService.generateApplicationPDF(submissionData)
         
-        // Handle different return types from PDFService
         if (Buffer.isBuffer(pdfResult)) {
-          pdfBuffer = pdfResult
+          console.log('PDF generated successfully, size:', pdfResult.length, 'bytes')
         } else if (pdfResult && typeof pdfResult === 'object' && 'applicationPDF' in pdfResult) {
-          pdfBuffer = pdfResult.applicationPDF
-        }
-        
-        if (pdfBuffer) {
-          console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes')
+          console.log('PDFs generated successfully:', {
+            applicationPDF: pdfResult.applicationPDF.length + ' bytes',
+            i9PDF: pdfResult.i9PDF ? pdfResult.i9PDF.length + ' bytes' : 'none'
+          })
         }
       } catch (pdfError) {
         console.error('PDF generation failed:', pdfError)
         // Continue without PDF - don't fail the entire submission
       }
 
-      // Send email notification
+      // Send email notification with all attachments
       try {
         if (process.env.ENABLE_EMAIL_NOTIFICATIONS === 'true') {
           const emailService = new EmailService()
-          await emailService.sendApplicationNotification(submissionData, pdfBuffer)
-          console.log('Email notification sent successfully')
+          await emailService.sendApplicationNotification(submissionData, pdfResult)
+          console.log('Email notification sent successfully with all attachments')
         } else {
           console.log('Email notifications disabled')
         }
@@ -89,9 +87,22 @@ export async function POST(request: NextRequest) {
         // Store submission data for download access
         console.log('📁 Storing submission data for download access')
         
+        // Store PDF data for download access
+        let pdfDataForStorage = null
+        if (pdfResult) {
+          if (Buffer.isBuffer(pdfResult)) {
+            pdfDataForStorage = { applicationPDF: pdfResult.toString('base64') }
+          } else {
+            pdfDataForStorage = { 
+              applicationPDF: pdfResult.applicationPDF.toString('base64'),
+              i9PDF: pdfResult.i9PDF?.toString('base64') || null
+            }
+          }
+        }
+
         const dataToStore = { 
           ...submissionData, 
-          pdfBuffer: pdfBuffer?.toString('base64') // Store as base64 for retrieval
+          pdfData: pdfDataForStorage
         }
         
         globalAny.submissionStore.set(submissionId, dataToStore)

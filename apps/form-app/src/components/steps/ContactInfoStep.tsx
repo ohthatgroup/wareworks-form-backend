@@ -185,7 +185,6 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
         registration={register('email')}
         error={errors.email?.message}
         placeholder={t('contact_info.email_placeholder')}
-        required
       />
 
       <div className="border-t pt-6">

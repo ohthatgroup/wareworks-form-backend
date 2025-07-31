@@ -195,12 +195,6 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <span className="font-medium">{t('review.citizenship_status_label')}</span>
             <p>{formData.citizenshipStatus || t('review.not_provided')}</p>
           </div>
-          {formData.workAuthorization && (
-            <div className="mt-2">
-              <span className="font-medium">{t('review.work_authorization_label')}</span>
-              <p>{formData.workAuthorization}</p>
-            </div>
-          )}
         </div>
       </div>
 

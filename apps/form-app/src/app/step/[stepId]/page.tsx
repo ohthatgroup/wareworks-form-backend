@@ -66,7 +66,7 @@ function ApplicationFormContent() {
       otherLastNames: '',
       streetAddress: '',
       city: '',
-      state: '',
+      state: undefined,
       zipCode: '',
       phoneNumber: '',
       homePhone: '',
@@ -76,8 +76,14 @@ function ApplicationFormContent() {
       emergencyName: '',
       emergencyPhone: '',
       emergencyRelationship: '',
-      citizenshipStatus: '',
-      workAuthorization: '',
+      citizenshipStatus: undefined,
+      uscisANumber: '',
+      workAuthExpiration: '',
+      alienDocumentType: undefined,
+      alienDocumentNumber: '',
+      i94AdmissionNumber: '',
+      foreignPassportNumber: '',
+      foreignPassportCountry: '',
       age18: '',
       transportation: '',
       workAuthorizationConfirm: '',
@@ -305,13 +311,24 @@ function ApplicationFormContent() {
         case 0: // Personal Information
           return ['legalFirstName', 'legalLastName', 'socialSecurityNumber']
         case 1: // Contact Details
-          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'email']
+          return ['streetAddress', 'city', 'state', 'zipCode', 'phoneNumber']
         case 2: // Citizenship
           const citizenshipStatus = formValues.citizenshipStatus
           if (citizenshipStatus === 'lawful_permanent') {
             return ['citizenshipStatus', 'uscisANumber']
           } else if (citizenshipStatus === 'alien_authorized') {
-            return ['citizenshipStatus', 'workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry']
+            const baseFields: (keyof ValidatedApplicationData)[] = ['citizenshipStatus', 'workAuthExpiration', 'alienDocumentType']
+            
+            // Add conditional document fields based on document type
+            if (formValues.alienDocumentType === 'uscis_a_number') {
+              return [...baseFields, 'alienDocumentNumber' as keyof ValidatedApplicationData]
+            } else if (formValues.alienDocumentType === 'form_i94') {
+              return [...baseFields, 'i94AdmissionNumber' as keyof ValidatedApplicationData]
+            } else if (formValues.alienDocumentType === 'foreign_passport') {
+              return [...baseFields, 'foreignPassportNumber' as keyof ValidatedApplicationData, 'foreignPassportCountry' as keyof ValidatedApplicationData]
+            }
+            
+            return baseFields
           }
           return []
         case 3: // Position & Experience
@@ -354,13 +371,22 @@ function ApplicationFormContent() {
   const isFormReadyForSubmission = useMemo(() => {
     let allRequiredFields = [
       'legalFirstName', 'legalLastName', 'socialSecurityNumber',
-      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber', 'email'
+      'streetAddress', 'city', 'state', 'zipCode', 'phoneNumber'
     ]
     
     if (formValues.citizenshipStatus === 'lawful_permanent') {
       allRequiredFields.push('citizenshipStatus', 'uscisANumber')
     } else if (formValues.citizenshipStatus === 'alien_authorized') {
-      allRequiredFields.push('citizenshipStatus', 'workAuthExpiration', 'alienDocumentType', 'alienDocumentNumber', 'documentCountry')
+      allRequiredFields.push('citizenshipStatus', 'workAuthExpiration', 'alienDocumentType')
+      
+      // Add conditional document fields based on document type selection
+      if (formValues.alienDocumentType === 'uscis_a_number') {
+        allRequiredFields.push('alienDocumentNumber')
+      } else if (formValues.alienDocumentType === 'form_i94') {
+        allRequiredFields.push('i94AdmissionNumber')
+      } else if (formValues.alienDocumentType === 'foreign_passport') {
+        allRequiredFields.push('foreignPassportNumber', 'foreignPassportCountry')
+      }
     } else if (formValues.citizenshipStatus) {
       allRequiredFields.push('citizenshipStatus')
     }

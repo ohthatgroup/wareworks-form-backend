@@ -26,7 +26,6 @@ export interface ApplicationData {
   
   // Work Authorization
   citizenshipStatus: string
-  workAuthorization?: string
   
   // Employment
   positionApplied?: string

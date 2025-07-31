@@ -297,7 +297,7 @@ export class PDFService {
   }
 
   private hasI9Documents(data: ValidatedApplicationData): boolean {
-    return !!(data.citizenshipStatus && data.citizenshipStatus !== 'citizen')
+    return !!(data.citizenshipStatus && data.citizenshipStatus !== 'us_citizen')
   }
 
   private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData): Promise<Buffer | null> {

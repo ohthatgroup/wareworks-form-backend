@@ -56,7 +56,6 @@ const baseSchema = z.object({
   workAuthExpiration: z.string().optional(),
   alienDocumentType: z.enum(['uscis_a_number', 'form_i94', 'foreign_passport']).optional(),
   alienDocumentNumber: z.string().optional(),
-  documentCountry: z.string().optional(),
   
   // Separate fields for alien authorized document types
   i94AdmissionNumber: z.string().optional(),
@@ -155,38 +154,68 @@ export const applicationSchema = baseSchema
     path: ["uscisANumber"]
   })
   .refine((data) => {
-    // If alien authorized to work, specific fields are required
+    // If alien authorized to work, work authorization expiration is required
     if (data.citizenshipStatus === 'alien_authorized') {
-      // Work authorization expiration is required
       if (!data.workAuthExpiration || data.workAuthExpiration.length === 0) {
         return false
       }
-      
-      // Document type is required
-      if (!data.alienDocumentType) {
-        return false
-      }
-      
-      // Validate based on document type
-      if (data.alienDocumentType === 'uscis_a_number') {
-        return data.alienDocumentNumber && data.alienDocumentNumber.length > 0
-      }
-      
-      if (data.alienDocumentType === 'form_i94') {
-        return data.i94AdmissionNumber && data.i94AdmissionNumber.length > 0
-      }
-      
-      if (data.alienDocumentType === 'foreign_passport') {
-        return data.foreignPassportNumber && data.foreignPassportNumber.length > 0 &&
-               data.foreignPassportCountry && data.foreignPassportCountry.length > 0
-      }
-      
-      return true
     }
     return true
   }, {
-    message: "Work authorization expiration and document type are required. Provide the appropriate document details based on your selection.",
+    message: "Work authorization expiration date is required for alien authorized to work",
     path: ["workAuthExpiration"]
+  })
+  .refine((data) => {
+    // If alien authorized to work, document type is required
+    if (data.citizenshipStatus === 'alien_authorized') {
+      if (!data.alienDocumentType) {
+        return false
+      }
+    }
+    return true
+  }, {
+    message: "Please select which document information you will provide",
+    path: ["alienDocumentType"]
+  })
+  .refine((data) => {
+    // If alien authorized with USCIS A-Number option, the number is required
+    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'uscis_a_number') {
+      return data.alienDocumentNumber && data.alienDocumentNumber.length > 0
+    }
+    return true
+  }, {
+    message: "USCIS A-Number is required when selected as document type",
+    path: ["alienDocumentNumber"]
+  })
+  .refine((data) => {
+    // If alien authorized with Form I-94 option, the admission number is required
+    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'form_i94') {
+      return data.i94AdmissionNumber && data.i94AdmissionNumber.length > 0
+    }
+    return true
+  }, {
+    message: "Form I-94 Admission Number is required when selected as document type",
+    path: ["i94AdmissionNumber"]
+  })
+  .refine((data) => {
+    // If alien authorized with foreign passport option, passport number and country are required
+    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'foreign_passport') {
+      return data.foreignPassportNumber && data.foreignPassportNumber.length > 0
+    }
+    return true
+  }, {
+    message: "Foreign passport number is required when selected as document type",
+    path: ["foreignPassportNumber"]
+  })
+  .refine((data) => {
+    // If alien authorized with foreign passport option, country is required
+    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'foreign_passport') {
+      return data.foreignPassportCountry && data.foreignPassportCountry.length > 0
+    }
+    return true
+  }, {
+    message: "Country of issuance is required for foreign passport",
+    path: ["foreignPassportCountry"]
   })
   .refine((data) => {
     // If previously applied is yes, when/where is required
