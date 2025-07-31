@@ -562,13 +562,9 @@ function ApplicationFormContent() {
     )
   }
 
-  // Invalid step
+  // Invalid step - redirect instead of showing loading
   if (currentStep === -1) {
-    return (
-      <div className={`mx-auto px-4 py-4 ${isEmbedded ? 'w-full max-w-none' : 'max-w-4xl'}`}>
-        <div className="text-center">Loading...</div>
-      </div>
-    )
+    return null // The useEffect will handle the redirect
   }
 
   const CurrentStepComponent = STEPS[currentStep].component
