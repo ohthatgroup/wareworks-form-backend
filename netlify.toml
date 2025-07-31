@@ -10,6 +10,8 @@
 
 [[plugins]]
   package = "@netlify/plugin-emails"
+  [plugins.inputs]
+    directory = "apps/form-app/emails"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
