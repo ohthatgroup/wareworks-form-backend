@@ -97,9 +97,7 @@ export class EmailService {
           'netlify-emails-secret': process.env.NETLIFY_EMAILS_SECRET || ''
         },
         body: JSON.stringify({
-          from: process.env.NODE_ENV === 'production' 
-            ? 'admin@wareworks.me'
-            : `noreply@${process.env.MAILGUN_DOMAIN?.replace('https://app.mailgun.com/mg/sending/', '') || 'example.com'}`,
+          from: `WareWorks Application System <noreply@sandbox83befb52fc8e44b19aa5d51bef784443.mailgun.org>`,
           to: hrEmail,
           subject: subject,
           parameters: {
@@ -142,12 +140,15 @@ export class EmailService {
         })
       })
 
+      console.log('Email API response status:', response.status, response.statusText)
+      
       if (!response.ok) {
         const errorText = await response.text()
         console.error('Email send failed:', {
           status: response.status,
           statusText: response.statusText,
-          errorText
+          errorText,
+          endpoint: emailEndpoint
         })
         throw new Error(`Email send failed: ${response.status} ${response.statusText} - ${errorText}`)
       }
