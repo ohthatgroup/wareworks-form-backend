@@ -1,4 +1,5 @@
 import { useLanguage } from '../contexts/LanguageContext'
+import { useEffect, useRef } from 'react'
 
 interface ProgressBarProps {
   currentStep: number
@@ -17,6 +18,7 @@ export function ProgressBar({
 }: ProgressBarProps) {
   const { t, language, setLanguage } = useLanguage()
   const progress = ((currentStep + 1) / totalSteps) * 100
+  const mobileScrollRef = useRef<HTMLDivElement>(null)
 
   const handleStepClick = (stepIndex: number) => {
     if (onStepClick && (stepIndex <= currentStep || completedSteps.includes(stepIndex))) {
@@ -34,6 +36,24 @@ export function ProgressBar({
     if (stepIndex < currentStep) return 'passed'
     return 'future'
   }
+
+  // Auto-scroll mobile progress bar to keep current step visible
+  useEffect(() => {
+    if (mobileScrollRef.current) {
+      const scrollContainer = mobileScrollRef.current
+      const segmentWidth = 60 // 60px per segment
+      const containerWidth = scrollContainer.clientWidth
+      const currentStepPosition = currentStep * segmentWidth
+      
+      // Keep current step towards the left side (25% from left edge)
+      const targetScroll = Math.max(0, currentStepPosition - (containerWidth * 0.25))
+      
+      scrollContainer.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      })
+    }
+  }, [currentStep])
 
   return (
     <div className="bg-white border-b border-gray-100 mb-6">
@@ -68,9 +88,8 @@ export function ProgressBar({
 
         {/* Fluid Segmented Progress Bar */}
         <div className="relative">
-          {/* Background Bar */}
-          <div className="w-full bg-secondary rounded-full h-8 relative overflow-hidden">
-            
+          {/* Desktop: Full width bar */}
+          <div className="hidden sm:block w-full bg-secondary rounded-full h-8 relative overflow-hidden">
             {/* Fluid Progress Fill */}
             <div 
               className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-500 ease-out"
@@ -121,6 +140,66 @@ export function ProgressBar({
                   </div>
                 )
               })}
+            </div>
+          </div>
+
+          {/* Mobile: Scrollable bar with fixed width segments */}
+          <div className="sm:hidden relative">
+            <div 
+              ref={mobileScrollRef}
+              className="overflow-x-auto scrollbar-hide" 
+              style={{ maxWidth: '100vw' }}
+            >
+              <div 
+                className="bg-secondary rounded-full h-8 relative"
+                style={{ 
+                  width: `${steps.length * 60}px`, // 60px per segment
+                  minWidth: '100%'
+                }}
+              >
+                {/* Fluid Progress Fill */}
+                <div 
+                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary to-primary-hover rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+                
+                {/* Segment Overlays */}
+                <div className="absolute inset-0 flex">
+                  {steps.map((step, index) => {
+                    const state = getStepState(index)
+                    const isClickable = isStepClickable(index)
+                    
+                    return (
+                      <div
+                        key={index}
+                        className={`
+                          relative transition-all duration-300 ease-out group
+                          ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+                          ${isClickable ? 'active:bg-white/10' : ''}
+                        `}
+                        onClick={() => handleStepClick(index)}
+                        style={{ width: '60px' }}
+                      >
+                        {/* Step Content */}
+                        <div className="absolute inset-0 flex items-center justify-center px-1">
+                          {/* Step Number (always visible on mobile) */}
+                          <span className={`
+                            text-sm font-bold z-10
+                            ${state === 'completed' || state === 'current' || state === 'passed' ? 'text-white' : 'text-gray-600'}
+                          `}>
+                            {index + 1}
+                          </span>
+                        </div>
+                        
+                        {/* Segment Divider */}
+                        {index < steps.length - 1 && (
+                          <div className="absolute right-0 top-0 bottom-0 w-px bg-white/30 z-20" />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>
