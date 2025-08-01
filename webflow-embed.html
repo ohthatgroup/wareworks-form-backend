@@ -532,7 +532,9 @@ Accept & Continue
         // Also adjust the container if needed
         const container = document.getElementById('application-container');
         if (container) {
-          container.style.minHeight = newHeight + 'px';
+          // Use height instead of minHeight to allow shrinking
+          container.style.height = newHeight + 'px';
+          container.style.minHeight = 'auto';
         }
       }
     }
