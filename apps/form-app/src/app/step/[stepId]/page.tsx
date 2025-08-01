@@ -123,12 +123,19 @@ function ApplicationFormContent() {
         try {
           const parsedResult = JSON.parse(savedResult)
           setSubmissionResult(parsedResult)
+          
+          // If we have a successful submission result, redirect to success page
+          if (parsedResult?.success && params?.stepId !== 'success') {
+            console.log('🔄 Redirecting to success page - application already submitted successfully')
+            router.push('/step/success')
+            return
+          }
         } catch (error) {
           console.error('Error loading submission result:', error)
         }
       }
     }
-  }, [])
+  }, [router, params?.stepId])
 
 
   // Stable save function using useRef to prevent re-render disruption

@@ -1,5 +1,5 @@
 import { CheckCircle, Download, Home } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLanguage } from '../../contexts/LanguageContext'
 
 interface SuccessStepProps {
@@ -9,6 +9,36 @@ interface SuccessStepProps {
 export function SuccessStep({ result }: SuccessStepProps) {
   const { t } = useLanguage()
   const [isDownloading, setIsDownloading] = useState(false)
+  
+  const handleStartNewApplication = () => {
+    if (typeof window !== 'undefined') {
+      console.log('🆕 Starting new application - clearing all data')
+      // Clear all form-related data
+      sessionStorage.clear()
+      // Redirect to first step
+      window.location.href = '/step/1'
+    }
+  }
+  
+  // Clear form data from sessionStorage on successful submission
+  useEffect(() => {
+    if (typeof window !== 'undefined' && result?.success) {
+      console.log('🧹 Clearing form data from sessionStorage after successful submission')
+      sessionStorage.removeItem('wareworks-form-data')
+      sessionStorage.removeItem('wareworks-submission-result')
+      sessionStorage.removeItem('debug-state')
+      
+      // Also clear any language or other form-related storage
+      const keysToRemove = []
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i)
+        if (key && (key.startsWith('wareworks-') || key.includes('form-data'))) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach(key => sessionStorage.removeItem(key))
+    }
+  }, [result])
   
   const handleDownload = async () => {
     if (!result?.submissionId) {
@@ -119,7 +149,15 @@ export function SuccessStep({ result }: SuccessStepProps) {
         </div>
 
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
+          <div className="text-center mb-4">
+            <button 
+              onClick={handleStartNewApplication}
+              className="text-sm text-gray-600 hover:text-primary underline"
+            >
+              Submit Another Application
+            </button>
+          </div>
+          <p className="text-sm text-gray-500 text-center">
             {t('success.questions_text')}{' '}
             <a href="mailto:hr@wareworks.me" className="text-primary hover:underline">
               hr@wareworks.me
