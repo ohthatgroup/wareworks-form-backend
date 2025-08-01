@@ -61,7 +61,7 @@ const US_STATES = [
 ]
 
 export function ContactInfoStep({ form }: ContactInfoStepProps) {
-  const { register, formState: { errors }, setValue } = form
+  const { register, formState: { errors }, setValue, watch } = form
   const { t } = useLanguage()
   
   const formatPhoneNumber = (value: string) => {
