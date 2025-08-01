@@ -84,13 +84,6 @@ const baseSchema = z.object({
   jobDiscovery: z.string().optional(),
   jobDiscoveryContinued: z.string().optional(),
   
-  // Equipment Experience - Optional
-  equipmentSD: z.string().optional(),
-  equipmentSU: z.string().optional(),
-  equipmentSUR: z.string().optional(),
-  equipmentCP: z.string().optional(),
-  equipmentCL: z.string().optional(),
-  equipmentRidingJack: z.string().optional(),
   
   // Skills - Optional
   skills1: z.string().optional(),

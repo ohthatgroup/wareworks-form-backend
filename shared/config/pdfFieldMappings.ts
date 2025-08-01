@@ -65,7 +65,7 @@ export interface PDFFieldMappings {
     forkliftCertYes: FieldMapping
     forkliftCertNo: FieldMapping
   }
-  equipment: {
+  forklift: {
     sd: FieldMapping
     su: FieldMapping
     sur: FieldMapping
@@ -192,7 +192,7 @@ export const pdfFieldMappings: PDFFieldMappings = {
     forkliftCertYes: { primary: 'Do you have forklift certification? Yes', fallbacks: ['Forklift Cert Yes'] },
     forkliftCertNo: { primary: 'Do you have forklift certification? No', fallbacks: ['Forklift Cert No'] }
   },
-  equipment: {
+  forklift: {
     sd: { primary: 'SD Sit Down', fallbacks: ['SD', 'Sit Down'] },
     su: { primary: 'SU Stand Up', fallbacks: ['SU', 'Stand Up'] },
     sur: { primary: 'SUR Stand Up Reach', fallbacks: ['SUR', 'Stand Up Reach'] },

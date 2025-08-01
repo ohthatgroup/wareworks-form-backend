@@ -140,13 +140,13 @@ const sampleFormDataWithDocs: ValidatedApplicationData = {
   jobDiscovery: 'Online Job Board',
   expectedSalary: '$45,000/year',
   
-  // Equipment Experience (minimal)
-  equipmentSD: 'none',
-  equipmentSU: 'none',
-  equipmentSUR: 'none',
-  equipmentCP: 'none',
-  equipmentCL: 'none',
-  equipmentRidingJack: 'none',
+  // Forklift Certification (minimal)
+  forkliftSD: false,
+  forkliftSU: false,
+  forkliftSUR: false,
+  forkliftCP: false,
+  forkliftCL: false,
+  forkliftRidingJack: false,
   
   // Skills
   skills1: 'Microsoft Office',

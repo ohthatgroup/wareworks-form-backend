@@ -101,13 +101,13 @@ const permanentResidentData: ValidatedApplicationData = {
   jobDiscovery: 'Job Fair',
   expectedSalary: '$20/hour',
   
-  // Equipment Experience
-  equipmentSD: 'expert',
-  equipmentSU: 'expert',
-  equipmentSUR: 'advanced',
-  equipmentCP: 'intermediate',
-  equipmentCL: 'advanced',
-  equipmentRidingJack: 'expert',
+  // Forklift Certification
+  forkliftSD: true,
+  forkliftSU: true,
+  forkliftSUR: true,
+  forkliftCP: true,
+  forkliftCL: true,
+  forkliftRidingJack: true,
   
   // Skills
   skills1: 'Heavy Equipment Operation',

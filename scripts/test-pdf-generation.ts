@@ -84,13 +84,13 @@ const sampleFormData: ValidatedApplicationData = {
   previouslyApplied: 'no',
   forkliftCertification: 'yes',
   
-  // Equipment Experience
-  equipmentSD: 'intermediate',
-  equipmentSU: 'basic',
-  equipmentSUR: 'none',
-  equipmentCP: 'advanced',
-  equipmentCL: 'basic',
-  equipmentRidingJack: 'intermediate',
+  // Forklift Certification
+  forkliftSD: true,
+  forkliftSU: true,
+  forkliftSUR: false,
+  forkliftCP: true,
+  forkliftCL: true,
+  forkliftRidingJack: true,
   
   // Skills
   skills1: 'Forklift Operation',

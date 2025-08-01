@@ -141,7 +141,7 @@ function ApplicationFormContent() {
         }
       }
     }
-  }, [router, params?.stepId])
+  }, [router, params?.stepId, form])
 
 
   // Stable save function using useRef to prevent re-render disruption
@@ -362,7 +362,7 @@ function ApplicationFormContent() {
           return []
       }
     }
-  }, [formValues.citizenshipStatus])
+  }, [formValues.citizenshipStatus, formValues.alienDocumentType, formValues.previouslyApplied])
   
   const isCurrentStepValid = useMemo(() => {
     if (currentStep === -1) return false
@@ -382,7 +382,7 @@ function ApplicationFormContent() {
     }
     
     return fieldsValid
-  }, [currentStep, formValues, formState.errors, getStepRequiredFields])
+  }, [currentStep, formValues, getStepRequiredFields])
 
   const isFormReadyForSubmission = useMemo(() => {
     let allRequiredFields = [

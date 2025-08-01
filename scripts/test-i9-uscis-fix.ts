@@ -70,13 +70,13 @@ const baseFormData = {
   jobDiscovery: 'Employee Referral',
   expectedSalary: '$55,000/year',
   
-  // Equipment Experience (minimal)
-  equipmentSD: 'advanced',
-  equipmentSU: 'intermediate',
-  equipmentSUR: 'basic',
-  equipmentCP: 'expert',
-  equipmentCL: 'intermediate',
-  equipmentRidingJack: 'advanced',
+  // Forklift Certification
+  forkliftSD: true,
+  forkliftSU: true,
+  forkliftSUR: true,
+  forkliftCP: true,
+  forkliftCL: true,
+  forkliftRidingJack: true,
   
   // Skills
   skills1: 'Team Management',

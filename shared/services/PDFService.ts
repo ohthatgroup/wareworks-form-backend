@@ -143,13 +143,13 @@ export class PDFService {
     // Checkbox Questions
     this.fillCheckboxQuestions(form, data)
     
-    // Equipment Experience (checkboxes)
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.sd, this.hasEquipmentExperience(data.equipmentSD))
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.su, this.hasEquipmentExperience(data.equipmentSU))
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.sur, this.hasEquipmentExperience(data.equipmentSUR))
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.cp, this.hasEquipmentExperience(data.equipmentCP))
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.cl, this.hasEquipmentExperience(data.equipmentCL))
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.rj, this.hasEquipmentExperience(data.equipmentRidingJack))
+    // Forklift Certification (checkboxes)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.forklift.sd, data.forkliftSD || false)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.forklift.su, data.forkliftSU || false)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.forklift.sur, data.forkliftSUR || false)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.forklift.cp, data.forkliftCP || false)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.forklift.cl, data.forkliftCL || false)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.forklift.rj, data.forkliftRidingJack || false)
     
     // Skills and Qualifications
     this.setTextFieldWithMapping(form, pdfFieldMappings.skills.skill1, data.skills1)
@@ -366,10 +366,6 @@ export class PDFService {
   }
 
 
-  private hasEquipmentExperience(experience: string | undefined): boolean {
-    // Return true if user has any experience level (not 'none' or empty)
-    return experience !== undefined && experience !== '' && experience !== 'none'
-  }
 
   private setCheckboxFieldWithMapping(form: PDFForm, mapping: FieldMapping, checked: boolean) {
     if (!checked) return // Only check boxes that should be checked
