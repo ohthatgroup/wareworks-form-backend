@@ -103,13 +103,13 @@ const sampleFormData: ValidatedApplicationData = {
       schoolName: 'Seattle Community College',
       graduationYear: '2020',
       fieldOfStudy: 'Business Administration',
-      diplomaReceived: 'yes'
+      degreeReceived: 'yes'
     },
     {
       schoolName: 'University of Washington',
       graduationYear: '2022',
       fieldOfStudy: 'Supply Chain Management',
-      diplomaReceived: 'yes'
+      degreeReceived: 'yes'
     }
   ],
   

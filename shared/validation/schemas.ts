@@ -55,6 +55,7 @@ const baseSchema = z.object({
   citizenshipStatus: z.enum(['us_citizen', 'noncitizen_national', 'lawful_permanent', 'alien_authorized']).or(z.literal('')).optional(),
   uscisANumber: z.string().optional(),
   workAuthExpiration: z.string().or(z.literal('')).optional(),
+  workAuthorizationExpiration: z.string().or(z.literal('')).optional(),
   alienDocumentType: z.enum(['uscis_a_number', 'form_i94', 'foreign_passport']).or(z.literal('')).optional(),
   alienDocumentNumber: z.string().optional(),
   
@@ -67,11 +68,15 @@ const baseSchema = z.object({
   age18: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   transportation: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   workAuthorizationConfirm: z.enum(['yes', 'no']).or(z.literal('')).optional(),
+  reliableTransport: z.enum(['yes', 'no']).or(z.literal('')).optional(),
+  workAuthorized: z.enum(['yes', 'no']).or(z.literal('')).optional(),
+  forkliftCertification: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   
   // Position & Experience - Optional
   positionApplied: z.string().optional(),
   expectedSalary: z.string().optional(),
   jobDiscovery: z.string().optional(),
+  jobDiscoveryContinued: z.string().optional(),
   
   // Equipment Experience - Optional
   equipmentSD: z.string().optional(),
@@ -127,7 +132,9 @@ const baseSchema = z.object({
     supervisorName: z.string().optional(),
     supervisorPhone: z.string().regex(PHONE_REGEX, 'Invalid phone number').or(z.literal('')).optional(),
     responsibilities: z.string().optional(),
+    responsibilitiesContinued: z.string().optional(),
     reasonForLeaving: z.string().optional(),
+    reasonLeavingContinued: z.string().optional(),
     mayContact: z.enum(['yes', 'no']).or(z.literal('')).optional()
   })).optional(),
   

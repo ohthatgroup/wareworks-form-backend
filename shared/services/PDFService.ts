@@ -164,15 +164,15 @@ export class PDFService {
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Year, edu.graduationYear)
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Major, edu.fieldOfStudy)
           // Diploma checkboxes
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school1DiplomaYes, edu.diplomaReceived === 'yes' || edu.diplomaReceived === true)
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school1DiplomaNo, edu.diplomaReceived === 'no' || edu.diplomaReceived === false)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school1DiplomaYes, edu.degreeReceived === 'yes')
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school1DiplomaNo, edu.degreeReceived === 'no')
         } else if (index === 1) {
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Name, edu.schoolName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Year, edu.graduationYear)
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Major, edu.fieldOfStudy)
           // Diploma checkboxes
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school2DiplomaYes, edu.diplomaReceived === 'yes' || edu.diplomaReceived === true)
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school2DiplomaNo, edu.diplomaReceived === 'no' || edu.diplomaReceived === false)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school2DiplomaYes, edu.degreeReceived === 'yes')
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school2DiplomaNo, edu.degreeReceived === 'no')
         }
       })
     }
@@ -205,8 +205,8 @@ export class PDFService {
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Supervisor, emp.supervisorName)
           
           // May contact checkboxes
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactYes, emp.mayContact === 'yes' || emp.mayContact === true)
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactNo, emp.mayContact === 'no' || emp.mayContact === false)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactYes, emp.mayContact === 'yes')
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactNo, emp.mayContact === 'no')
           
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Responsibilities, emp.responsibilities)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ResponsibilitiesContinued, emp.responsibilitiesContinued)
@@ -238,8 +238,8 @@ export class PDFService {
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Supervisor, emp.supervisorName)
           
           // May contact checkboxes
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactYes, emp.mayContact === 'yes' || emp.mayContact === true)
-          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactNo, emp.mayContact === 'no' || emp.mayContact === false)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactYes, emp.mayContact === 'yes')
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactNo, emp.mayContact === 'no')
           
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Responsibilities, emp.responsibilities)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ResponsibilitiesContinued, emp.responsibilitiesContinued)
