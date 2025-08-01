@@ -459,10 +459,21 @@ function ApplicationFormContent() {
       
       try {
         router.push(`/step/${nextStepId}`)
-        // Scroll to top after navigation
+        // Scroll to top after navigation - multiple attempts for iframe compatibility
         setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        }, 100)
+          try {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            // Also try scrolling parent if in iframe
+            if (window.parent && window.parent !== window) {
+              window.parent.scrollTo({ top: 0, behavior: 'smooth' })
+            }
+            // Force scroll for stubborn cases
+            document.documentElement.scrollTop = 0
+            document.body.scrollTop = 0
+          } catch (error) {
+            console.log('Scroll attempt failed:', error)
+          }
+        }, 150)
         console.log('✅ Navigation initiated successfully')
       } catch (error) {
         console.error('❌ Navigation failed:', error)
@@ -476,10 +487,21 @@ function ApplicationFormContent() {
     if (currentStep > 0) {
       const prevStepId = STEPS[currentStep - 1].id
       router.push(`/step/${prevStepId}`)
-      // Scroll to top after navigation
+      // Scroll to top after navigation - multiple attempts for iframe compatibility
       setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }, 100)
+        try {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          // Also try scrolling parent if in iframe
+          if (window.parent && window.parent !== window) {
+            window.parent.scrollTo({ top: 0, behavior: 'smooth' })
+          }
+          // Force scroll for stubborn cases
+          document.documentElement.scrollTop = 0
+          document.body.scrollTop = 0
+        } catch (error) {
+          console.log('Scroll attempt failed:', error)
+        }
+      }, 150)
     }
   }, [currentStep, router])
 
@@ -487,10 +509,21 @@ function ApplicationFormContent() {
     if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       const stepId = STEPS[stepIndex].id
       router.push(`/step/${stepId}`)
-      // Scroll to top after navigation
+      // Scroll to top after navigation - multiple attempts for iframe compatibility
       setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }, 100)
+        try {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+          // Also try scrolling parent if in iframe
+          if (window.parent && window.parent !== window) {
+            window.parent.scrollTo({ top: 0, behavior: 'smooth' })
+          }
+          // Force scroll for stubborn cases
+          document.documentElement.scrollTop = 0
+          document.body.scrollTop = 0
+        } catch (error) {
+          console.log('Scroll attempt failed:', error)
+        }
+      }, 150)
     }
   }, [currentStep, completedSteps, router])
 

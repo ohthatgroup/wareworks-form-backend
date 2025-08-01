@@ -17,32 +17,7 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
   const { t } = useLanguage()
   const citizenshipStatus = watch('citizenshipStatus')
   
-  // Clear conditional fields when citizenship status changes
-  useEffect(() => {
-    if (citizenshipStatus !== 'lawful_permanent') {
-      setValue('uscisANumber', '')
-    }
-    if (citizenshipStatus !== 'alien_authorized') {
-      setValue('workAuthExpiration', '')
-      setValue('alienDocumentType', undefined)
-      setValue('alienDocumentNumber', '')
-      setValue('i94AdmissionNumber', '')
-      setValue('foreignPassportNumber', '')
-      setValue('foreignPassportCountry', '')
-    }
-  }, [citizenshipStatus, setValue])
-  
-  // Clear alien document fields when document type changes
-  const alienDocumentType = watch('alienDocumentType')
-  useEffect(() => {
-    if (citizenshipStatus === 'alien_authorized' && alienDocumentType) {
-      // Clear all alien document fields first
-      setValue('alienDocumentNumber', '')
-      setValue('i94AdmissionNumber', '')
-      setValue('foreignPassportNumber', '')
-      setValue('foreignPassportCountry', '')
-    }
-  }, [alienDocumentType, citizenshipStatus, setValue])
+  // We don't need aggressive field clearing - let users navigate freely
   
   const citizenshipOptions = [
     { value: 'us_citizen', label: t('citizenship.us_citizen') },
