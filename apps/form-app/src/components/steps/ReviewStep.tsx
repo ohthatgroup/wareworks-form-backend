@@ -62,6 +62,20 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     expectedSalary: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
     jobDiscovery: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
     
+    // Forklift Certification (Step 3)
+    forkliftCertification: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    forkliftSD: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    forkliftSU: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    forkliftSUR: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    forkliftCP: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    forkliftCL: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    forkliftRidingJack: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    
+    // Skills & Qualifications (Step 3)
+    skills1: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    skills2: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    skills3: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    
     // Availability (Step 4)
     fullTimeEmployment: { stepIndex: 4, stepNameKey: 'review.availability_title' },
     swingShifts: { stepIndex: 4, stepNameKey: 'review.availability_title' },
@@ -205,7 +219,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <p>{formData.legalFirstName} {formData.middleInitial} {formData.legalLastName}</p>
           </div>
           <div>
-            <span className="font-medium">Social Security Number *</span>
+            <span className="font-medium">{t('review.ssn_label')}</span>
             <p>{formData.socialSecurityNumber || t('review.not_provided')}</p>
           </div>
           <div>
@@ -356,6 +370,85 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
         </div>
       </div>
 
+      {/* Forklift Certification */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-primary">Forklift Certification</h3>
+          <button 
+            type="button" 
+            onClick={() => handleEdit(3)}
+            className="btn-secondary text-sm flex items-center gap-2"
+          >
+            <Edit size={16} />
+            {t('review.edit_button')}
+          </button>
+        </div>
+        <div className="text-sm space-y-2">
+          <div>
+            <span className="font-medium">Do you have forklift certification?</span>
+            <p>{formData.forkliftCertification || t('review.not_provided')}</p>
+          </div>
+          
+          {formData.forkliftCertification === 'yes' && (
+            <div>
+              <span className="font-medium">Certified Forklift Types:</span>
+              <div className="mt-2 space-y-1">
+                {formData.forkliftSD && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SD - Sit Down Forklift</span></div>}
+                {formData.forkliftSU && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SU - Stand Up Forklift</span></div>}
+                {formData.forkliftSUR && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SUR - Stand Up Reach</span></div>}
+                {formData.forkliftCP && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>CP - Cherry Picker</span></div>}
+                {formData.forkliftCL && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>CL - Clamps</span></div>}
+                {formData.forkliftRidingJack && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>Riding Jack</span></div>}
+                {!formData.forkliftSD && !formData.forkliftSU && !formData.forkliftSUR && !formData.forkliftCP && !formData.forkliftCL && !formData.forkliftRidingJack && (
+                  <p className="text-gray-500">No specific forklift types selected</p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Skills & Qualifications */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-primary">Skills & Qualifications</h3>
+          <button 
+            type="button" 
+            onClick={() => handleEdit(3)}
+            className="btn-secondary text-sm flex items-center gap-2"
+          >
+            <Edit size={16} />
+            {t('review.edit_button')}
+          </button>
+        </div>
+        <div className="text-sm space-y-2">
+          {(formData.skills1 || formData.skills2 || formData.skills3) ? (
+            <div className="space-y-2">
+              {formData.skills1 && (
+                <div>
+                  <span className="font-medium">Skill 1:</span>
+                  <p>{formData.skills1}</p>
+                </div>
+              )}
+              {formData.skills2 && (
+                <div>
+                  <span className="font-medium">Skill 2:</span>
+                  <p>{formData.skills2}</p>
+                </div>
+              )}
+              {formData.skills3 && (
+                <div>
+                  <span className="font-medium">Skill 3:</span>
+                  <p>{formData.skills3}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-500">No skills or qualifications provided</p>
+          )}
+        </div>
+      </div>
+
       {/* Availability */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
@@ -394,6 +487,24 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
               <p>{formData.previousApplicationWhen || t('review.not_provided')}</p>
             </div>
           )}
+          
+          {/* Weekly Availability Schedule */}
+          {(formData.availabilitySunday || formData.availabilityMonday || formData.availabilityTuesday || 
+            formData.availabilityWednesday || formData.availabilityThursday || formData.availabilityFriday || 
+            formData.availabilitySaturday) && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <span className="font-medium">Weekly Availability:</span>
+              <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                {formData.availabilitySunday && <div><strong>Sunday:</strong> {formData.availabilitySunday}</div>}
+                {formData.availabilityMonday && <div><strong>Monday:</strong> {formData.availabilityMonday}</div>}
+                {formData.availabilityTuesday && <div><strong>Tuesday:</strong> {formData.availabilityTuesday}</div>}
+                {formData.availabilityWednesday && <div><strong>Wednesday:</strong> {formData.availabilityWednesday}</div>}
+                {formData.availabilityThursday && <div><strong>Thursday:</strong> {formData.availabilityThursday}</div>}
+                {formData.availabilityFriday && <div><strong>Friday:</strong> {formData.availabilityFriday}</div>}
+                {formData.availabilitySaturday && <div><strong>Saturday:</strong> {formData.availabilitySaturday}</div>}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -411,13 +522,48 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           </button>
         </div>
         <div className="text-sm space-y-4">
+          {/* Education Entries */}
           <div>
-            <span className="font-medium">{t('review.education_entries_label')}</span>
-            <p>{formData.education?.length || 0} {t('review.entries_count')}</p>
+            <span className="font-medium">{t('review.education_entries_label')} ({formData.education?.length || 0})</span>
+            {formData.education && formData.education.length > 0 ? (
+              <div className="mt-2 space-y-3">
+                {formData.education.map((edu: any, index: number) => (
+                  <div key={index} className="bg-gray-50 p-3 rounded border">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div><strong>School:</strong> {edu.schoolName}</div>
+                      <div><strong>Year:</strong> {edu.graduationYear}</div>
+                      <div><strong>Field:</strong> {edu.fieldOfStudy}</div>
+                      <div><strong>Degree:</strong> {edu.degreeReceived === 'yes' ? 'Yes' : 'No'}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 mt-1">No education entries provided</p>
+            )}
           </div>
+          
+          {/* Employment Entries */}
           <div>
-            <span className="font-medium">{t('review.employment_entries_label')}</span>
-            <p>{formData.employment?.length || 0} {t('review.entries_count')}</p>
+            <span className="font-medium">{t('review.employment_entries_label')} ({formData.employment?.length || 0})</span>
+            {formData.employment && formData.employment.length > 0 ? (
+              <div className="mt-2 space-y-3">
+                {formData.employment.map((emp: any, index: number) => (
+                  <div key={index} className="bg-gray-50 p-3 rounded border">
+                    <div className="space-y-1 text-xs">
+                      <div><strong>Company:</strong> {emp.companyName}</div>
+                      <div><strong>Position:</strong> {emp.jobTitle}</div>
+                      <div><strong>Duration:</strong> {emp.startDate} - {emp.endDate || 'Present'}</div>
+                      <div><strong>Supervisor:</strong> {emp.supervisorName} ({emp.supervisorPhone})</div>
+                      {emp.responsibilities && <div><strong>Responsibilities:</strong> {emp.responsibilities}</div>}
+                      {emp.reasonLeaving && <div><strong>Reason for leaving:</strong> {emp.reasonLeaving}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 mt-1">No employment entries provided</p>
+            )}
           </div>
         </div>
       </div>
