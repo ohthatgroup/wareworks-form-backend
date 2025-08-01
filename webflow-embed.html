@@ -536,6 +536,31 @@ Accept & Continue
         }
       }
     }
+    
+    // Handle scroll-to-top messages from the iframe
+    if (event.data.action === 'scrollToTop') {
+      console.log('📜 Scroll to top requested from iframe');
+      
+      // Try multiple scroll methods for better compatibility
+      try {
+        // Method 1: Smooth scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Method 2: Also scroll document elements
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // Method 3: Try to scroll to the form container
+        const container = document.getElementById('wareworks-application-container');
+        if (container) {
+          container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        console.log('✅ Scroll to top executed');
+      } catch (error) {
+        console.warn('❌ Scroll to top failed:', error);
+      }
+    }
   }, false);
 
   function updateProgressBar(current, total) {

@@ -15,12 +15,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
   const { t } = useLanguage()
   const previouslyApplied = watch('previouslyApplied')
   
-  // Trigger validation when previouslyApplied changes
-  useEffect(() => {
-    if (previouslyApplied) {
-      trigger('previousApplicationWhen')
-    }
-  }, [previouslyApplied, trigger])
+  // Don't trigger validation immediately - let user interact first
+  // Validation will happen naturally when fields are touched or on form submission
   
   // Check if weekly availability should be shown
   const fullTimeEmployment = watch('fullTimeEmployment')

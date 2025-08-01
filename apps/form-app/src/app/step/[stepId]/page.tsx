@@ -58,7 +58,7 @@ function ApplicationFormContent() {
   // Initialize form
   const form = useForm<ValidatedApplicationData>({
     resolver: zodResolver(applicationSchema),
-    mode: 'onChange',
+    mode: 'onTouched', // Only validate after user interacts with fields
     defaultValues: {
       submissionId: '',
       legalFirstName: '',
@@ -116,8 +116,7 @@ function ApplicationFormContent() {
           // Delay restore to let conditional fields render first
           setTimeout(() => {
             form.reset(parsedData.formData)
-            // Clear stale validation errors after restore
-            form.trigger()
+            // Don't trigger validation immediately after restore - let user interact first
           }, 100)
           
           setCompletedSteps(parsedData.completedSteps || [])

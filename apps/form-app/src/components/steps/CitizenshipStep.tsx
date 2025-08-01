@@ -18,18 +18,8 @@ export function CitizenshipStep({ form }: CitizenshipStepProps) {
   const citizenshipStatus = watch('citizenshipStatus')
   const alienDocumentType = watch('alienDocumentType')
   
-  // Trigger validation when conditional fields change
-  useEffect(() => {
-    if (citizenshipStatus) {
-      trigger(['uscisANumber', 'workAuthExpiration', 'alienDocumentType'])
-    }
-  }, [citizenshipStatus, trigger])
-  
-  useEffect(() => {
-    if (alienDocumentType) {
-      trigger(['alienDocumentNumber', 'i94AdmissionNumber', 'foreignPassportNumber', 'foreignPassportCountry'])
-    }
-  }, [alienDocumentType, trigger])
+  // Don't trigger validation immediately - let user interact first
+  // Validation will happen naturally when fields are touched or on form submission
   
   const citizenshipOptions = [
     { value: 'us_citizen', label: t('citizenship.us_citizen') },

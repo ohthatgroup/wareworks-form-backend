@@ -146,7 +146,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             type="tel"
             className={`form-input ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''}`}
             autoComplete="off"
-            {...register('phoneNumber')}
+            value={watch('phoneNumber') || ''}
             onChange={(e) => {
               const formatted = formatPhoneNumber(e.target.value)
               setValue('phoneNumber', formatted)
@@ -165,7 +165,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
             type="tel"
             className={`form-input ${errors.homePhone ? 'border-red-500 focus:border-red-500' : ''}`}
             autoComplete="off"
-            {...register('homePhone')}
+            value={watch('homePhone') || ''}
             onChange={(e) => {
               const formatted = formatPhoneNumber(e.target.value)
               setValue('homePhone', formatted)
@@ -205,7 +205,7 @@ export function ContactInfoStep({ form }: ContactInfoStepProps) {
               type="tel"
               className={`form-input ${errors.emergencyPhone ? 'border-red-500 focus:border-red-500' : ''}`}
               autoComplete="off"
-              {...register('emergencyPhone')}
+              value={watch('emergencyPhone') || ''}
               onChange={(e) => {
                 const formatted = formatPhoneNumber(e.target.value)
                 setValue('emergencyPhone', formatted)

@@ -159,8 +159,8 @@ export function SuccessStep({ result }: SuccessStepProps) {
           </div>
           <p className="text-sm text-gray-500 text-center">
             {t('success.questions_text')}{' '}
-            <a href="mailto:hr@wareworks.me" className="text-primary hover:underline">
-              hr@wareworks.me
+            <a href="mailto:admin@wareworks.me" className="text-primary hover:underline">
+              admin@wareworks.me
             </a>
           </p>
         </div>
