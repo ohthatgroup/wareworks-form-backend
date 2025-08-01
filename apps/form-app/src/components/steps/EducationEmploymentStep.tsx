@@ -50,7 +50,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
   // Don't auto-initialize entries - let users add them when needed
 
   const addEducation = () => {
-    if (educationFields.length < 3) {
+    if (educationFields.length < 2) {
       appendEducation({
         schoolName: '',
         graduationYear: '',
@@ -61,7 +61,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
   }
 
   const addEmployment = () => {
-    if (employmentFields.length < 3) {
+    if (employmentFields.length < 2) {
       appendEmployment({
         companyName: '',
         startDate: '',
@@ -87,7 +87,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
           <button
             type="button"
             onClick={addEducation}
-            disabled={educationFields.length >= 3}
+            disabled={educationFields.length >= 2}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Plus size={16} />
@@ -162,7 +162,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
           <button
             type="button"
             onClick={addEmployment}
-            disabled={employmentFields.length >= 3}
+            disabled={employmentFields.length >= 2}
             className="btn-secondary text-sm flex items-center gap-2"
           >
             <Plus size={16} />
