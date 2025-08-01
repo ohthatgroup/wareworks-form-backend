@@ -112,7 +112,14 @@ function ApplicationFormContent() {
         try {
           const parsedData = JSON.parse(savedData)
           console.log('🔄 Restoring form data from sessionStorage:', Object.keys(parsedData.formData || {}))
-          form.reset(parsedData.formData)
+          
+          // Delay restore to let conditional fields render first
+          setTimeout(() => {
+            form.reset(parsedData.formData)
+            // Clear stale validation errors after restore
+            form.trigger()
+          }, 100)
+          
           setCompletedSteps(parsedData.completedSteps || [])
         } catch (error) {
           console.error('Error loading saved form data:', error)
@@ -337,11 +344,15 @@ function ApplicationFormContent() {
             
             return baseFields
           }
-          return []
+          return ['citizenshipStatus']
         case 3: // Position & Experience
           return []
         case 4: // Availability
-          return []
+          const fields: (keyof ValidatedApplicationData)[] = []
+          if (formValues.previouslyApplied === 'yes') {
+            fields.push('previousApplicationWhen')
+          }
+          return fields
         case 5: // Education & Employment
           return []
         case 6: // Documents
@@ -362,8 +373,7 @@ function ApplicationFormContent() {
     const fieldsValid = requiredFields.every(field => {
       const value = formValues[field]
       const hasValue = value !== undefined && value !== null && value !== ''
-      const hasNoError = !formState.errors[field]
-      return hasValue && hasNoError
+      return hasValue
     })
     
     if (currentStep === 6) {
@@ -398,11 +408,15 @@ function ApplicationFormContent() {
       allRequiredFields.push('citizenshipStatus')
     }
     
+    // Add conditional field for previous application
+    if (formValues.previouslyApplied === 'yes') {
+      allRequiredFields.push('previousApplicationWhen')
+    }
+    
     const requiredFieldsValid = allRequiredFields.every(field => {
       const value = formValues[field as keyof ValidatedApplicationData]
       const hasValue = value !== undefined && value !== null && value !== ''
-      const hasNoError = !formState.errors[field as keyof ValidatedApplicationData]
-      return hasValue && hasNoError
+      return hasValue
     })
     
     // Only log when submit is blocked (can't submit) and state changes
@@ -459,21 +473,60 @@ function ApplicationFormContent() {
       
       try {
         router.push(`/step/${nextStepId}`)
-        // Scroll to top after navigation - multiple attempts for iframe compatibility
+        // Enhanced scroll-to-top for iframe compatibility
         setTimeout(() => {
           try {
+            // Method 1: Standard window scroll
             window.scrollTo({ top: 0, behavior: 'smooth' })
-            // Also try scrolling parent if in iframe
+            
+            // Method 2: Try parent window (iframe context)
             if (window.parent && window.parent !== window) {
-              window.parent.scrollTo({ top: 0, behavior: 'smooth' })
+              try {
+                window.parent.scrollTo({ top: 0, behavior: 'smooth' })
+                // Also try parent document
+                if (window.parent.document) {
+                  window.parent.document.documentElement.scrollTop = 0
+                  window.parent.document.body.scrollTop = 0
+                }
+              } catch (crossOriginError) {
+                console.log('Cross-origin scroll blocked, trying postMessage')
+                // Method 3: Use postMessage for cross-origin iframes
+                window.parent.postMessage({ action: 'scrollToTop' }, '*')
+              }
             }
-            // Force scroll for stubborn cases
+            
+            // Method 4: Force immediate scroll on current document
             document.documentElement.scrollTop = 0
             document.body.scrollTop = 0
+            
+            // Method 5: Try to scroll main content area if it exists
+            const mainContent = document.querySelector('main, #main, .main-content, [role="main"]')
+            if (mainContent) {
+              mainContent.scrollTop = 0
+            }
+            
+            // Method 6: Scroll any scrollable parent containers
+            let element = document.body
+            while (element && element.parentElement) {
+              if (element.scrollTop > 0) {
+                element.scrollTop = 0
+              }
+              element = element.parentElement
+            }
+            
           } catch (error) {
             console.log('Scroll attempt failed:', error)
+            // Final fallback - focus top element to trigger scroll
+            try {
+              const topElement = document.querySelector('h1, .container, body')
+              if (topElement && 'focus' in topElement) {
+                (topElement as HTMLElement).focus({ preventScroll: false })
+              }
+            } catch (focusError) {
+              console.log('Focus fallback failed:', focusError)
+            }
           }
-        }, 150)
+        }, 200)
         console.log('✅ Navigation initiated successfully')
       } catch (error) {
         console.error('❌ Navigation failed:', error)
@@ -487,21 +540,22 @@ function ApplicationFormContent() {
     if (currentStep > 0) {
       const prevStepId = STEPS[currentStep - 1].id
       router.push(`/step/${prevStepId}`)
-      // Scroll to top after navigation - multiple attempts for iframe compatibility
+      // Simple scroll-to-top for iframe compatibility
       setTimeout(() => {
+        // Scroll iframe content
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        document.documentElement.scrollTop = 0
+        
+        // Try to scroll parent window (for embedded iframe)
         try {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-          // Also try scrolling parent if in iframe
           if (window.parent && window.parent !== window) {
             window.parent.scrollTo({ top: 0, behavior: 'smooth' })
           }
-          // Force scroll for stubborn cases
-          document.documentElement.scrollTop = 0
-          document.body.scrollTop = 0
         } catch (error) {
-          console.log('Scroll attempt failed:', error)
+          // Cross-origin fallback
+          window.parent.postMessage({ action: 'scrollToTop' }, '*')
         }
-      }, 150)
+      }, 100)
     }
   }, [currentStep, router])
 
@@ -509,21 +563,22 @@ function ApplicationFormContent() {
     if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       const stepId = STEPS[stepIndex].id
       router.push(`/step/${stepId}`)
-      // Scroll to top after navigation - multiple attempts for iframe compatibility
+      // Simple scroll-to-top for iframe compatibility
       setTimeout(() => {
+        // Scroll iframe content
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        document.documentElement.scrollTop = 0
+        
+        // Try to scroll parent window (for embedded iframe)
         try {
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-          // Also try scrolling parent if in iframe
           if (window.parent && window.parent !== window) {
             window.parent.scrollTo({ top: 0, behavior: 'smooth' })
           }
-          // Force scroll for stubborn cases
-          document.documentElement.scrollTop = 0
-          document.body.scrollTop = 0
         } catch (error) {
-          console.log('Scroll attempt failed:', error)
+          // Cross-origin fallback
+          window.parent.postMessage({ action: 'scrollToTop' }, '*')
         }
-      }, 150)
+      }, 100)
     }
   }, [currentStep, completedSteps, router])
 

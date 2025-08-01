@@ -23,38 +23,97 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
 
   // Map field names to their respective steps for better error reporting
   const fieldToStep: Record<string, { stepIndex: number, stepNameKey: string }> = {
+    // Personal Information (Step 0)
     legalFirstName: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
     legalLastName: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
     middleInitial: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
     otherLastNames: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
     dateOfBirth: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
     socialSecurityNumber: { stepIndex: 0, stepNameKey: 'review.personal_info_title' },
+    
+    // Contact Information (Step 1)
     streetAddress: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    aptNumber: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     city: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     state: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     zipCode: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     phoneNumber: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    homePhone: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     email: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     emergencyName: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
     emergencyPhone: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    emergencyRelationship: { stepIndex: 1, stepNameKey: 'review.contact_details_title' },
+    
+    // Citizenship/Work Authorization (Step 2)
     citizenshipStatus: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    uscisANumber: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    workAuthExpiration: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    alienDocumentType: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    alienDocumentNumber: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    i94AdmissionNumber: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    foreignPassportNumber: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    foreignPassportCountry: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
     age18: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
     transportation: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
     workAuthorizationConfirm: { stepIndex: 2, stepNameKey: 'review.work_authorization_title' },
+    
+    // Position & Experience (Step 3)
     positionApplied: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    expectedSalary: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
     jobDiscovery: { stepIndex: 3, stepNameKey: 'review.position_experience_title' },
+    
+    // Availability (Step 4)
     fullTimeEmployment: { stepIndex: 4, stepNameKey: 'review.availability_title' },
     swingShifts: { stepIndex: 4, stepNameKey: 'review.availability_title' },
     graveyardShifts: { stepIndex: 4, stepNameKey: 'review.availability_title' },
     previouslyApplied: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    previousApplicationWhen: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    // Weekly availability fields
+    availabilitySunday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    availabilityMonday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    availabilityTuesday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    availabilityWednesday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    availabilityThursday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    availabilityFriday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    availabilitySaturday: { stepIndex: 4, stepNameKey: 'review.availability_title' },
+    
+    // Education & Employment (Step 5)
+    education: { stepIndex: 5, stepNameKey: 'review.education_employment_title' },
+    employment: { stepIndex: 5, stepNameKey: 'review.education_employment_title' },
+    
+    // Documents (Step 6)
+    documents: { stepIndex: 6, stepNameKey: 'review.documents_title' },
   }
 
-  // Get specific error details for display
+  // Get specific error details for display with better field names
+  const fieldDisplayNames: Record<string, string> = {
+    legalFirstName: 'First Name',
+    legalLastName: 'Last Name',
+    socialSecurityNumber: 'Social Security Number',
+    streetAddress: 'Street Address',
+    city: 'City',
+    state: 'State',
+    zipCode: 'ZIP Code',
+    phoneNumber: 'Phone Number',
+    email: 'Email Address',
+    citizenshipStatus: 'Citizenship Status',
+    uscisANumber: 'USCIS A-Number',
+    workAuthExpiration: 'Work Authorization Expiration',
+    alienDocumentType: 'Document Type',
+    alienDocumentNumber: 'USCIS A-Number',
+    i94AdmissionNumber: 'Form I-94 Admission Number',
+    foreignPassportNumber: 'Foreign Passport Number',
+    foreignPassportCountry: 'Country of Issuance',
+    previousApplicationWhen: 'Previous Application Details'
+  }
+
   const errorDetails = Object.entries(errors).map(([fieldName, error]) => {
     const stepInfo = fieldToStep[fieldName] || { stepIndex: -1, stepNameKey: 'review.personal_info_title' }
+    const displayName = fieldDisplayNames[fieldName] || fieldName
     return {
       fieldName,
-      message: error.message || 'This field is required',
+      displayName,
+      message: error.message || `${displayName} is required`,
       stepIndex: stepInfo.stepIndex,
       stepName: t(stepInfo.stepNameKey)
     }
@@ -105,11 +164,13 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
         {/* Show specific validation errors */}
         {hasErrors && errorDetails.length > 0 && (
           <div className="mt-4 space-y-2">
-            {errorDetails.map(({ fieldName, message, stepIndex, stepName }) => (
+            {errorDetails.map(({ fieldName, displayName, message, stepIndex, stepName }) => (
               <div key={fieldName} className="flex items-center justify-between bg-red-100 rounded-md p-2">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-red-900">{stepName}</p>
-                  <p className="text-xs text-red-700">{message}</p>
+                  <p className="text-xs text-red-700">
+                    <span className="font-medium">{displayName}:</span> {message}
+                  </p>
                 </div>
                 {stepIndex >= 0 && (
                   <button

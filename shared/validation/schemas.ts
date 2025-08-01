@@ -155,92 +155,9 @@ const baseSchema = z.object({
   submittedAt: z.string().optional()
 })
 
-// Apply conditional validation
+// Use base schema without complex conditional refines to avoid stale validation errors
+// Conditional validation is now handled dynamically in the form logic
 export const applicationSchema = baseSchema
-  .refine((data) => {
-    // If lawful permanent resident, USCIS A-Number is required
-    if (data.citizenshipStatus === 'lawful_permanent') {
-      return data.uscisANumber && data.uscisANumber.length > 0
-    }
-    return true
-  }, {
-    message: "USCIS A-Number is required for lawful permanent residents",
-    path: ["uscisANumber"]
-  })
-  .refine((data) => {
-    // If alien authorized to work, work authorization expiration is required
-    if (data.citizenshipStatus === 'alien_authorized') {
-      if (!data.workAuthExpiration || data.workAuthExpiration.length === 0) {
-        return false
-      }
-    }
-    return true
-  }, {
-    message: "Work authorization expiration date is required for alien authorized to work",
-    path: ["workAuthExpiration"]
-  })
-  .refine((data) => {
-    // If alien authorized to work, document type is required
-    if (data.citizenshipStatus === 'alien_authorized') {
-      if (!data.alienDocumentType) {
-        return false
-      }
-    }
-    return true
-  }, {
-    message: "Please select which document information you will provide",
-    path: ["alienDocumentType"]
-  })
-  .refine((data) => {
-    // If alien authorized with USCIS A-Number option, the number is required
-    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'uscis_a_number') {
-      return data.alienDocumentNumber && data.alienDocumentNumber.length > 0
-    }
-    return true
-  }, {
-    message: "USCIS A-Number is required when selected as document type",
-    path: ["alienDocumentNumber"]
-  })
-  .refine((data) => {
-    // If alien authorized with Form I-94 option, the admission number is required
-    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'form_i94') {
-      return data.i94AdmissionNumber && data.i94AdmissionNumber.length > 0
-    }
-    return true
-  }, {
-    message: "Form I-94 Admission Number is required when selected as document type",
-    path: ["i94AdmissionNumber"]
-  })
-  .refine((data) => {
-    // If alien authorized with foreign passport option, passport number and country are required
-    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'foreign_passport') {
-      return data.foreignPassportNumber && data.foreignPassportNumber.length > 0
-    }
-    return true
-  }, {
-    message: "Foreign passport number is required when selected as document type",
-    path: ["foreignPassportNumber"]
-  })
-  .refine((data) => {
-    // If alien authorized with foreign passport option, country is required
-    if (data.citizenshipStatus === 'alien_authorized' && data.alienDocumentType === 'foreign_passport') {
-      return data.foreignPassportCountry && data.foreignPassportCountry.length > 0
-    }
-    return true
-  }, {
-    message: "Country of issuance is required for foreign passport",
-    path: ["foreignPassportCountry"]
-  })
-  .refine((data) => {
-    // If previously applied is yes, when/where is required
-    if (data.previouslyApplied === 'yes') {
-      return data.previousApplicationWhen && data.previousApplicationWhen.length > 0
-    }
-    return true
-  }, {
-    message: "Please provide details about when and where you previously applied",
-    path: ["previousApplicationWhen"]
-  })
 
 export type ValidatedApplicationData = z.infer<typeof baseSchema>
 

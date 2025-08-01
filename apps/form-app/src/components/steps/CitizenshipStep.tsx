@@ -13,11 +13,23 @@ interface CitizenshipStepProps {
 // Options will be generated inside the component to use translations
 
 export function CitizenshipStep({ form }: CitizenshipStepProps) {
-  const { register, watch, setValue, formState: { errors } } = form
+  const { register, watch, setValue, trigger, formState: { errors } } = form
   const { t } = useLanguage()
   const citizenshipStatus = watch('citizenshipStatus')
+  const alienDocumentType = watch('alienDocumentType')
   
-  // We don't need aggressive field clearing - let users navigate freely
+  // Trigger validation when conditional fields change
+  useEffect(() => {
+    if (citizenshipStatus) {
+      trigger(['uscisANumber', 'workAuthExpiration', 'alienDocumentType'])
+    }
+  }, [citizenshipStatus, trigger])
+  
+  useEffect(() => {
+    if (alienDocumentType) {
+      trigger(['alienDocumentNumber', 'i94AdmissionNumber', 'foreignPassportNumber', 'foreignPassportCountry'])
+    }
+  }, [alienDocumentType, trigger])
   
   const citizenshipOptions = [
     { value: 'us_citizen', label: t('citizenship.us_citizen') },

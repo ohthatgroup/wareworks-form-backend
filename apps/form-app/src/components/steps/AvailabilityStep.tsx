@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { Input } from '../ui/Input'
@@ -10,9 +11,16 @@ interface AvailabilityStepProps {
 }
 
 export function AvailabilityStep({ form }: AvailabilityStepProps) {
-  const { register, watch, setValue, formState: { errors } } = form
+  const { register, watch, setValue, trigger, formState: { errors } } = form
   const { t } = useLanguage()
   const previouslyApplied = watch('previouslyApplied')
+  
+  // Trigger validation when previouslyApplied changes
+  useEffect(() => {
+    if (previouslyApplied) {
+      trigger('previousApplicationWhen')
+    }
+  }, [previouslyApplied, trigger])
   
   // Check if weekly availability should be shown
   const fullTimeEmployment = watch('fullTimeEmployment')
