@@ -45,7 +45,6 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             options={yesNoOptions}
             registration={register('fullTimeEmployment')}
             error={errors.fullTimeEmployment?.message}
-            required
           />
 
           <RadioGroup
@@ -54,7 +53,6 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             options={yesNoOptions}
             registration={register('swingShifts')}
             error={errors.swingShifts?.message}
-            required
           />
 
           <RadioGroup
@@ -63,7 +61,6 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             options={yesNoOptions}
             registration={register('graveyardShifts')}
             error={errors.graveyardShifts?.message}
-            required
           />
         </div>
       </div>
@@ -175,7 +172,6 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             options={yesNoOptions}
             registration={register('previouslyApplied')}
             error={errors.previouslyApplied?.message}
-            required
           />
 
           {previouslyApplied === 'yes' && (

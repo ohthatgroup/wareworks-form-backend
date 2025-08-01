@@ -237,7 +237,31 @@ function ApplicationFormContent() {
       if (timeoutId) clearTimeout(timeoutId);
       resizeObserver.disconnect();
     };
-  }, [isEmbedded, currentStep]); // Re-run when step changes
+  }, [isEmbedded, currentStep, currentStepId]); // Re-run when step changes or success page loads
+
+  // Additional height adjustment specifically for success page
+  useEffect(() => {
+    if (isEmbedded && currentStepId === 'success') {
+      // Wait for DOM to fully render the success page, then adjust height
+      const timer = setTimeout(() => {
+        try {
+          const bodyHeight = document.body.scrollHeight;
+          const htmlHeight = document.documentElement.scrollHeight;
+          const height = Math.max(bodyHeight, htmlHeight);
+          
+          window.parent.postMessage({
+            type: 'iframe-resize',
+            height: height,
+            source: 'wareworks-form'
+          }, '*');
+        } catch (error) {
+          console.warn('Could not send height to parent for success page:', error);
+        }
+      }, 500); // Give more time for success page to fully render
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isEmbedded, currentStepId])
 
   // Add embedded class to body when in iframe
   useEffect(() => {
@@ -328,9 +352,9 @@ function ApplicationFormContent() {
         case 2: // Citizenship
           const citizenshipStatus = formValues.citizenshipStatus
           if (citizenshipStatus === 'lawful_permanent') {
-            return ['citizenshipStatus', 'uscisANumber']
+            return ['uscisANumber']
           } else if (citizenshipStatus === 'alien_authorized') {
-            const baseFields: (keyof ValidatedApplicationData)[] = ['citizenshipStatus', 'workAuthExpiration', 'alienDocumentType']
+            const baseFields: (keyof ValidatedApplicationData)[] = ['workAuthExpiration', 'alienDocumentType']
             
             // Add conditional document fields based on document type
             if (formValues.alienDocumentType === 'uscis_a_number') {
@@ -343,7 +367,7 @@ function ApplicationFormContent() {
             
             return baseFields
           }
-          return ['citizenshipStatus']
+          return []
         case 3: // Position & Experience
           return []
         case 4: // Availability

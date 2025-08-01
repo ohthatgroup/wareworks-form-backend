@@ -20,6 +20,13 @@ export function SuccessStep({ result }: SuccessStepProps) {
     }
   }
   
+  // Scroll to top when success page loads
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [])
+
   // Clear form data from sessionStorage on successful submission
   useEffect(() => {
     if (typeof window !== 'undefined' && result?.success) {
@@ -91,7 +98,7 @@ export function SuccessStep({ result }: SuccessStepProps) {
   }
   
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-2xl min-h-0">
       <div className="bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="mb-6">
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
