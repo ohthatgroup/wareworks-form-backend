@@ -297,12 +297,13 @@ export class PDFService {
   }
 
   private hasI9Documents(data: ValidatedApplicationData): boolean {
-    return !!(data.citizenshipStatus && data.citizenshipStatus !== 'us_citizen')
+    // HR needs I-9 form for every application packet regardless of citizenship status
+    return true
   }
 
   private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData): Promise<Buffer | null> {
     try {
-      console.log('Creating separate filled I-9 form for non-citizen applicant...')
+      console.log('Creating separate filled I-9 form for application packet...')
       
       // Handle path resolution for both standalone and Next.js contexts
       const baseDir = process.cwd()

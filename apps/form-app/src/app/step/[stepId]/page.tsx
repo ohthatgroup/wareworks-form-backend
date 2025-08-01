@@ -452,6 +452,10 @@ function ApplicationFormContent() {
       
       try {
         router.push(`/step/${nextStepId}`)
+        // Scroll to top after navigation
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }, 100)
         console.log('✅ Navigation initiated successfully')
       } catch (error) {
         console.error('❌ Navigation failed:', error)
@@ -465,6 +469,10 @@ function ApplicationFormContent() {
     if (currentStep > 0) {
       const prevStepId = STEPS[currentStep - 1].id
       router.push(`/step/${prevStepId}`)
+      // Scroll to top after navigation
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
     }
   }, [currentStep, router])
 
@@ -472,6 +480,10 @@ function ApplicationFormContent() {
     if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       const stepId = STEPS[stepIndex].id
       router.push(`/step/${stepId}`)
+      // Scroll to top after navigation
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 100)
     }
   }, [currentStep, completedSteps, router])
 

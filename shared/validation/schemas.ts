@@ -43,7 +43,7 @@ const baseSchema = z.object({
   
   // Contact Information - Optional
   aptNumber: z.string().optional(),
-  email: z.string().email('Invalid email address').optional(),
+  email: z.string().email('Invalid email address').or(z.literal('')).optional(),
   homePhone: z.string().regex(PHONE_REGEX, 'Invalid phone number').or(z.literal('')).optional(),
   
   // Emergency Contact - Optional
@@ -52,10 +52,10 @@ const baseSchema = z.object({
   emergencyRelationship: z.string().optional(),
   
   // Work Authorization - Optional (validated conditionally)
-  citizenshipStatus: z.enum(['us_citizen', 'noncitizen_national', 'lawful_permanent', 'alien_authorized']).optional(),
+  citizenshipStatus: z.enum(['us_citizen', 'noncitizen_national', 'lawful_permanent', 'alien_authorized']).or(z.literal('')).optional(),
   uscisANumber: z.string().optional(),
-  workAuthExpiration: z.string().optional(),
-  alienDocumentType: z.enum(['uscis_a_number', 'form_i94', 'foreign_passport']).optional(),
+  workAuthExpiration: z.string().or(z.literal('')).optional(),
+  alienDocumentType: z.enum(['uscis_a_number', 'form_i94', 'foreign_passport']).or(z.literal('')).optional(),
   alienDocumentNumber: z.string().optional(),
   
   // Separate fields for alien authorized document types
