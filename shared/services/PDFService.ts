@@ -416,20 +416,24 @@ export class PDFService {
   private fillCheckboxQuestions(form: PDFForm, data: ValidatedApplicationData) {
     // Simple checkbox handling - just check the yes/no based on data
     
-    // Age verification - assume 18+ (simplify)
-    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.ageOver18Yes, true)
+    // Age verification
+    if (data.age18 === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.ageOver18Yes, true)
+    } else if (data.age18 === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.ageOver18No, true)
+    }
     
     // Transportation
-    if (data.reliableTransport === 'yes') {
+    if (data.transportation === 'yes') {
       this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.reliableTransportYes, true)
-    } else if (data.reliableTransport === 'no') {
+    } else if (data.transportation === 'no') {
       this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.reliableTransportNo, true)
     }
     
     // Work authorization
-    if (data.workAuthorized === 'yes') {
+    if (data.workAuthorizationConfirm === 'yes') {
       this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.workAuthorizedYes, true)
-    } else if (data.workAuthorized === 'no') {
+    } else if (data.workAuthorizationConfirm === 'no') {
       this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.workAuthorizedNo, true)
     }
     

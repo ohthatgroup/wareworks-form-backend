@@ -29,22 +29,22 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     return acc
   }, {})
   
-  // Watch for certified equipment
-  const equipmentSD = watch('equipmentSD')
-  const equipmentSU = watch('equipmentSU') 
-  const equipmentSUR = watch('equipmentSUR')
-  const equipmentCP = watch('equipmentCP')
-  const equipmentCL = watch('equipmentCL')
-  const equipmentRidingJack = watch('equipmentRidingJack')
+  // Watch for forklift certifications
+  const forkliftSD = watch('forkliftSD')
+  const forkliftSU = watch('forkliftSU') 
+  const forkliftSUR = watch('forkliftSUR')
+  const forkliftCP = watch('forkliftCP')
+  const forkliftCL = watch('forkliftCL')
+  const forkliftRidingJack = watch('forkliftRidingJack')
   
-  const certifiedEquipment = [
-    { key: 'equipmentSD', value: equipmentSD, labelKey: 'equipment.sd_label' },
-    { key: 'equipmentSU', value: equipmentSU, labelKey: 'equipment.su_label' },
-    { key: 'equipmentSUR', value: equipmentSUR, labelKey: 'equipment.sur_label' },
-    { key: 'equipmentCP', value: equipmentCP, labelKey: 'equipment.cp_label' },
-    { key: 'equipmentCL', value: equipmentCL, labelKey: 'equipment.cl_label' },
-    { key: 'equipmentRidingJack', value: equipmentRidingJack, labelKey: 'equipment.riding_jack_label' }
-  ].filter(equipment => equipment.value === 'certified')
+  const certifiedForklifts = [
+    { key: 'forkliftSD', value: forkliftSD, label: 'SD - Sit Down Forklift' },
+    { key: 'forkliftSU', value: forkliftSU, label: 'SU - Stand Up Forklift' },
+    { key: 'forkliftSUR', value: forkliftSUR, label: 'SUR - Stand Up Reach' },
+    { key: 'forkliftCP', value: forkliftCP, label: 'CP - Cherry Picker' },
+    { key: 'forkliftCL', value: forkliftCL, label: 'CL - Clamps' },
+    { key: 'forkliftRidingJack', value: forkliftRidingJack, label: 'Riding Jack' }
+  ].filter(forklift => forklift.value === true)
 
   // Watch for certified skills
   const skills1 = watch('skills1')
@@ -277,32 +277,32 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             </p>
             
             <div className="space-y-6">
-              {/* Equipment Certifications */}
-              {certifiedEquipment.map((equipment) => (
-                <div key={equipment.key}>
+              {/* Forklift Certifications */}
+              {certifiedForklifts.map((forklift) => (
+                <div key={forklift.key}>
                   <label className="form-label">
-                    {translateKey(t, equipment.labelKey)} {t('documents.certification_label')}
+                    {forklift.label} Certification
                   </label>
                   <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
                     <Upload className="mx-auto h-12 w-12 text-primary" />
                     <div className="mt-4">
-                      <label htmlFor={`${equipment.key}-cert-upload`} className="cursor-pointer">
+                      <label htmlFor={`${forklift.key}-cert-upload`} className="cursor-pointer">
                         <span className="btn-primary inline-block">{t('documents.upload_certification')}</span>
                         <input
-                          id={`${equipment.key}-cert-upload`}
+                          id={`${forklift.key}-cert-upload`}
                           type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
                           multiple
                           className="sr-only"
-                          onChange={(e) => e.target.files && handleFileUpload(`${equipment.key}-cert`, e.target.files)}
+                          onChange={(e) => e.target.files && handleFileUpload(`${forklift.key}-cert`, e.target.files)}
                         />
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-primary">
-                      {t('documents.official_certification')} {translateKey(t, equipment.labelKey).split(' - ')[1]}
+                      Upload your official {forklift.label.toLowerCase()} certification documents
                     </p>
                   </div>
-                  {documentsByCategory[`${equipment.key}-cert`] && renderDocumentList(`${equipment.key}-cert`, documentsByCategory[`${equipment.key}-cert`])}
+                  {documentsByCategory[`${forklift.key}-cert`] && renderDocumentList(`${forklift.key}-cert`, documentsByCategory[`${forklift.key}-cert`])}
                 </div>
               ))}
 

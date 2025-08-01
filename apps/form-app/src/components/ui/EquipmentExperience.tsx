@@ -1,133 +1,91 @@
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { useLanguage } from '../../contexts/LanguageContext'
-import { translateKey, EquipmentLabelKey, EquipmentDescriptionKey } from '../../types/translations'
+import { RadioGroup } from './RadioGroup'
 
-interface EquipmentItem {
+interface ForkliftType {
   key: keyof ValidatedApplicationData
-  labelKey: EquipmentLabelKey
-  descriptionKey: EquipmentDescriptionKey
+  label: string
+  description: string
 }
 
 interface EquipmentExperienceProps {
   form: UseFormReturn<ValidatedApplicationData>
 }
 
-const EQUIPMENT_LIST: EquipmentItem[] = [
-  { key: 'equipmentSD', labelKey: 'equipment.sd_label', descriptionKey: 'equipment.sd_description' },
-  { key: 'equipmentSU', labelKey: 'equipment.su_label', descriptionKey: 'equipment.su_description' },
-  { key: 'equipmentSUR', labelKey: 'equipment.sur_label', descriptionKey: 'equipment.sur_description' },
-  { key: 'equipmentCP', labelKey: 'equipment.cp_label', descriptionKey: 'equipment.cp_description' },
-  { key: 'equipmentCL', labelKey: 'equipment.cl_label', descriptionKey: 'equipment.cl_description' },
-  { key: 'equipmentRidingJack', labelKey: 'equipment.riding_jack_label', descriptionKey: 'equipment.riding_jack_description' }
+const FORKLIFT_TYPES: ForkliftType[] = [
+  { key: 'forkliftSD', label: 'SD - Sit Down Forklift', description: 'Standard sit-down counterbalance forklift' },
+  { key: 'forkliftSU', label: 'SU - Stand Up Forklift', description: 'Stand-up counterbalance forklift' },
+  { key: 'forkliftSUR', label: 'SUR - Stand Up Reach', description: 'Stand-up reach truck for narrow aisles' },
+  { key: 'forkliftCP', label: 'CP - Cherry Picker', description: 'Order picker/cherry picker lift' },
+  { key: 'forkliftCL', label: 'CL - Clamps', description: 'Forklift with clamp attachment' },
+  { key: 'forkliftRidingJack', label: 'Riding Jack', description: 'Electric pallet jack/riding jack' }
 ]
 
 export function EquipmentExperience({ form }: EquipmentExperienceProps) {
   const { register, watch, setValue, formState: { errors } } = form
   const { t } = useLanguage()
-
-  const experienceLevels = [
-    { value: 'none', label: t('equipment.no_experience') },
-    { value: 'basic', label: t('equipment.basic') },
-    { value: 'intermediate', label: t('equipment.intermediate') },
-    { value: 'advanced', label: t('equipment.advanced') },
-    { value: 'expert', label: t('equipment.expert') },
-    { value: 'certified', label: t('equipment.certified') }
+  
+  const forkliftCertification = watch('forkliftCertification')
+  
+  const yesNoOptions = [
+    { value: 'yes', label: 'Yes' },
+    { value: 'no', label: 'No' }
   ]
 
-  const isEquipmentSelected = (equipmentKey: string): boolean => {
-    const value = watch(equipmentKey as keyof ValidatedApplicationData)
-    return Boolean(value && value !== '')
-  }
-
-  const toggleEquipment = (equipmentKey: string, checked: boolean) => {
-    if (!checked) {
-      // Clear the experience level when unchecking
-      setValue(equipmentKey as keyof ValidatedApplicationData, '')
-    } else {
-      // Set a placeholder value when checking to show dropdown
-      setValue(equipmentKey as keyof ValidatedApplicationData, 'none')
-    }
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max">
-        {EQUIPMENT_LIST.map((equipment) => {
-          const isSelected = isEquipmentSelected(equipment.key)
-          const currentValue = watch(equipment.key) as string
+    <div className="space-y-6">
+      {/* Main forklift certification question */}
+      <RadioGroup
+        label="Do you have forklift certification?"
+        name="forkliftCertification"
+        options={yesNoOptions}
+        registration={register('forkliftCertification')}
+        error={errors.forkliftCertification?.message}
+      />
+
+      {/* Conditional forklift types section */}
+      {forkliftCertification === 'yes' && (
+        <div className="border-t pt-6">
+          <h4 className="text-md font-medium text-gray-900 mb-4">
+            Which forklift types are you certified for?
+          </h4>
           
-          return (
-            <div 
-              key={equipment.key}
-              className={`border rounded-lg p-4 transition-all ${
-                isSelected 
-                  ? 'border-primary bg-primary/5 shadow-sm' 
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-start space-x-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {FORKLIFT_TYPES.map((forklift) => {
+              const isChecked = watch(forklift.key) as boolean
+              
+              return (
+                <div key={forklift.key} className="flex items-start space-x-3">
                   <input
                     type="checkbox"
-                    id={equipment.key}
-                    checked={isSelected}
-                    onChange={(e) => {
-                      toggleEquipment(equipment.key, e.target.checked)
-                    }}
+                    id={forklift.key}
+                    {...register(forklift.key)}
                     className="w-5 h-5 mt-0.5 text-primary border-gray-300 rounded focus:ring-primary focus:ring-2 focus:ring-offset-0"
                   />
                   <div className="flex-1">
                     <label 
-                      htmlFor={equipment.key}
+                      htmlFor={forklift.key}
                       className="text-sm font-medium text-gray-900 cursor-pointer block"
                     >
-                      {t(equipment.labelKey)}
+                      {forklift.label}
                     </label>
-                  </div>
-                </div>
-                
-                {/* Experience Level Dropdown - full width below label */}
-                {isSelected && (
-                  <div className="ml-8">
-                    <select
-                      {...register(equipment.key)}
-                      className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
-                      defaultValue={currentValue || ''}
-                    >
-                      <option value="">{t('equipment.select_level')}</option>
-                      {experienceLevels.map((level) => (
-                        <option key={level.value} value={level.value}>
-                          {level.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                
-                <div className="ml-8">
-                  <p className="text-xs text-gray-600">
-                    {translateKey(t, equipment.descriptionKey)}
-                  </p>
-                  
-                  {/* Error display */}
-                  {errors[equipment.key] && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {errors[equipment.key]?.message}
+                    <p className="text-xs text-gray-600 mt-1">
+                      {forklift.description}
                     </p>
-                  )}
+                  </div>
                 </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-      
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800">
-          <strong>{t('equipment.note_title')}</strong> {t('equipment.note_message')}
-        </p>
-      </div>
+              )
+            })}
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> You will be able to upload certification documents for each selected forklift type on the Documents page.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

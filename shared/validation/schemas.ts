@@ -71,6 +71,12 @@ const baseSchema = z.object({
   reliableTransport: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   workAuthorized: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   forkliftCertification: z.enum(['yes', 'no']).or(z.literal('')).optional(),
+  forkliftSD: z.boolean().optional(),
+  forkliftSU: z.boolean().optional(),
+  forkliftSUR: z.boolean().optional(),
+  forkliftCP: z.boolean().optional(),
+  forkliftCL: z.boolean().optional(),
+  forkliftRidingJack: z.boolean().optional(),
   
   // Position & Experience - Optional
   positionApplied: z.string().optional(),
