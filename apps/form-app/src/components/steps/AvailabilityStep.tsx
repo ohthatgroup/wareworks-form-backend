@@ -125,13 +125,12 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                     {isSelected && (
                       <div className="ml-8">
                         <input
-                          {...register(day.key as keyof ValidatedApplicationData)}
                           type="text"
                           className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
                           placeholder={t('availability.time_placeholder')}
                           value={currentValue || ''}
                           onChange={(e) => {
-                            setValue(day.key as keyof ValidatedApplicationData, e.target.value as any)
+                            setValue(day.key as keyof ValidatedApplicationData, e.target.value)
                           }}
                         />
                       </div>
