@@ -205,6 +205,10 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <p>{formData.legalFirstName} {formData.middleInitial} {formData.legalLastName}</p>
           </div>
           <div>
+            <span className="font-medium">Social Security Number *</span>
+            <p>{formData.socialSecurityNumber || t('review.not_provided')}</p>
+          </div>
+          <div>
             <span className="font-medium">{t('review.date_of_birth_label')}</span>
             <p>{formData.dateOfBirth || t('review.not_provided')}</p>
           </div>
@@ -251,11 +255,79 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             {t('review.edit_button')}
           </button>
         </div>
-        <div className="text-sm">
+        <div className="text-sm space-y-2">
           <div>
             <span className="font-medium">{t('review.citizenship_status_label')}</span>
             <p>{formData.citizenshipStatus || t('review.not_provided')}</p>
           </div>
+          
+          {/* Conditional fields based on citizenship status */}
+          {formData.citizenshipStatus === 'lawful_permanent' && (
+            <div>
+              <span className="font-medium">USCIS A-Number *</span>
+              <p>{formData.uscisANumber || t('review.not_provided')}</p>
+            </div>
+          )}
+          
+          {formData.citizenshipStatus === 'alien_authorized' && (
+            <>
+              <div>
+                <span className="font-medium">Work Authorization Expiration *</span>
+                <p>{formData.workAuthExpiration || t('review.not_provided')}</p>
+              </div>
+              <div>
+                <span className="font-medium">Document Type *</span>
+                <p>{formData.alienDocumentType || t('review.not_provided')}</p>
+              </div>
+              
+              {formData.alienDocumentType === 'uscis_a_number' && (
+                <div>
+                  <span className="font-medium">USCIS A-Number *</span>
+                  <p>{formData.alienDocumentNumber || t('review.not_provided')}</p>
+                </div>
+              )}
+              
+              {formData.alienDocumentType === 'form_i94' && (
+                <div>
+                  <span className="font-medium">Form I-94 Admission Number *</span>
+                  <p>{formData.i94AdmissionNumber || t('review.not_provided')}</p>
+                </div>
+              )}
+              
+              {formData.alienDocumentType === 'foreign_passport' && (
+                <>
+                  <div>
+                    <span className="font-medium">Foreign Passport Number *</span>
+                    <p>{formData.foreignPassportNumber || t('review.not_provided')}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">Country of Issuance *</span>
+                    <p>{formData.foreignPassportCountry || t('review.not_provided')}</p>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+          
+          {/* Basic eligibility questions */}
+          {formData.age18 && (
+            <div>
+              <span className="font-medium">Are you 18 years of age or older?</span>
+              <p>{formData.age18}</p>
+            </div>
+          )}
+          {formData.transportation && (
+            <div>
+              <span className="font-medium">Do you have reliable transportation?</span>
+              <p>{formData.transportation}</p>
+            </div>
+          )}
+          {formData.workAuthorizationConfirm && (
+            <div>
+              <span className="font-medium">Are you authorized to work in the US?</span>
+              <p>{formData.workAuthorizationConfirm}</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -303,9 +375,25 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <p>{formData.fullTimeEmployment || t('review.not_provided')}</p>
           </div>
           <div>
+            <span className="font-medium">Swing Shifts</span>
+            <p>{formData.swingShifts || t('review.not_provided')}</p>
+          </div>
+          <div>
+            <span className="font-medium">Graveyard Shifts</span>
+            <p>{formData.graveyardShifts || t('review.not_provided')}</p>
+          </div>
+          <div>
             <span className="font-medium">{t('review.previously_applied_label')}</span>
             <p>{formData.previouslyApplied || t('review.not_provided')}</p>
           </div>
+          
+          {/* Conditional field for previous application details */}
+          {formData.previouslyApplied === 'yes' && (
+            <div>
+              <span className="font-medium">Previous Application Details *</span>
+              <p>{formData.previousApplicationWhen || t('review.not_provided')}</p>
+            </div>
+          )}
         </div>
       </div>
 
