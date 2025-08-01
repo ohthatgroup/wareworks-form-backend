@@ -16,7 +16,14 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   
   // Group documents by category for display
   const documentsByCategory = documents.reduce((acc: {[key: string]: any[]}, doc) => {
-    const category = doc.category || 'unknown'
+    // Backward compatibility: if no category, infer from type
+    let category = doc.category
+    if (!category) {
+      if (doc.type === 'identification') category = 'id'
+      else if (doc.type === 'resume') category = 'resume'
+      else category = 'certification'
+    }
+    
     if (!acc[category]) acc[category] = []
     acc[category].push(doc)
     return acc
