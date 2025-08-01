@@ -173,7 +173,7 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
         {employmentFields.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>Click &quot;Add Employment&quot; to add your work history.</p>
+            <p>{t('employment.no_entries_message')}</p>
           </div>
         ) : null}
 

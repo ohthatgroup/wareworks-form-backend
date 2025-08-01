@@ -76,8 +76,8 @@ const sampleFormData: ValidatedApplicationData = {
   expectedSalary: '$18/hour',
   
   // YES/NO CHECKBOX QUESTIONS (NEW!)
-  reliableTransport: 'yes',
-  workAuthorized: 'yes',
+  transportation: 'yes',
+  workAuthorizationConfirm: 'yes',
   fullTimeEmployment: 'yes',
   swingShifts: 'no',
   graveyardShifts: 'no',

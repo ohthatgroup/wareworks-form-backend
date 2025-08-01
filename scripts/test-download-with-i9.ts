@@ -119,6 +119,10 @@ const permanentResidentData: ValidatedApplicationData = {
   uscisANumber: 'A555666777',
   dateOfBirth: '1985-08-12',
   
+  // Transportation and Work Authorization
+  transportation: 'yes',
+  workAuthorizationConfirm: 'yes',
+  
   // Test documents
   documents: [
     {
