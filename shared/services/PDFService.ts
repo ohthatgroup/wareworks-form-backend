@@ -1,5 +1,5 @@
 import { ValidatedApplicationData } from '../validation/schemas'
-import { PDFDocument, PDFForm, PDFTextField, rgb } from 'pdf-lib'
+import { PDFDocument, PDFForm, PDFTextField, PDFCheckBox, rgb } from 'pdf-lib'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { pdfFieldMappings, i9FieldMappings, FieldMapping } from '../config/pdfFieldMappings'
@@ -93,6 +93,15 @@ export class PDFService {
     // Personal Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalFirstName, data.legalFirstName)
     this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalLastName, data.legalLastName)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.middleInitial, data.middleInitial)
+    
+    // Split Date of Birth fields
+    if (data.dateOfBirth) {
+      const dobParts = this.splitDate(data.dateOfBirth)
+      this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.dobMonth, dobParts.month)
+      this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.dobDay, dobParts.day)
+      this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.dobYear, dobParts.year)
+    }
     
     // Contact Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.streetAddress, data.streetAddress)
@@ -101,8 +110,15 @@ export class PDFService {
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.zipCode, data.zipCode)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.homePhone, data.homePhone || data.phoneNumber)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.cellPhone, data.homePhone || data.phoneNumber)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.socialSecurityNumber, data.socialSecurityNumber)
     this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.email, data.email || '')
+    
+    // Split SSN fields
+    if (data.socialSecurityNumber) {
+      const ssnParts = this.splitSSN(data.socialSecurityNumber)
+      this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.ssnPart1, ssnParts.part1)
+      this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.ssnPart2, ssnParts.part2)
+      this.setTextFieldWithMapping(form, pdfFieldMappings.contactInfo.ssnPart3, ssnParts.part3)
+    }
     
     // Emergency Contact
     this.setTextFieldWithMapping(form, pdfFieldMappings.emergencyContact.name, data.emergencyName)
@@ -121,15 +137,19 @@ export class PDFService {
     // Position Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.position.positionApplied, data.positionApplied)
     this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscovery, data.jobDiscovery)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscoveryContinued, data.jobDiscoveryContinued)
     this.setTextFieldWithMapping(form, pdfFieldMappings.position.expectedSalary, data.expectedSalary)
     
-    // Equipment Experience
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.sd, this.formatEquipmentExperience(data.equipmentSD))
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.su, this.formatEquipmentExperience(data.equipmentSU))
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.sur, this.formatEquipmentExperience(data.equipmentSUR))
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.cp, this.formatEquipmentExperience(data.equipmentCP))
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.cl, this.formatEquipmentExperience(data.equipmentCL))
-    this.setTextFieldWithMapping(form, pdfFieldMappings.equipment.rj, this.formatEquipmentExperience(data.equipmentRidingJack))
+    // Checkbox Questions
+    this.fillCheckboxQuestions(form, data)
+    
+    // Equipment Experience (checkboxes)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.sd, this.hasEquipmentExperience(data.equipmentSD))
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.su, this.hasEquipmentExperience(data.equipmentSU))
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.sur, this.hasEquipmentExperience(data.equipmentSUR))
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.cp, this.hasEquipmentExperience(data.equipmentCP))
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.cl, this.hasEquipmentExperience(data.equipmentCL))
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.equipment.rj, this.hasEquipmentExperience(data.equipmentRidingJack))
     
     // Skills and Qualifications
     this.setTextFieldWithMapping(form, pdfFieldMappings.skills.skill1, data.skills1)
@@ -143,10 +163,16 @@ export class PDFService {
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Name, edu.schoolName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Year, edu.graduationYear)
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school1Major, edu.fieldOfStudy)
+          // Diploma checkboxes
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school1DiplomaYes, edu.diplomaReceived === 'yes' || edu.diplomaReceived === true)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school1DiplomaNo, edu.diplomaReceived === 'no' || edu.diplomaReceived === false)
         } else if (index === 1) {
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Name, edu.schoolName || '')
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Year, edu.graduationYear)
           this.setTextFieldWithMapping(form, pdfFieldMappings.education.school2Major, edu.fieldOfStudy)
+          // Diploma checkboxes
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school2DiplomaYes, edu.diplomaReceived === 'yes' || edu.diplomaReceived === true)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.education.school2DiplomaNo, edu.diplomaReceived === 'no' || edu.diplomaReceived === false)
         }
       })
     }
@@ -156,23 +182,79 @@ export class PDFService {
       data.employment.forEach((emp, index) => {
         if (index === 0) {
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Name, emp.companyName || '')
+          
+          // Split employment start date
+          if (emp.startDate) {
+            const startParts = this.splitDate(emp.startDate)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1StartMonth, startParts.month)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1StartDay, startParts.day)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1StartYear, startParts.year)
+          }
+          
+          // Split employment end date
+          if (emp.endDate) {
+            const endParts = this.splitDate(emp.endDate)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1EndMonth, endParts.month)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1EndDay, endParts.day)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1EndYear, endParts.year)
+          }
+          
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1StartPosition, emp.startingPosition)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1EndPosition, emp.endingPosition)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Phone, emp.supervisorPhone)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Supervisor, emp.supervisorName)
+          
+          // May contact checkboxes
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactYes, emp.mayContact === 'yes' || emp.mayContact === true)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactNo, emp.mayContact === 'no' || emp.mayContact === false)
+          
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Responsibilities, emp.responsibilities)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ResponsibilitiesContinued, emp.responsibilitiesContinued)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeaving, emp.reasonForLeaving)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeavingContinued, emp.reasonLeavingContinued)
+          
         } else if (index === 1) {
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Name, emp.companyName || '')
+          
+          // Split employment start date
+          if (emp.startDate) {
+            const startParts = this.splitDate(emp.startDate)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2StartMonth, startParts.month)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2StartDay, startParts.day)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2StartYear, startParts.year)
+          }
+          
+          // Split employment end date
+          if (emp.endDate) {
+            const endParts = this.splitDate(emp.endDate)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2EndMonth, endParts.month)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2EndDay, endParts.day)
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2EndYear, endParts.year)
+          }
+          
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2StartPosition, emp.startingPosition)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2EndPosition, emp.endingPosition)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Phone, emp.supervisorPhone)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Supervisor, emp.supervisorName)
+          
+          // May contact checkboxes
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactYes, emp.mayContact === 'yes' || emp.mayContact === true)
+          this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactNo, emp.mayContact === 'no' || emp.mayContact === false)
+          
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Responsibilities, emp.responsibilities)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ResponsibilitiesContinued, emp.responsibilitiesContinued)
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeaving, emp.reasonForLeaving)
+          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeavingContinued, emp.reasonLeavingContinued)
         }
       })
     }
+    
+    // Signature Date (current date split into components)
+    const currentDate = new Date()
+    const sigDateParts = this.splitDate(currentDate.toISOString())
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.dateMonth, sigDateParts.month)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.dateDay, sigDateParts.day)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.dateYear, sigDateParts.year)
   }
 
   private setTextField(form: PDFForm, fieldName: string, value: string | undefined) {
@@ -269,6 +351,7 @@ export class PDFService {
         this.setCheckboxField(form, 'CB_2', true) // Non-citizen national
         break
       case 'lawful_permanent':
+      case 'permanent_resident': // Handle both formats
         this.setCheckboxField(form, 'CB_3', true) // Lawful permanent resident
         break
       case 'alien_authorized':
@@ -283,17 +366,107 @@ export class PDFService {
   }
 
 
-  private formatEquipmentExperience(experience: string | undefined): string {
-    if (!experience) return ''
-    // Convert experience level to readable format
-    const mapping: { [key: string]: string } = {
-      'none': 'None',
-      'basic': 'Basic',
-      'intermediate': 'Intermediate', 
-      'advanced': 'Advanced',
-      'expert': 'Expert'
+  private hasEquipmentExperience(experience: string | undefined): boolean {
+    // Return true if user has any experience level (not 'none' or empty)
+    return experience !== undefined && experience !== '' && experience !== 'none'
+  }
+
+  private setCheckboxFieldWithMapping(form: PDFForm, mapping: FieldMapping, checked: boolean) {
+    if (!checked) return // Only check boxes that should be checked
+
+    try {
+      const field = form.getField(mapping.primary) as PDFCheckBox
+      field.check()
+    } catch (error) {
+      // If primary field doesn't work, just silently ignore
+      console.log(`Checkbox field "${mapping.primary}" not found, skipping`)
     }
-    return mapping[experience] || experience
+  }
+
+  private splitDate(dateString: string): { month: string, day: string, year: string } {
+    try {
+      const date = new Date(dateString)
+      return {
+        month: String(date.getMonth() + 1).padStart(2, '0'), // JavaScript months are 0-indexed
+        day: String(date.getDate()).padStart(2, '0'),
+        year: String(date.getFullYear())
+      }
+    } catch (error) {
+      console.warn('Error splitting date:', dateString, error)
+      return { month: '', day: '', year: '' }
+    }
+  }
+
+  private splitSSN(ssn: string): { part1: string, part2: string, part3: string } {
+    // Remove all non-digit characters
+    const cleanSSN = ssn.replace(/\D/g, '')
+    
+    if (cleanSSN.length !== 9) {
+      console.warn('Invalid SSN length:', cleanSSN.length)
+      return { part1: '', part2: '', part3: '' }
+    }
+    
+    return {
+      part1: cleanSSN.substring(0, 3),  // First 3 digits
+      part2: cleanSSN.substring(3, 5),  // Middle 2 digits  
+      part3: cleanSSN.substring(5, 9)   // Last 4 digits
+    }
+  }
+
+  private fillCheckboxQuestions(form: PDFForm, data: ValidatedApplicationData) {
+    // Simple checkbox handling - just check the yes/no based on data
+    
+    // Age verification - assume 18+ (simplify)
+    this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.ageOver18Yes, true)
+    
+    // Transportation
+    if (data.reliableTransport === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.reliableTransportYes, true)
+    } else if (data.reliableTransport === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.reliableTransportNo, true)
+    }
+    
+    // Work authorization
+    if (data.workAuthorized === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.workAuthorizedYes, true)
+    } else if (data.workAuthorized === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.workAuthorizedNo, true)
+    }
+    
+    // Full-time employment
+    if (data.fullTimeEmployment === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.fullTimeYes, true)
+    } else if (data.fullTimeEmployment === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.fullTimeNo, true)
+    }
+    
+    // Swing shifts
+    if (data.swingShifts === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.swingShiftsYes, true)
+    } else if (data.swingShifts === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.swingShiftsNo, true)
+    }
+    
+    // Graveyard shifts
+    if (data.graveyardShifts === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.graveyardShiftsYes, true)
+    } else if (data.graveyardShifts === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.graveyardShiftsNo, true)
+    }
+    
+    // Previously applied
+    if (data.previouslyApplied === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.previouslyAppliedYes, true)
+    } else if (data.previouslyApplied === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.previouslyAppliedNo, true)
+    }
+    
+    // Forklift certification
+    if (data.forkliftCertification === 'yes') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.forkliftCertYes, true)
+    } else if (data.forkliftCertification === 'no') {
+      this.setCheckboxFieldWithMapping(form, pdfFieldMappings.checkboxFields.forkliftCertNo, true)
+    }
   }
 
   private hasI9Documents(data: ValidatedApplicationData): boolean {
@@ -378,7 +551,7 @@ export class PDFService {
     // Work authorization text fields
     console.log('Filling work authorization text fields...')
     
-    if (data.citizenshipStatus === 'lawful_permanent' && data.uscisANumber) {
+    if ((data.citizenshipStatus === 'lawful_permanent' || data.citizenshipStatus === 'permanent_resident') && data.uscisANumber) {
       // Use CB_3 specific field for permanent residents
       this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.uscisANumberCB3, data.uscisANumber)
       console.log(`  ✅ Set permanent resident USCIS A-Number (CB_3 field): ${data.uscisANumber}`)

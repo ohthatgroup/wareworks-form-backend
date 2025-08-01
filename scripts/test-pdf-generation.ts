@@ -34,15 +34,16 @@ async function loadEnvVars() {
   }
 }
 
-// Sample realistic form data
+// COMPREHENSIVE form data - testing ALL fields
 const sampleFormData: ValidatedApplicationData = {
-  submissionId: 'TEST-' + Date.now(),
+  submissionId: 'COMPREHENSIVE-TEST-' + Date.now(),
   submittedAt: new Date().toISOString(),
   
   // Personal Information
   legalFirstName: 'John',
   legalLastName: 'Smith',
   middleInitial: 'A',
+  dateOfBirth: '1995-03-15',
   
   // Contact Information
   streetAddress: '123 Main Street',
@@ -71,7 +72,17 @@ const sampleFormData: ValidatedApplicationData = {
   // Position Information
   positionApplied: 'Warehouse Associate',
   jobDiscovery: 'Company Website',
+  jobDiscoveryContinued: 'Found through career section after seeing job posting on Indeed',
   expectedSalary: '$18/hour',
+  
+  // YES/NO CHECKBOX QUESTIONS (NEW!)
+  reliableTransport: 'yes',
+  workAuthorized: 'yes',
+  fullTimeEmployment: 'yes',
+  swingShifts: 'no',
+  graveyardShifts: 'no',
+  previouslyApplied: 'no',
+  forkliftCertification: 'yes',
   
   // Equipment Experience
   equipmentSD: 'intermediate',
@@ -86,28 +97,60 @@ const sampleFormData: ValidatedApplicationData = {
   skills2: 'Inventory Management',
   skills3: 'Team Leadership',
   
-  // Education
-  education: [{
-    schoolName: 'Seattle Community College',
-    graduationYear: '2020',
-    fieldOfStudy: 'Business Administration'
-  }],
+  // Education (COMPLETE with diploma info)
+  education: [
+    {
+      schoolName: 'Seattle Community College',
+      graduationYear: '2020',
+      fieldOfStudy: 'Business Administration',
+      diplomaReceived: 'yes'
+    },
+    {
+      schoolName: 'University of Washington',
+      graduationYear: '2022',
+      fieldOfStudy: 'Supply Chain Management',
+      diplomaReceived: 'yes'
+    }
+  ],
   
-  // Employment History
-  employment: [{
-    companyName: 'ABC Logistics',
-    startingPosition: 'Warehouse Worker',
-    endingPosition: 'Lead Associate',
-    supervisorName: 'Mike Johnson',
-    supervisorPhone: '(206) 555-9999',
-    responsibilities: 'Loading/unloading trucks, inventory management, team coordination',
-    reasonForLeaving: 'Seeking career advancement'
-  }],
+  // Employment History (COMPLETE with dates and contact info)
+  employment: [
+    {
+      companyName: 'ABC Logistics, Seattle WA',
+      startDate: '2020-03-15',
+      endDate: '2022-08-30',
+      startingPosition: 'Warehouse Worker',
+      endingPosition: 'Lead Associate',
+      supervisorName: 'Mike Johnson',
+      supervisorPhone: '(206) 555-9999',
+      mayContact: 'yes',
+      responsibilities: 'Loading/unloading trucks, inventory management, team coordination',
+      responsibilitiesContinued: 'Training new employees, quality control inspections, safety compliance',
+      reasonForLeaving: 'Seeking career advancement',
+      reasonLeavingContinued: 'Company restructuring limited promotion opportunities'
+    },
+    {
+      companyName: 'XYZ Distribution, Tacoma WA', 
+      startDate: '2022-09-01',
+      endDate: '2024-01-15',
+      startingPosition: 'Shift Supervisor',
+      endingPosition: 'Operations Coordinator',
+      supervisorName: 'Sarah Wilson',
+      supervisorPhone: '(253) 555-7777',
+      mayContact: 'no',
+      responsibilities: 'Managing warehouse operations, supervising 15+ staff members',
+      responsibilitiesContinued: 'Implementing process improvements, maintaining safety standards',
+      reasonForLeaving: 'Seeking better opportunities',
+      reasonLeavingContinued: 'Looking for role with more growth potential'
+    }
+  ],
   
-  // Citizenship (for I-9 testing)
+  // Citizenship (testing permanent_resident format)
   citizenshipStatus: 'permanent_resident',
   uscisANumber: 'A123456789',
-  dateOfBirth: '1995-03-15'
+  
+  // Additional fields for comprehensive testing
+  documents: []
 }
 
 async function testPDFGeneration(): Promise<boolean> {

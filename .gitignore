@@ -121,3 +121,5 @@ FILE_ANALYSIS.md
 **/secrets/*
 **/*secret*
 **/*password*
+/test-output
+/scripts/output

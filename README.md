@@ -15,7 +15,7 @@
                             ┌──────────────────────┐     ┌─────────────────────┐
                             │   File Storage       │     │   Data Processing   │
                             │   Netlify Blobs      │     │   Email + PDF       │
-                            │   (Documents/Uploads)│     │   Google Sheets     │
+                            │   (Documents/Uploads)│     │   Generation        │
                             └──────────────────────┘     └─────────────────────┘
 ```
 
