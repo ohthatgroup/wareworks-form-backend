@@ -269,7 +269,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
 
 
         {/* Certifications - Dynamic based on selections */}
-        {(certifiedEquipment.length > 0 || certifiedSkills.length > 0) && (
+        {(certifiedForklifts.length > 0 || certifiedSkills.length > 0) && (
           <div className="border-t pt-6">
             <h3 className="text-lg font-medium text-primary mb-4">{t('documents.certifications_title')}</h3>
             <p className="text-sm text-gray-600 mb-6">
