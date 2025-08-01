@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { Plus, X } from 'lucide-react'
@@ -18,22 +18,34 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
   const { watch, setValue } = form
   const { t } = useLanguage()
   
-  // Initialize with existing skills or one empty skill
-  const [skills, setSkills] = useState<Skill[]>(() => {
-    const skill1 = watch('skills1')
-    const skill2 = watch('skills2')
-    const skill3 = watch('skills3')
-    const skill1Certified = watch('skills1Certified')
-    const skill2Certified = watch('skills2Certified')
-    const skill3Certified = watch('skills3Certified')
-    
+  // Initialize with one empty skill
+  const [skills, setSkills] = useState<Skill[]>([{ id: 'skill1', value: '', isCertified: false }])
+
+  // Watch form values
+  const skill1 = watch('skills1')
+  const skill2 = watch('skills2')
+  const skill3 = watch('skills3')
+  const skill1Certified = watch('skills1Certified')
+  const skill2Certified = watch('skills2Certified')
+  const skill3Certified = watch('skills3Certified')
+
+  // Sync local state with form values when they change
+  useEffect(() => {
     const existingSkills: Skill[] = []
     if (skill1) existingSkills.push({ id: 'skill1', value: skill1, isCertified: skill1Certified || false })
     if (skill2) existingSkills.push({ id: 'skill2', value: skill2, isCertified: skill2Certified || false })
     if (skill3) existingSkills.push({ id: 'skill3', value: skill3, isCertified: skill3Certified || false })
     
-    return existingSkills.length > 0 ? existingSkills : [{ id: 'skill1', value: '', isCertified: false }]
-  })
+    if (existingSkills.length > 0) {
+      setSkills(existingSkills)
+    } else {
+      // Only reset to empty skill if no existing skills and current state is also empty
+      const hasValues = skills.some(skill => skill.value.trim())
+      if (!hasValues) {
+        setSkills([{ id: 'skill1', value: '', isCertified: false }])
+      }
+    }
+  }, [skill1, skill2, skill3, skill1Certified, skill2Certified, skill3Certified])
 
   const updateFormValues = (updatedSkills: Skill[]) => {
     // Clear all skills first
