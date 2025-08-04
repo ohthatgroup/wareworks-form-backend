@@ -133,6 +133,36 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     }
   })
 
+  // Get document category title for display
+  const getDocumentCategoryTitle = (doc: any): string => {
+    const category = doc.category || (doc.type === 'identification' ? 'id' : doc.type === 'resume' ? 'resume' : 'certification')
+    
+    switch (category) {
+      case 'id':
+        return 'Government ID'
+      case 'resume':
+        return 'Resume'
+      case 'forkliftSD-cert':
+        return 'SD - Sit Down Forklift Certification'
+      case 'forkliftSU-cert':
+        return 'SU - Stand Up Forklift Certification'
+      case 'forkliftSUR-cert':
+        return 'SUR - Stand Up Reach Certification'
+      case 'forkliftCP-cert':
+        return 'CP - Cherry Picker Certification'
+      case 'forkliftCL-cert':
+        return 'CL - Clamps Certification'
+      case 'forkliftRidingJack-cert':
+        return 'Riding Jack Certification'
+      case 'skills1-cert':
+      case 'skills2-cert':
+      case 'skills3-cert':
+        return 'Skills Certification'
+      default:
+        return 'Document'
+    }
+  }
+
   const previewDocument = (doc: any) => {
     try {
       const byteCharacters = atob(doc.data)
@@ -591,6 +621,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                       <span className="text-white text-xs font-medium">{doc.name.split('.').pop()?.toUpperCase()}</span>
                     </div>
                     <div>
+                      <p className="text-xs font-medium text-primary">{getDocumentCategoryTitle(doc)}</p>
                       <p className="font-medium">{doc.name}</p>
                       <p className="text-xs text-gray-500">{(doc.size / 1024).toFixed(1)} KB</p>
                     </div>

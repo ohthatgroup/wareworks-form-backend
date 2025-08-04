@@ -23,7 +23,18 @@ export function SuccessStep({ result }: SuccessStepProps) {
   // Scroll to top when success page loads
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Scroll within iframe
       window.scrollTo({ top: 0, behavior: 'smooth' })
+      
+      // Send message to parent window (webflow embed) to scroll to top
+      if (window.parent && window.parent !== window) {
+        try {
+          window.parent.postMessage({ action: 'scrollToTop' }, '*')
+          console.log('📜 Sent scrollToTop message to parent window')
+        } catch (error) {
+          console.warn('Failed to send scroll message to parent:', error)
+        }
+      }
     }
   }, [])
 
@@ -166,8 +177,8 @@ export function SuccessStep({ result }: SuccessStepProps) {
           </div>
           <p className="text-sm text-gray-500 text-center">
             {t('success.questions_text')}{' '}
-            <a href="mailto:admin@wareworks.me" className="text-primary hover:underline">
-              admin@wareworks.me
+            <a href="mailto:admins@warework.me" className="text-primary hover:underline">
+              admins@warework.me
             </a>
           </p>
         </div>

@@ -16,7 +16,7 @@ export class EmailService {
       return
     }
 
-    // HR email - will eventually change to admin@wareworks.me
+    // HR email - will eventually change to admins@warework.me
     const hrEmail = process.env.HR_EMAIL || 'inbox@ohthatgrp.com'
     const subject = `New Application - ${data.legalFirstName} ${data.legalLastName} - ${data.state}`
 
@@ -168,24 +168,14 @@ export class EmailService {
         console.log(`📋 Added I-9 PDF: ${i9Doc.getPageCount()} pages`)
       }
       
-      // Add uploaded document pages (if PDFs)
+      // NOTE: Uploaded documents are already included in the application PDF
+      // by PDFService.mergeUploadedDocuments(), so we don't add them again here
+      // to avoid duplication in the final merged document
       if (uploadedDocs && uploadedDocs.length > 0) {
-        for (const doc of uploadedDocs) {
-          if (doc.mimeType === 'application/pdf') {
-            try {
-              const docBuffer = Buffer.from(doc.data, 'base64')
-              const uploadedDoc = await PDFDocument.load(docBuffer)
-              const uploadedPages = await mergedDoc.copyPages(uploadedDoc, uploadedDoc.getPageIndices())
-              uploadedPages.forEach((page) => mergedDoc.addPage(page))
-              console.log(`📋 Added uploaded PDF "${doc.name}": ${uploadedDoc.getPageCount()} pages`)
-            } catch (error) {
-              console.error(`❌ Failed to merge uploaded PDF "${doc.name}":`, error)
-              // Continue with other documents
-            }
-          } else {
-            console.log(`⏭️ Skipping non-PDF document "${doc.name}" (${doc.mimeType})`)
-          }
-        }
+        console.log(`📋 Skipping re-merge of ${uploadedDocs.length} uploaded documents (already included in application PDF)`)
+        uploadedDocs.forEach(doc => {
+          console.log(`⏭️ Document "${doc.name}" (${doc.mimeType}) already merged in application PDF`)
+        })
       }
       
       const totalPages = mergedDoc.getPageCount()

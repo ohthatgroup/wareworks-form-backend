@@ -200,7 +200,7 @@ ENABLE_FILE_UPLOADS=true
 MAILGUN_API_KEY=key-xxxxxxxxxxxxxxxxx
 MAILGUN_DOMAIN=apply.wareworks.me
 HR_EMAIL=hr@wareworks.me
-ADMIN_EMAIL=admin@wareworks.me
+ADMIN_EMAIL=admins@warework.me
 
 # File Upload (Netlify Blobs)
 NETLIFY_BLOBS_URL=https://apply.wareworks.me

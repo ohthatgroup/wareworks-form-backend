@@ -79,11 +79,6 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
             })}
           </div>
           
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>Note:</strong> You will be able to upload certification documents for each selected forklift type on the Documents page.
-            </p>
-          </div>
         </div>
       )}
     </div>

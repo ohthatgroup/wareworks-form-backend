@@ -53,7 +53,7 @@ ENABLE_FILE_UPLOADS=true
 GMAIL_USER=your-gmail@gmail.com
 GMAIL_APP_PASSWORD=your-16-char-app-password
 HR_EMAIL=hr@wareworks.me
-ADMIN_EMAIL=admin@wareworks.me
+ADMIN_EMAIL=admins@warework.me
 
 # File Upload (uses fallback base64 storage)
 NETLIFY_BLOBS_URL=http://localhost:8888

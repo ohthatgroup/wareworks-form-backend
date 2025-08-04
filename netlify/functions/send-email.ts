@@ -78,7 +78,7 @@ async function sendViaMailgun(emailData: EmailData) {
   
   // Set sender based on environment (testing vs production)
   const senderEmail = process.env.NODE_ENV === 'production' 
-    ? `Wareworks Application System <admin@wareworks.me>`
+    ? `Wareworks Application System <admins@warework.me>`
     : `Wareworks Application System <noreply@${process.env.MAILGUN_DOMAIN}>`
   
   formData.append('from', senderEmail)

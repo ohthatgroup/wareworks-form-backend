@@ -154,11 +154,6 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
             })}
           </div>
           
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>{t('availability.note_title')}</strong> {t('availability.note_message')}
-            </p>
-          </div>
         </div>
       )}
 

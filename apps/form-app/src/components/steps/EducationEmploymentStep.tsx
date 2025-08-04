@@ -82,17 +82,8 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
       {/* Education Section */}
       <div className="border-t pt-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4">
           <h3 className="text-lg font-medium text-primary">{t('education.title')}</h3>
-          <button
-            type="button"
-            onClick={addEducation}
-            disabled={educationFields.length >= 2}
-            className="btn-secondary text-sm flex items-center gap-2"
-          >
-            <Plus size={16} />
-            {t('education.add_button')}
-          </button>
         </div>
 
 
@@ -151,23 +142,28 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                 error={errors.education?.[index]?.degreeReceived?.message}
               />
             </div>
+            
+            {/* Add Education button - shown under first entry, hidden when 2 entries exist */}
+            {index === 0 && educationFields.length < 2 && (
+              <div className="mt-4 text-center">
+                <button
+                  type="button"
+                  onClick={addEducation}
+                  className="btn-secondary text-sm flex items-center gap-2 mx-auto"
+                >
+                  <Plus size={16} />
+                  {t('education.add_button')}
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
       {/* Employment Section */}
       <div className="border-t pt-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4">
           <h3 className="text-lg font-medium text-primary">{t('employment.title')}</h3>
-          <button
-            type="button"
-            onClick={addEmployment}
-            disabled={employmentFields.length >= 2}
-            className="btn-secondary text-sm flex items-center gap-2"
-          >
-            <Plus size={16} />
-            {t('employment.add_button')}
-          </button>
         </div>
 
 
@@ -295,6 +291,20 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
                 error={errors.employment?.[index]?.mayContact?.message}
               />
             </div>
+            
+            {/* Add Employment button - shown under first entry, hidden when 2 entries exist */}
+            {index === 0 && employmentFields.length < 2 && (
+              <div className="mt-4 text-center">
+                <button
+                  type="button"
+                  onClick={addEmployment}
+                  className="btn-secondary text-sm flex items-center gap-2 mx-auto"
+                >
+                  <Plus size={16} />
+                  {t('employment.add_button')}
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

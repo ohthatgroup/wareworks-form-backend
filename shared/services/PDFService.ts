@@ -617,6 +617,10 @@ export class PDFService {
           const pageCount = uploadedDoc.getPageCount()
           console.log(`  📑 PDF has ${pageCount} pages`)
           
+          // Add a title page before the PDF content
+          await this.addDocumentTitlePage(pdfDoc, doc)
+          console.log(`  📋 Added title page for "${doc.name}"`)
+          
           // Copy pages from uploaded document
           const pages = await pdfDoc.copyPages(uploadedDoc, uploadedDoc.getPageIndices())
           pages.forEach((page) => pdfDoc.addPage(page))
@@ -624,6 +628,10 @@ export class PDFService {
           
         } else if (doc.mimeType.startsWith('image/')) {
           console.log('  🖼️ Embedding image document...')
+          // Add title page first
+          await this.addDocumentTitlePage(pdfDoc, doc)
+          console.log(`  📋 Added title page for "${doc.name}"`)
+          // Then add the image
           await this.addImageToDocument(pdfDoc, doc)
           console.log('  ✅ Image embedded on new page')
           
@@ -674,16 +682,101 @@ export class PDFService {
       
       page.drawImage(image, { x, y, width: imageWidth, height: imageHeight })
       
-      // Add document title
-      page.drawText(`Document: ${doc.name}`, {
+    } catch (error) {
+      console.warn(`Could not add image ${doc.name}:`, error)
+    }
+  }
+
+  private async addDocumentTitlePage(pdfDoc: PDFDocument, doc: any) {
+    try {
+      const page = pdfDoc.addPage()
+      const { width, height } = page.getSize()
+      
+      // Get document category title
+      const categoryTitle = this.getDocumentCategoryTitle(doc)
+      
+      // Draw border
+      page.drawRectangle({
         x: 50,
-        y: height - 30,
-        size: 12,
+        y: 50,
+        width: width - 100,
+        height: height - 100,
+        borderColor: rgb(0.2, 0.2, 0.2),
+        borderWidth: 2
+      })
+      
+      // Draw title
+      page.drawText(categoryTitle, {
+        x: 80,
+        y: height - 120,
+        size: 24,
+        color: rgb(0.1, 0.1, 0.4) // Dark blue
+      })
+      
+      // Draw filename
+      page.drawText(`File: ${doc.name}`, {
+        x: 80,
+        y: height - 160,
+        size: 14,
         color: rgb(0, 0, 0)
       })
       
+      // Draw file info
+      const fileSize = (doc.size / 1024).toFixed(1) + ' KB'
+      page.drawText(`Size: ${fileSize}`, {
+        x: 80,
+        y: height - 180,
+        size: 12,
+        color: rgb(0.3, 0.3, 0.3)
+      })
+      
+      // Draw separator line
+      page.drawLine({
+        start: { x: 80, y: height - 200 },
+        end: { x: width - 80, y: height - 200 },
+        thickness: 1,
+        color: rgb(0.7, 0.7, 0.7)
+      })
+      
+      // Add note about document content
+      page.drawText('Document content follows on next page(s)', {
+        x: 80,
+        y: height - 230,
+        size: 10,
+        color: rgb(0.5, 0.5, 0.5)
+      })
+      
     } catch (error) {
-      console.warn(`Could not add image ${doc.name}:`, error)
+      console.warn(`Could not add title page for ${doc.name}:`, error)
+    }
+  }
+
+  private getDocumentCategoryTitle(doc: any): string {
+    const category = doc.category || (doc.type === 'identification' ? 'id' : doc.type === 'resume' ? 'resume' : 'certification')
+    
+    switch (category) {
+      case 'id':
+        return 'Government Identification Document'
+      case 'resume':
+        return 'Resume / CV'
+      case 'forkliftSD-cert':
+        return 'SD - Sit Down Forklift Certification'
+      case 'forkliftSU-cert':
+        return 'SU - Stand Up Forklift Certification'
+      case 'forkliftSUR-cert':
+        return 'SUR - Stand Up Reach Certification'
+      case 'forkliftCP-cert':
+        return 'CP - Cherry Picker Certification'
+      case 'forkliftCL-cert':
+        return 'CL - Clamps Certification'
+      case 'forkliftRidingJack-cert':
+        return 'Riding Jack Certification'
+      case 'skills1-cert':
+      case 'skills2-cert':
+      case 'skills3-cert':
+        return 'Skills Certification Document'
+      default:
+        return 'Uploaded Document'
     }
   }
 }

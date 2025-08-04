@@ -130,16 +130,16 @@ export const translations = {
     'equipment.expert': 'Expert (5+ years)',
     'equipment.certified': 'Certified',
     'equipment.note_title': 'Note:',
-    'equipment.note_message': 'Select "Certified" if you have official certification for any equipment. You\'ll be able to upload certification documents in the Documents section.',
+    'equipment.note_message': 'Select "Certified" if you have official certification for any equipment.',
     
     // Skills & Qualifications
     'skills.skill_qualification': 'Skill/Qualification',
     'skills.skill_placeholder': 'e.g., Forklift certification, OSHA training, RF Scanner experience',
     'skills.certification_checkbox': 'I have certification/documentation for this skill',
-    'skills.document_note': '📄 You\'ll be able to upload certification documents in the Documents section',
+    'skills.document_note': '📄 Certification documents can be uploaded in the Documents section',
     'skills.add_skill': 'Add Another Skill/Qualification',
     'skills.certified_skills': 'Certified Skills',
-    'skills.certification_note': 'You\'ll be prompted to upload certification documents for these skills in the Documents section.',
+    'skills.certification_note': 'Upload certification documents for these skills in the Documents section.',
     'skills.remove_skill': 'Remove skill',
 
     // Availability
