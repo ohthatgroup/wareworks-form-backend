@@ -132,11 +132,6 @@ export interface PDFFieldMappings {
     company2ReasonLeaving: FieldMapping
     company2ReasonLeavingContinued: FieldMapping
   }
-  signature: {
-    dateMonth: FieldMapping
-    dateDay: FieldMapping
-    dateYear: FieldMapping
-  }
 }
 
 export const pdfFieldMappings: PDFFieldMappings = {
@@ -264,11 +259,6 @@ export const pdfFieldMappings: PDFFieldMappings = {
     company2ResponsibilitiesContinued: { primary: 'Company Responsibilities 2 Continued', fallbacks: ['Responsibilities 2 Continued'] },
     company2ReasonLeaving: { primary: 'Company Reason for Leaving 2', fallbacks: ['Reason for Leaving 1_2', 'Reason Leaving 2', 'Why Left 2'] },
     company2ReasonLeavingContinued: { primary: 'Company Reason for Leaving 2 Continued', fallbacks: ['Reason Leaving 2 Continued'] }
-  },
-  signature: {
-    dateMonth: { primary: 'Signature Date - Month', fallbacks: ['Sig Month'] },
-    dateDay: { primary: 'Signature Date - Day', fallbacks: ['Sig Day'] },
-    dateYear: { primary: 'Signature Date - Year', fallbacks: ['Sig Year'] }
   }
 }
 
