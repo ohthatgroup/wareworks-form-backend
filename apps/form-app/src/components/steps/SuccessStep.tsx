@@ -13,8 +13,14 @@ export function SuccessStep({ result }: SuccessStepProps) {
   const handleStartNewApplication = () => {
     if (typeof window !== 'undefined') {
       console.log('🆕 Starting new application - clearing all data')
+      // Preserve language preference during cleanup
+      const languagePreference = sessionStorage.getItem('preferred-language')
       // Clear all form-related data
       sessionStorage.clear()
+      // Restore language preference
+      if (languagePreference) {
+        sessionStorage.setItem('preferred-language', languagePreference)
+      }
       // Redirect to first step
       window.location.href = '/step/1'
     }
