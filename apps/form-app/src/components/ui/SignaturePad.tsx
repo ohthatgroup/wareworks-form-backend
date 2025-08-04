@@ -118,7 +118,7 @@ const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(({ onSignatu
   }
 
   const handleCanvasRef = (canvas: HTMLCanvasElement | null) => {
-    if (canvas) {
+    if (canvas && canvasRef.current !== canvas) {
       canvasRef.current = canvas
       setupCanvas(canvas)
       
@@ -132,16 +132,17 @@ const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(({ onSignatu
       canvas.addEventListener('touchstart', startDrawing)
       canvas.addEventListener('touchmove', draw)
       canvas.addEventListener('touchend', stopDrawing)
-      
-      return () => {
-        canvas.removeEventListener('mousedown', startDrawing)
-        canvas.removeEventListener('mousemove', draw)
-        canvas.removeEventListener('mouseup', stopDrawing)
-        canvas.removeEventListener('mouseout', stopDrawing)
-        canvas.removeEventListener('touchstart', startDrawing)
-        canvas.removeEventListener('touchmove', draw)
-        canvas.removeEventListener('touchend', stopDrawing)
-      }
+    } else if (!canvas && canvasRef.current) {
+      // Cleanup when canvas is removed
+      const currentCanvas = canvasRef.current
+      currentCanvas.removeEventListener('mousedown', startDrawing)
+      currentCanvas.removeEventListener('mousemove', draw)
+      currentCanvas.removeEventListener('mouseup', stopDrawing)
+      currentCanvas.removeEventListener('mouseout', stopDrawing)
+      currentCanvas.removeEventListener('touchstart', startDrawing)
+      currentCanvas.removeEventListener('touchmove', draw)
+      currentCanvas.removeEventListener('touchend', stopDrawing)
+      canvasRef.current = null
     }
   }
 
