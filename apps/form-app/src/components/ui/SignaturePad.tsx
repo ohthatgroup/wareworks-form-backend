@@ -119,7 +119,8 @@ const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(({ onSignatu
 
   const handleCanvasRef = (canvas: HTMLCanvasElement | null) => {
     if (canvas && canvasRef.current !== canvas) {
-      canvasRef.current = canvas
+      // Use type assertion to allow assignment to ref.current
+      ;(canvasRef as React.MutableRefObject<HTMLCanvasElement | null>).current = canvas
       setupCanvas(canvas)
       
       // Mouse events
@@ -142,7 +143,7 @@ const SignaturePad = forwardRef<SignaturePadRef, SignaturePadProps>(({ onSignatu
       currentCanvas.removeEventListener('touchstart', startDrawing)
       currentCanvas.removeEventListener('touchmove', draw)
       currentCanvas.removeEventListener('touchend', stopDrawing)
-      canvasRef.current = null
+      ;(canvasRef as React.MutableRefObject<HTMLCanvasElement | null>).current = null
     }
   }
 
