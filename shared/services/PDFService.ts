@@ -255,9 +255,9 @@ export class PDFService {
     // Signature Date (current date split into components)
     const currentDate = new Date()
     const sigDateParts = this.splitDate(currentDate.toISOString())
-    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.dateMonth, sigDateParts.month)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.dateDay, sigDateParts.day)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.dateYear, sigDateParts.year)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, sigDateParts.month)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, sigDateParts.day)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, sigDateParts.year)
   }
 
   private setTextField(form: PDFForm, fieldName: string, value: string | undefined) {
