@@ -560,9 +560,9 @@ export class PDFService {
     // For alien authorized to work
     if (data.citizenshipStatus === 'alien_authorized') {
       // Work authorization expiration date
-      if (data.workAuthorizationExpiration) {
-        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.expirationDate, this.formatDateForI9(data.workAuthorizationExpiration))
-        console.log(`  ✅ Set work authorization expiration: ${data.workAuthorizationExpiration}`)
+      if (data.workAuthExpiration) {
+        this.setTextFieldWithMapping(form, i9FieldMappings.workAuthorization.expirationDate, this.formatDateForI9(data.workAuthExpiration))
+        console.log(`  ✅ Set work authorization expiration: ${data.workAuthExpiration}`)
       }
       
       // Fill the appropriate field based on document type
