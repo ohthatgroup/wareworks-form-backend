@@ -11,6 +11,12 @@ export const translations = {
     'steps.documents.title': 'Documents',
     'steps.review.title': 'Review & Submit',
 
+    // Signature
+    'signature.label': 'Digital Signature',
+    'signature.instruction': 'Sign above using your mouse, finger, or stylus',
+    'signature.clear': 'Clear',
+    'signature.required': 'Signature is required to submit application',
+
     // Personal Information
     'personal_info.legal_first_name': 'Legal First Name',
     'personal_info.middle_initial': 'Middle Initial',
@@ -136,10 +142,7 @@ export const translations = {
     'skills.skill_qualification': 'Skill/Qualification',
     'skills.skill_placeholder': 'e.g., Forklift certification, OSHA training, RF Scanner experience',
     'skills.certification_checkbox': 'I have certification/documentation for this skill',
-    'skills.document_note': '📄 Certification documents can be uploaded in the Documents section',
     'skills.add_skill': 'Add Another Skill/Qualification',
-    'skills.certified_skills': 'Certified Skills',
-    'skills.certification_note': 'Upload certification documents for these skills in the Documents section.',
     'skills.remove_skill': 'Remove skill',
 
     // Availability
@@ -148,7 +151,6 @@ export const translations = {
     'availability.swing_shifts_question': 'Are you available for swing shifts (3PM-11PM)?',
     'availability.graveyard_shifts_question': 'Are you available for graveyard shifts (11PM-7AM)?',
     'availability.weekly_availability_title': 'Weekly Availability',
-    'availability.weekly_description': 'Since you indicated limited availability for standard shifts, please specify your availability for each day:',
     'availability.sunday': 'Sunday',
     'availability.monday': 'Monday',
     'availability.tuesday': 'Tuesday',
@@ -156,13 +158,6 @@ export const translations = {
     'availability.thursday': 'Thursday',
     'availability.friday': 'Friday',
     'availability.saturday': 'Saturday',
-    'availability.sunday_description': 'Available on Sunday',
-    'availability.monday_description': 'Available on Monday',
-    'availability.tuesday_description': 'Available on Tuesday',
-    'availability.wednesday_description': 'Available on Wednesday',
-    'availability.thursday_description': 'Available on Thursday',
-    'availability.friday_description': 'Available on Friday',
-    'availability.saturday_description': 'Available on Saturday',
     'availability.time_placeholder': 'e.g., 8AM-5PM',
     'availability.note_title': 'Note:',
     'availability.note_message': 'Enter your available hours for each day (e.g., "8AM-5PM", "6PM-11PM") or write "Not Available" if you cannot work that day.',
@@ -293,6 +288,12 @@ export const translations = {
     'steps.documents.title': 'Documentos',
     'steps.review.title': 'Revisar y Enviar',
 
+    // Signature
+    'signature.label': 'Firma Digital',
+    'signature.instruction': 'Firme arriba usando su ratón, dedo o lápiz óptico',
+    'signature.clear': 'Borrar',
+    'signature.required': 'Se requiere firma para enviar la solicitud',
+
     // Personal Information
     'personal_info.legal_first_name': 'Nombre Legal',
     'personal_info.middle_initial': 'Inicial del Segundo Nombre',
@@ -418,10 +419,7 @@ export const translations = {
     'skills.skill_qualification': 'Habilidad/Calificación',
     'skills.skill_placeholder': 'ej., Certificación de montacargas, Entrenamiento OSHA, Experiencia con escáner RF',
     'skills.certification_checkbox': 'Tengo certificación/documentación para esta habilidad',
-    'skills.document_note': '📄 Podrá subir documentos de certificación en la sección de Documentos',
     'skills.add_skill': 'Agregar Otra Habilidad/Calificación',
-    'skills.certified_skills': 'Habilidades Certificadas',
-    'skills.certification_note': 'Se le pedirá que suba documentos de certificación para estas habilidades en la sección de Documentos.',
     'skills.remove_skill': 'Eliminar habilidad',
 
     // Availability
@@ -430,7 +428,6 @@ export const translations = {
     'availability.swing_shifts_question': '¿Está disponible para turnos vespertinos (3PM-11PM)?',
     'availability.graveyard_shifts_question': '¿Está disponible para turnos nocturnos (11PM-7AM)?',
     'availability.weekly_availability_title': 'Disponibilidad Semanal',
-    'availability.weekly_description': 'Como indicó disponibilidad limitada para turnos estándar, especifique su disponibilidad para cada día:',
     'availability.sunday': 'Domingo',
     'availability.monday': 'Lunes',
     'availability.tuesday': 'Martes',
@@ -438,13 +435,6 @@ export const translations = {
     'availability.thursday': 'Jueves',
     'availability.friday': 'Viernes',
     'availability.saturday': 'Sábado',
-    'availability.sunday_description': 'Disponible el domingo',
-    'availability.monday_description': 'Disponible el lunes',
-    'availability.tuesday_description': 'Disponible el martes',
-    'availability.wednesday_description': 'Disponible el miércoles',
-    'availability.thursday_description': 'Disponible el jueves',
-    'availability.friday_description': 'Disponible el viernes',
-    'availability.saturday_description': 'Disponible el sábado',
     'availability.time_placeholder': 'ej., 8AM-5PM',
     'availability.note_title': 'Nota:',
     'availability.note_message': 'Ingrese sus horas disponibles para cada día (ej., "8AM-5PM", "6PM-11PM") o escriba "No Disponible" si no puede trabajar ese día.',

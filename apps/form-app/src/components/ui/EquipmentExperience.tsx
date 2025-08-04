@@ -14,12 +14,12 @@ interface EquipmentExperienceProps {
 }
 
 const FORKLIFT_TYPES: ForkliftType[] = [
-  { key: 'forkliftSD', label: 'SD - Sit Down Forklift', description: 'Standard sit-down counterbalance forklift' },
-  { key: 'forkliftSU', label: 'SU - Stand Up Forklift', description: 'Stand-up counterbalance forklift' },
-  { key: 'forkliftSUR', label: 'SUR - Stand Up Reach', description: 'Stand-up reach truck for narrow aisles' },
-  { key: 'forkliftCP', label: 'CP - Cherry Picker', description: 'Order picker/cherry picker lift' },
-  { key: 'forkliftCL', label: 'CL - Clamps', description: 'Forklift with clamp attachment' },
-  { key: 'forkliftRidingJack', label: 'Riding Jack', description: 'Electric pallet jack/riding jack' }
+  { key: 'forkliftSD', label: 'SD - Sit Down Forklift', description: '' },
+  { key: 'forkliftSU', label: 'SU - Stand Up Forklift', description: '' },
+  { key: 'forkliftSUR', label: 'SUR - Stand Up Reach', description: '' },
+  { key: 'forkliftCP', label: 'CP - Cherry Picker', description: '' },
+  { key: 'forkliftCL', label: 'CL - Clamps', description: '' },
+  { key: 'forkliftRidingJack', label: 'Riding Jack', description: '' }
 ]
 
 export function EquipmentExperience({ form }: EquipmentExperienceProps) {
@@ -70,9 +70,6 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
                     >
                       {forklift.label}
                     </label>
-                    <p className="text-xs text-gray-600 mt-1">
-                      {forklift.description}
-                    </p>
                   </div>
                 </div>
               )

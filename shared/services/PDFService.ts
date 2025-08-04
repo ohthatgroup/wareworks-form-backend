@@ -62,6 +62,9 @@ export class PDFService {
       } else {
         console.log('📄 No uploaded documents to merge')
       }
+
+      // Add digital signature if provided
+      await this.addSignatureToApplicationPDF(pdfDoc, form, data)
       
       // Generate separate I-9 form if needed
       let i9Buffer: Buffer | null = null
@@ -777,6 +780,57 @@ export class PDFService {
         return 'Skills Certification Document'
       default:
         return 'Uploaded Document'
+    }
+  }
+
+  // Handle signature in WareWorks Application PDF
+  private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData) {
+    if (!data.signature) {
+      console.log('📝 No signature provided, skipping signature field')
+      return
+    }
+
+    console.log('🖊️ Processing digital signature for application PDF')
+
+    try {
+      // Convert base64 signature to PNG image
+      const signatureData = data.signature.split(',')[1] // Remove data:image/png;base64, prefix
+      const signatureImage = await pdfDoc.embedPng(Buffer.from(signatureData, 'base64'))
+      
+      // Try to find signature field position and draw image
+      const pages = pdfDoc.getPages()
+      const lastPage = pages[pages.length - 1] // Signature typically on last page
+      
+      // Get approximate signature field position (coordinates may need adjustment)
+      // These coordinates should be adjusted based on your actual PDF template
+      const signatureRect = { x: 100, y: 150, width: 200, height: 50 }
+      
+      lastPage.drawImage(signatureImage, {
+        x: signatureRect.x,
+        y: signatureRect.y,
+        width: signatureRect.width,
+        height: signatureRect.height
+      })
+      
+      console.log('🖊️ Signature image drawn successfully')
+
+      // Fill signature date fields
+      if (data.signatureDate) {
+        const signatureDate = new Date(data.signatureDate)
+        
+        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, 
+          (signatureDate.getMonth() + 1).toString().padStart(2, '0'))
+        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, 
+          signatureDate.getDate().toString().padStart(2, '0'))
+        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, 
+          signatureDate.getFullYear().toString())
+          
+        console.log(`📅 Signature date filled: ${signatureDate.toLocaleDateString()}`)
+      }
+
+    } catch (error) {
+      console.error('❌ Failed to process signature:', error)
+      // Continue without signature rather than failing entire PDF generation
     }
   }
 }

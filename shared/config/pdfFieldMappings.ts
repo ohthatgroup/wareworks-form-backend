@@ -73,6 +73,12 @@ export interface PDFFieldMappings {
     cl: FieldMapping
     rj: FieldMapping
   }
+  signature: {
+    signature: FieldMapping
+    signatureDateMonth: FieldMapping
+    signatureDateDay: FieldMapping
+    signatureDateYear: FieldMapping
+  }
   skills: {
     skill1: FieldMapping
     skill2: FieldMapping
@@ -204,6 +210,12 @@ export const pdfFieldMappings: PDFFieldMappings = {
     skill1: { primary: 'Applicable Skills  Qualifications 1', fallbacks: ['Skills 1', 'Skill 1'] },
     skill2: { primary: 'Applicable Skills  Qualifications 2', fallbacks: ['Skills 2', 'Skill 2'] },
     skill3: { primary: 'Applicable Skills  Qualifications 3', fallbacks: ['Skills 3', 'Skill 3'] }
+  },
+  signature: {
+    signature: { primary: 'Signature', fallbacks: ['Applicant Signature'] },
+    signatureDateMonth: { primary: 'Signature Date - Month', fallbacks: ['Sig Month'] },
+    signatureDateDay: { primary: 'Signature Date - Day', fallbacks: ['Sig Day'] },
+    signatureDateYear: { primary: 'Signature Date - Year', fallbacks: ['Sig Year'] }
   },
   education: {
     school1Name: { primary: 'School Name and Location 1', fallbacks: ['School Name and Location', 'School 1', 'Education 1'] },

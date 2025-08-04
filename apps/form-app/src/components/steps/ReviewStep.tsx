@@ -2,6 +2,8 @@ import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { CheckCircle, AlertCircle, Edit, Eye, Download } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
+import SignaturePad, { SignaturePadRef } from '../ui/SignaturePad'
+import { useRef } from 'react'
 
 interface ReviewStepProps {
   form: UseFormReturn<ValidatedApplicationData>
@@ -9,15 +11,26 @@ interface ReviewStepProps {
 }
 
 export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
-  const { watch, formState: { errors } } = form
+  const { watch, formState: { errors }, setValue } = form
   const { t } = useLanguage()
   const formData = watch()
+  const signaturePadRef = useRef<SignaturePadRef>(null)
 
   const hasErrors = Object.keys(errors).length > 0
 
   const handleEdit = (stepIndex: number) => {
     if (onEditStep) {
       onEditStep(stepIndex)
+    }
+  }
+
+  const handleSignatureChange = (signature: string | null) => {
+    if (signature) {
+      setValue('signature', signature)
+      setValue('signatureDate', new Date().toISOString())
+    } else {
+      setValue('signature', '')
+      setValue('signatureDate', '')
     }
   }
 
@@ -684,6 +697,15 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             {t('review.legal_text_2')}
           </p>
         </div>
+      </div>
+
+      {/* Digital Signature */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <SignaturePad
+          ref={signaturePadRef}
+          onSignatureChange={handleSignatureChange}
+          error={errors.signature?.message}
+        />
       </div>
     </div>
   )

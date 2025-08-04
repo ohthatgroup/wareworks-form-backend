@@ -149,11 +149,6 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
                 </label>
               </div>
               
-              {skill.isCertified && skill.value.trim() && (
-                <div className="mt-2 p-2 bg-primary/10 border border-primary/30 rounded text-xs text-primary">
-                  {t('skills.document_note')}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -170,21 +165,6 @@ export function SkillsQualifications({ form }: SkillsQualificationsProps) {
         </button>
       )}
       
-      {certifiedSkills.length > 0 && (
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800">
-            <strong>{t('skills.certified_skills')} ({certifiedSkills.length}):</strong> {t('skills.certification_note')}
-          </p>
-          <ul className="mt-2 text-sm text-blue-700">
-            {certifiedSkills.map((skill, index) => (
-              <li key={skill.id} className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-                {skill.value}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   )
 }
