@@ -27,6 +27,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (hydrated && typeof window !== 'undefined') {
+      // Check if we're in an iframe
+      const isInIframe = window.self !== window.top
+      
       // Read language from URL parameter (from webflow embed)
       const urlParams = new URLSearchParams(window.location.search)
       const urlLanguage = urlParams.get('lang') as Language | null
@@ -46,14 +49,67 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setLanguageState('en')
         sessionStorage.setItem('preferred-language', 'en')
       }
+
+      // Set up cross-frame communication for language synchronization
+      if (isInIframe) {
+        const handleMessage = (event: MessageEvent) => {
+          // Security: Only accept messages from trusted origins
+          const allowedOrigins = [
+            'https://wareworks.me',
+            'https://www.wareworks.me',
+            'https://wareworks.webflow.io',
+            window.location.origin
+          ]
+          
+          if (!allowedOrigins.includes(event.origin)) {
+            return
+          }
+
+          if (event.data.type === 'languageChange' && event.data.language) {
+            const newLang = event.data.language as Language
+            if (newLang === 'en' || newLang === 'es') {
+              setLanguageState(newLang)
+              sessionStorage.setItem('preferred-language', newLang)
+            }
+          }
+        }
+
+        window.addEventListener('message', handleMessage)
+        
+        // Send current language to parent on load
+        try {
+          window.parent.postMessage({
+            type: 'iframeLanguageUpdate',
+            language: language
+          }, '*')
+        } catch (error) {
+          console.warn('Could not communicate with parent window:', error)
+        }
+
+        return () => {
+          window.removeEventListener('message', handleMessage)
+        }
+      }
     }
-  }, [hydrated])
+  }, [hydrated, language])
 
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage)
     
     if (hydrated && typeof window !== 'undefined') {
       sessionStorage.setItem('preferred-language', newLanguage)
+      
+      // If we're in an iframe, notify the parent of the language change
+      try {
+        if (window.self !== window.top) {
+          window.parent.postMessage({
+            type: 'iframeLanguageUpdate',
+            language: newLanguage
+          }, '*')
+        }
+      } catch (error) {
+        console.warn('Could not communicate language change to parent window:', error)
+      }
     }
   }
 

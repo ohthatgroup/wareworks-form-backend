@@ -51,7 +51,10 @@ function ApplicationFormContent() {
   useEffect(() => {
     if (currentStepId === 'success') return // Allow success step
     if (currentStep === -1 && currentStepId) {
-      router.replace('/step/personal')
+      const currentUrl = new URL(window.location.href)
+      const langParam = currentUrl.searchParams.get('lang')
+      const redirectUrl = langParam ? '/step/personal?lang=' + langParam : '/step/personal'
+      router.replace(redirectUrl)
     }
   }, [currentStepId, currentStep, router])
 
@@ -501,10 +504,13 @@ function ApplicationFormContent() {
         })
       }
       const nextStepId = STEPS[currentStep + 1].id
-      console.log('🚀 Attempting navigation to:', `/step/${nextStepId}`)
+      const currentUrl = new URL(window.location.href)
+      const langParam = currentUrl.searchParams.get('lang')
+      const nextUrl = langParam ? `/step/${nextStepId}?lang=${langParam}` : `/step/${nextStepId}`
+      console.log('🚀 Attempting navigation to:', nextUrl)
       
       try {
-        router.push(`/step/${nextStepId}`)
+        router.push(nextUrl)
         // Enhanced scroll-to-top for iframe compatibility
         setTimeout(() => {
           try {
@@ -571,7 +577,10 @@ function ApplicationFormContent() {
   const prevStep = useCallback(() => {
     if (currentStep > 0) {
       const prevStepId = STEPS[currentStep - 1].id
-      router.push(`/step/${prevStepId}`)
+      const currentUrl = new URL(window.location.href)
+      const langParam = currentUrl.searchParams.get('lang')
+      const prevUrl = langParam ? `/step/${prevStepId}?lang=${langParam}` : `/step/${prevStepId}`
+      router.push(prevUrl)
       // Simple scroll-to-top for iframe compatibility
       setTimeout(() => {
         // Scroll iframe content
@@ -594,7 +603,10 @@ function ApplicationFormContent() {
   const handleStepClick = useCallback((stepIndex: number) => {
     if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       const stepId = STEPS[stepIndex].id
-      router.push(`/step/${stepId}`)
+      const currentUrl = new URL(window.location.href)
+      const langParam = currentUrl.searchParams.get('lang')
+      const stepUrl = langParam ? `/step/${stepId}?lang=${langParam}` : `/step/${stepId}`
+      router.push(stepUrl)
       // Simple scroll-to-top for iframe compatibility
       setTimeout(() => {
         // Scroll iframe content
@@ -724,7 +736,10 @@ function ApplicationFormContent() {
             form={form}
             onEditStep={currentStep === STEPS.length - 1 ? (stepIndex: number) => {
               const stepId = STEPS[stepIndex].id
-              router.push(`/step/${stepId}`)
+              const currentUrl = new URL(window.location.href)
+              const langParam = currentUrl.searchParams.get('lang')
+              const stepUrl = langParam ? `/step/${stepId}?lang=${langParam}` : `/step/${stepId}`
+              router.push(stepUrl)
             } : undefined}
           />
 

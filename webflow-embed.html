@@ -434,6 +434,20 @@ Accept & Continue
     }
     
     trackEvent('language_selected', { language });
+    
+    // Send language change to iframe if it exists
+    try {
+      const iframe = document.querySelector('#application-container iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'languageChange',
+          language: language
+        }, '*');
+        console.log('🌐 Sent language change to iframe:', language);
+      }
+    } catch (error) {
+      console.warn('Could not send language change to iframe:', error);
+    }
   }
 
   // Continue to application
@@ -562,6 +576,16 @@ Accept & Continue
       } catch (error) {
         console.warn('❌ Scroll to top failed:', error);
       }
+    }
+
+    // Handle language update messages from the iframe
+    if (event.data.type === 'iframeLanguageUpdate' && event.data.language) {
+      console.log('🌐 Language update received from iframe:', event.data.language);
+      selectedLanguage = event.data.language;
+      
+      // Update parent language state to keep in sync
+      // This ensures that if the user navigates back to the disclaimer, 
+      // the correct language is maintained
     }
   }, false);
 
