@@ -793,26 +793,9 @@ export class PDFService {
     console.log('🖊️ Processing digital signature for application PDF')
 
     try {
-      // Convert base64 signature to PNG image
-      const signatureData = data.signature.split(',')[1] // Remove data:image/png;base64, prefix
-      const signatureImage = await pdfDoc.embedPng(Buffer.from(signatureData, 'base64'))
-      
-      // Try to find signature field position and draw image
-      const pages = pdfDoc.getPages()
-      const lastPage = pages[pages.length - 1] // Signature typically on last page
-      
-      // Get approximate signature field position (coordinates may need adjustment)
-      // These coordinates should be adjusted based on your actual PDF template
-      const signatureRect = { x: 100, y: 150, width: 200, height: 50 }
-      
-      lastPage.drawImage(signatureImage, {
-        x: signatureRect.x,
-        y: signatureRect.y,
-        width: signatureRect.width,
-        height: signatureRect.height
-      })
-      
-      console.log('🖊️ Signature image drawn successfully')
+      // Fill signature text field with the person's name
+      this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signature, data.signature)
+      console.log(`🖊️ Signature filled: ${data.signature}`)
 
       // Fill signature date fields
       if (data.signatureDate) {
