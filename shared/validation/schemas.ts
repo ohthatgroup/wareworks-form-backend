@@ -70,7 +70,7 @@ const baseSchema = z.object({
   workAuthorizationConfirm: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   reliableTransport: z.enum(['yes', 'no']).or(z.literal('')).optional(),
   workAuthorized: z.enum(['yes', 'no']).or(z.literal('')).optional(),
-  forkliftCertification: z.enum(['yes', 'no']).or(z.literal('')).optional(),
+  forkliftCertification: z.enum(['yes', 'no']).or(z.literal('')).or(z.null()).optional(),
   forkliftSD: z.boolean().optional(),
   forkliftSU: z.boolean().optional(),
   forkliftSUR: z.boolean().optional(),

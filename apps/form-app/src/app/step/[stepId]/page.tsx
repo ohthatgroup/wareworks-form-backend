@@ -97,6 +97,8 @@ function ApplicationFormContent() {
       previousApplicationWhen: '',
       education: [],
       employment: [],
+      signature: '',
+      signatureDate: '',
       submittedAt: '',
       documents: []
     }
