@@ -100,8 +100,8 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                         checked={isSelected}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            // Set placeholder text to show the time input field
-                            setValue(day.key as keyof ValidatedApplicationData, ' ' as any)
+                            // Set empty string to show the time input field with placeholder
+                            setValue(day.key as keyof ValidatedApplicationData, '' as any)
                           } else {
                             // Clear the value completely
                             setValue(day.key as keyof ValidatedApplicationData, undefined as any)
@@ -126,7 +126,7 @@ export function AvailabilityStep({ form }: AvailabilityStepProps) {
                           type="text"
                           className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:ring-primary focus:border-primary"
                           placeholder={t('availability.time_placeholder')}
-                          value={currentValue || ''}
+                          value={currentValue?.trim() || ''}
                           onChange={(e) => {
                             setValue(day.key as keyof ValidatedApplicationData, e.target.value)
                           }}
