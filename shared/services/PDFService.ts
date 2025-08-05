@@ -793,11 +793,24 @@ export class PDFService {
     console.log('🖊️ Processing digital signature for application PDF')
 
     try {
-      // Fill signature text field with the person's name
-      this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signature, data.signature)
-      console.log(`🖊️ Signature filled: ${data.signature}`)
+      // The "Signature" field in the PDF is a PDFSignature field (for digital certificates)
+      // Since we have text-based signatures, we'll draw the text directly onto the PDF
+      const pages = pdfDoc.getPages()
+      const lastPage = pages[pages.length - 1] // Signature typically on last page
+      
+      // Draw signature text at approximate signature field location
+      // These coordinates are estimated and may need adjustment based on your PDF template
+      lastPage.drawText(data.signature, {
+        x: 100, // X coordinate - adjust as needed
+        y: 150, // Y coordinate - adjust as needed  
+        size: 14,
+        color: rgb(0, 0, 0), // Black text
+        // You could add a cursive font here if available
+      })
+      
+      console.log(`🖊️ Signature drawn on PDF: ${data.signature}`)
 
-      // Fill signature date fields
+      // Fill signature date fields (these are text fields and work correctly)
       if (data.signatureDate) {
         const signatureDate = new Date(data.signatureDate)
         
