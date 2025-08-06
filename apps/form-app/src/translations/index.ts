@@ -131,6 +131,8 @@ export const translations = {
     'equipment.riding_jack_description': 'Electric pallet jack/riding jack',
     
     // Forklift Certification
+    'forklift.certification_title': 'Forklift Certification',
+    'forklift.certification_description': 'Please indicate if you have forklift certification and specify which types you are certified to operate.',
     'forklift.certification_question': 'Do you have forklift certification?',
     'forklift.which_types_question': 'Which forklift types are you certified for?',
     'forklift.no_types_selected': 'No specific forklift types selected',
@@ -479,6 +481,8 @@ export const translations = {
     'equipment.riding_jack_description': 'Gato de paletas eléctrico/gato móvil',
     
     // Forklift Certification
+    'forklift.certification_title': 'Certificación de Montacargas',
+    'forklift.certification_description': 'Por favor indique si tiene certificación de montacargas y especifique para qué tipos está certificado para operar.',
     'forklift.certification_question': '¿Tiene certificación de montacargas?',
     'forklift.which_types_question': '¿Para qué tipos de montacargas está certificado?',
     'forklift.no_types_selected': 'No se seleccionaron tipos específicos de montacargas',

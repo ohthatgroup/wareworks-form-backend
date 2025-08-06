@@ -20,6 +20,7 @@ import { ReviewStep } from '../../../components/steps/ReviewStep'
 import { SuccessStep } from '../../../components/steps/SuccessStep'
 import { LanguageProvider, useLanguage } from '../../../contexts/LanguageContext'
 import { translateKey, SubmissionResult } from '../../../types/translations'
+import { navigateWithLanguage, ensureLanguageInUrl } from '../../../utils/navigation'
 
 const STEPS = [
   { id: 'personal', titleKey: 'steps.personal_info.title', component: PersonalInfoStep },
@@ -38,8 +39,9 @@ const SUBMISSION_RESULT_KEY = 'wareworks-submission-result'
 function ApplicationFormContent() {
   const router = useRouter()
   const params = useParams()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
 
@@ -47,16 +49,29 @@ function ApplicationFormContent() {
   const currentStepId = params.stepId as string
   const currentStep = STEPS.findIndex(step => step.id === currentStepId)
   
+  // Set hydrated flag
+  useEffect(() => {
+    setHydrated(true)
+  }, [])
+  
   // Redirect to first step if invalid step
   useEffect(() => {
     if (currentStepId === 'success') return // Allow success step
     if (currentStep === -1 && currentStepId) {
-      const currentUrl = new URL(window.location.href)
-      const langParam = currentUrl.searchParams.get('lang')
-      const redirectUrl = langParam ? '/step/personal?lang=' + langParam : '/step/personal'
-      router.replace(redirectUrl)
+      navigateWithLanguage(router, '/step/personal', undefined, 'replace')
     }
   }, [currentStepId, currentStep, router])
+
+  // Ensure language parameter is in URL for consistency
+  useEffect(() => {
+    if (hydrated && currentStepId && currentStepId !== 'success') {
+      const currentPath = window.location.pathname
+      const hasValidLanguageParam = ensureLanguageInUrl(router, currentPath, language)
+      if (!hasValidLanguageParam) {
+        console.log('🌍 Added missing language parameter to URL')
+      }
+    }
+  }, [hydrated, currentStepId, language, router])
 
   // Initialize form
   const form = useForm<ValidatedApplicationData>({
@@ -146,7 +161,7 @@ function ApplicationFormContent() {
           // If we have a successful submission result, redirect to success page
           if (parsedResult?.success && params?.stepId !== 'success') {
             console.log('🔄 Redirecting to success page - application already submitted successfully')
-            router.push('/step/success')
+            navigateWithLanguage(router, '/step/success')
             return
           }
         } catch (error) {
@@ -338,7 +353,7 @@ function ApplicationFormContent() {
         if (typeof stepIndex === 'number' && stepIndex >= 0 && stepIndex < STEPS.length) {
           const stepId = STEPS[stepIndex].id
           console.log('🚀 Parent-triggered navigation to:', stepId)
-          router.push(`/step/${stepId}`)
+          navigateWithLanguage(router, `/step/${stepId}`)
         }
       }
     }
@@ -505,13 +520,10 @@ function ApplicationFormContent() {
         })
       }
       const nextStepId = STEPS[currentStep + 1].id
-      const currentUrl = new URL(window.location.href)
-      const langParam = currentUrl.searchParams.get('lang')
-      const nextUrl = langParam ? `/step/${nextStepId}?lang=${langParam}` : `/step/${nextStepId}`
-      console.log('🚀 Attempting navigation to:', nextUrl)
+      console.log('🚀 Attempting navigation to:', nextStepId)
       
       try {
-        router.push(nextUrl)
+        navigateWithLanguage(router, `/step/${nextStepId}`)
         // Enhanced scroll-to-top for iframe compatibility
         setTimeout(() => {
           try {
@@ -578,10 +590,7 @@ function ApplicationFormContent() {
   const prevStep = useCallback(() => {
     if (currentStep > 0) {
       const prevStepId = STEPS[currentStep - 1].id
-      const currentUrl = new URL(window.location.href)
-      const langParam = currentUrl.searchParams.get('lang')
-      const prevUrl = langParam ? `/step/${prevStepId}?lang=${langParam}` : `/step/${prevStepId}`
-      router.push(prevUrl)
+      navigateWithLanguage(router, `/step/${prevStepId}`)
       // Simple scroll-to-top for iframe compatibility
       setTimeout(() => {
         // Scroll iframe content
@@ -604,10 +613,7 @@ function ApplicationFormContent() {
   const handleStepClick = useCallback((stepIndex: number) => {
     if (stepIndex <= currentStep || completedSteps.includes(stepIndex)) {
       const stepId = STEPS[stepIndex].id
-      const currentUrl = new URL(window.location.href)
-      const langParam = currentUrl.searchParams.get('lang')
-      const stepUrl = langParam ? `/step/${stepId}?lang=${langParam}` : `/step/${stepId}`
-      router.push(stepUrl)
+      navigateWithLanguage(router, `/step/${stepId}`)
       // Simple scroll-to-top for iframe compatibility
       setTimeout(() => {
         // Scroll iframe content
@@ -682,7 +688,7 @@ function ApplicationFormContent() {
         sessionStorage.setItem(SUBMISSION_RESULT_KEY, JSON.stringify(result))
       }
       
-      router.push('/step/success')
+      navigateWithLanguage(router, '/step/success')
       
     } catch (error) {
       console.error('Submission error details:', error)
@@ -737,10 +743,7 @@ function ApplicationFormContent() {
             form={form}
             onEditStep={currentStep === STEPS.length - 1 ? (stepIndex: number) => {
               const stepId = STEPS[stepIndex].id
-              const currentUrl = new URL(window.location.href)
-              const langParam = currentUrl.searchParams.get('lang')
-              const stepUrl = langParam ? `/step/${stepId}?lang=${langParam}` : `/step/${stepId}`
-              router.push(stepUrl)
+              navigateWithLanguage(router, `/step/${stepId}`)
             } : undefined}
           />
 

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { translations, TranslationKey, Language } from '../translations'
+import { getCurrentLanguageFromUrl } from '../utils/navigation'
 
 // Create a more flexible translation function type
 type TranslationFunction = {
@@ -30,13 +31,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       // Check if we're in an iframe
       const isInIframe = window.self !== window.top
       
-      // Read language from URL parameter (from webflow embed)
-      const urlParams = new URLSearchParams(window.location.search)
-      const urlLanguage = urlParams.get('lang') as Language | null
+      // Read language from URL parameter using our utility
+      const urlLanguage = getCurrentLanguageFromUrl()
       const savedLanguage = sessionStorage.getItem('preferred-language') as Language
       
       // Priority 1: URL parameter (highest priority - overrides saved preference)
-      if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
+      if (urlLanguage) {
         console.log('🌍 Setting language from URL parameter:', urlLanguage)
         setLanguageState(urlLanguage)
         sessionStorage.setItem('preferred-language', urlLanguage)
@@ -45,6 +45,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       else if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
         console.log('🌍 Setting language from sessionStorage:', savedLanguage)
         setLanguageState(savedLanguage)
+        // Important: If we have saved language but no URL param, we should ensure URL has it
+        // This will be handled by navigation utilities in components
       }
       // Priority 3: Default to English for new users
       else {

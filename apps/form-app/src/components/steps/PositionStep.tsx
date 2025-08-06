@@ -41,9 +41,9 @@ export function PositionStep({ form }: PositionStepProps) {
       />
 
       <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-primary mb-4">Forklift Certification</h3>
+        <h3 className="text-lg font-medium text-primary mb-4">{t('forklift.certification_title')}</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Please indicate if you have forklift certification and specify which types you are certified to operate.
+          {t('forklift.certification_description')}
         </p>
         
         <EquipmentExperience form={form} />
