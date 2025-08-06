@@ -2,9 +2,7 @@ import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { CheckCircle, AlertCircle, Edit, Eye, Download } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
-// COMMENTED OUT - SIGNATURE FEATURE
-// import SignaturePad, { SignaturePadRef } from '../ui/SignaturePad'
-// import { useRef } from 'react'
+import SignaturePad, { SignaturePadRef } from '../ui/SignaturePad'
 import { useRef } from 'react'
 
 interface ReviewStepProps {
@@ -16,8 +14,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
   const { watch, formState: { errors }, setValue } = form
   const { t } = useLanguage()
   const formData = watch()
-  // COMMENTED OUT - SIGNATURE FEATURE
-  // const signaturePadRef = useRef<SignaturePadRef>(null)
+  const signaturePadRef = useRef<SignaturePadRef>(null)
 
   const hasErrors = Object.keys(errors).length > 0
 
@@ -27,16 +24,15 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     }
   }
 
-  // COMMENTED OUT - SIGNATURE FEATURE
-  // const handleSignatureChange = (signature: string | null) => {
-  //   if (signature) {
-  //     setValue('signature', signature)
-  //     setValue('signatureDate', new Date().toISOString())
-  //   } else {
-  //     setValue('signature', '')
-  //     setValue('signatureDate', '')
-  //   }
-  // }
+  const handleSignatureChange = (signature: string | null) => {
+    if (signature) {
+      setValue('signature', signature)
+      setValue('signatureDate', new Date().toISOString())
+    } else {
+      setValue('signature', '')
+      setValue('signatureDate', '')
+    }
+  }
 
   // Map field names to their respective steps for better error reporting
   const fieldToStep: Record<string, { stepIndex: number, stepNameKey: string }> = {
@@ -114,6 +110,10 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     
     // Documents (Step 6)
     documents: { stepIndex: 6, stepNameKey: 'review.documents_title' },
+    
+    // Signature (Step 7 - Review Step)
+    signature: { stepIndex: 7, stepNameKey: 'review.signature_title' },
+    signatureDate: { stepIndex: 7, stepNameKey: 'review.signature_title' },
   }
 
   // Get specific error details for display with better field names
@@ -703,14 +703,14 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
         </div>
       </div>
 
-      {/* COMMENTED OUT - SIGNATURE FEATURE */}
-      {/* <div className="bg-white border border-gray-200 rounded-lg p-6">
+      {/* Signature Section */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
         <SignaturePad
           ref={signaturePadRef}
           onSignatureChange={handleSignatureChange}
           error={errors.signature?.message}
         />
-      </div> */}
+      </div>
     </div>
   )
 }
