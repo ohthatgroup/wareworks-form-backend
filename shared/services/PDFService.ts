@@ -1,6 +1,6 @@
 import { ValidatedApplicationData } from '../validation/schemas'
 import { PDFDocument, PDFForm, PDFTextField, PDFCheckBox, rgb, StandardFonts } from 'pdf-lib'
-import fontkit from 'fontkit'
+import * as fontkit from 'fontkit'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { pdfFieldMappings, i9FieldMappings, FieldMapping } from '../config/pdfFieldMappings'

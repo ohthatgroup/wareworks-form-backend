@@ -13,6 +13,7 @@
     "deploy:preview": "netlify deploy"
   },
   "devDependencies": {
+    "@types/fontkit": "^2.0.8",
     "@types/node": "^20.19.9",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
