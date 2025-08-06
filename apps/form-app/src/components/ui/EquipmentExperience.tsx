@@ -13,14 +13,7 @@ interface EquipmentExperienceProps {
   form: UseFormReturn<ValidatedApplicationData>
 }
 
-const FORKLIFT_TYPES: ForkliftType[] = [
-  { key: 'forkliftSD', label: 'SD - Sit Down Forklift', description: '' },
-  { key: 'forkliftSU', label: 'SU - Stand Up Forklift', description: '' },
-  { key: 'forkliftSUR', label: 'SUR - Stand Up Reach', description: '' },
-  { key: 'forkliftCP', label: 'CP - Cherry Picker', description: '' },
-  { key: 'forkliftCL', label: 'CL - Clamps', description: '' },
-  { key: 'forkliftRidingJack', label: 'Riding Jack', description: '' }
-]
+// This will be dynamically generated using translation keys
 
 export function EquipmentExperience({ form }: EquipmentExperienceProps) {
   const { register, watch, setValue, formState: { errors } } = form
@@ -31,6 +24,15 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
   const yesNoOptions = [
     { value: 'yes', label: t('common.yes') },
     { value: 'no', label: t('common.no') }
+  ]
+  
+  const forkliftTypes: ForkliftType[] = [
+    { key: 'forkliftSD', label: t('equipment.sd_label'), description: t('equipment.sd_description') },
+    { key: 'forkliftSU', label: t('equipment.su_label'), description: t('equipment.su_description') },
+    { key: 'forkliftSUR', label: t('equipment.sur_label'), description: t('equipment.sur_description') },
+    { key: 'forkliftCP', label: t('equipment.cp_label'), description: t('equipment.cp_description') },
+    { key: 'forkliftCL', label: t('equipment.cl_label'), description: t('equipment.cl_description') },
+    { key: 'forkliftRidingJack', label: t('equipment.riding_jack_label'), description: t('equipment.riding_jack_description') }
   ]
 
   return (
@@ -52,7 +54,7 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
           </h4>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {FORKLIFT_TYPES.map((forklift) => {
+            {forkliftTypes.map((forklift) => {
               const isChecked = watch(forklift.key) as boolean
               
               return (

@@ -325,7 +325,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           {/* Conditional fields based on citizenship status */}
           {formData.citizenshipStatus === 'lawful_permanent' && (
             <div>
-              <span className="font-medium">USCIS A-Number *</span>
+              <span className="font-medium">{t('review.uscis_a_number')}</span>
               <p>{formData.uscisANumber || t('review.not_provided')}</p>
             </div>
           )}
@@ -333,24 +333,24 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           {formData.citizenshipStatus === 'alien_authorized' && (
             <>
               <div>
-                <span className="font-medium">Work Authorization Expiration *</span>
+                <span className="font-medium">{t('review.work_auth_expiration')}</span>
                 <p>{formData.workAuthExpiration || t('review.not_provided')}</p>
               </div>
               <div>
-                <span className="font-medium">Document Type *</span>
+                <span className="font-medium">{t('review.document_type')}</span>
                 <p>{formData.alienDocumentType || t('review.not_provided')}</p>
               </div>
               
               {formData.alienDocumentType === 'uscis_a_number' && (
                 <div>
-                  <span className="font-medium">USCIS A-Number *</span>
+                  <span className="font-medium">{t('review.uscis_a_number')}</span>
                   <p>{formData.alienDocumentNumber || t('review.not_provided')}</p>
                 </div>
               )}
               
               {formData.alienDocumentType === 'form_i94' && (
                 <div>
-                  <span className="font-medium">Form I-94 Admission Number *</span>
+                  <span className="font-medium">{t('review.form_i94_admission')}</span>
                   <p>{formData.i94AdmissionNumber || t('review.not_provided')}</p>
                 </div>
               )}
@@ -358,11 +358,11 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
               {formData.alienDocumentType === 'foreign_passport' && (
                 <>
                   <div>
-                    <span className="font-medium">Foreign Passport Number *</span>
+                    <span className="font-medium">{t('review.foreign_passport_number')}</span>
                     <p>{formData.foreignPassportNumber || t('review.not_provided')}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Country of Issuance *</span>
+                    <span className="font-medium">{t('review.country_of_issuance')}</span>
                     <p>{formData.foreignPassportCountry || t('review.not_provided')}</p>
                   </div>
                 </>
@@ -373,19 +373,19 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           {/* Basic eligibility questions */}
           {formData.age18 && (
             <div>
-              <span className="font-medium">Are you 18 years of age or older?</span>
+              <span className="font-medium">{t('review.age_18_question')}</span>
               <p>{formData.age18}</p>
             </div>
           )}
           {formData.transportation && (
             <div>
-              <span className="font-medium">Do you have reliable transportation?</span>
+              <span className="font-medium">{t('review.reliable_transportation')}</span>
               <p>{formData.transportation}</p>
             </div>
           )}
           {formData.workAuthorizationConfirm && (
             <div>
-              <span className="font-medium">Are you authorized to work in the US?</span>
+              <span className="font-medium">{t('review.work_authorized_us')}</span>
               <p>{formData.workAuthorizationConfirm}</p>
             </div>
           )}
@@ -440,12 +440,12 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <div>
               <span className="font-medium">{t('review.certified_forklift_types')}</span>
               <div className="mt-2 space-y-1">
-                {formData.forkliftSD && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SD - Sit Down Forklift</span></div>}
-                {formData.forkliftSU && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SU - Stand Up Forklift</span></div>}
-                {formData.forkliftSUR && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SUR - Stand Up Reach</span></div>}
-                {formData.forkliftCP && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>CP - Cherry Picker</span></div>}
-                {formData.forkliftCL && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>CL - Clamps</span></div>}
-                {formData.forkliftRidingJack && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>Riding Jack</span></div>}
+                {formData.forkliftSD && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>{t('equipment.sd_label')}</span></div>}
+                {formData.forkliftSU && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>{t('equipment.su_label')}</span></div>}
+                {formData.forkliftSUR && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>{t('equipment.sur_label')}</span></div>}
+                {formData.forkliftCP && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>{t('equipment.cp_label')}</span></div>}
+                {formData.forkliftCL && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>{t('equipment.cl_label')}</span></div>}
+                {formData.forkliftRidingJack && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>{t('equipment.riding_jack_label')}</span></div>}
                 {!formData.forkliftSD && !formData.forkliftSU && !formData.forkliftSUR && !formData.forkliftCP && !formData.forkliftCL && !formData.forkliftRidingJack && (
                   <p className="text-gray-500">{t('forklift.no_types_selected')}</p>
                 )}
@@ -473,19 +473,19 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <div className="space-y-2">
               {formData.skills1 && (
                 <div>
-                  <span className="font-medium">Skill 1:</span>
+                  <span className="font-medium">{t('review.skill_1')}</span>
                   <p>{formData.skills1}</p>
                 </div>
               )}
               {formData.skills2 && (
                 <div>
-                  <span className="font-medium">Skill 2:</span>
+                  <span className="font-medium">{t('review.skill_2')}</span>
                   <p>{formData.skills2}</p>
                 </div>
               )}
               {formData.skills3 && (
                 <div>
-                  <span className="font-medium">Skill 3:</span>
+                  <span className="font-medium">{t('review.skill_3')}</span>
                   <p>{formData.skills3}</p>
                 </div>
               )}
@@ -530,7 +530,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
           {/* Conditional field for previous application details */}
           {formData.previouslyApplied === 'yes' && (
             <div>
-              <span className="font-medium">Previous Application Details *</span>
+              <span className="font-medium">{t('review.previous_application_details')}</span>
               <p>{formData.previousApplicationWhen || t('review.not_provided')}</p>
             </div>
           )}
@@ -540,15 +540,15 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             formData.availabilityWednesday || formData.availabilityThursday || formData.availabilityFriday || 
             formData.availabilitySaturday) && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <span className="font-medium">Weekly Availability:</span>
+              <span className="font-medium">{t('review.weekly_availability')}</span>
               <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                {formData.availabilitySunday && <div><strong>Sunday:</strong> {formData.availabilitySunday}</div>}
-                {formData.availabilityMonday && <div><strong>Monday:</strong> {formData.availabilityMonday}</div>}
-                {formData.availabilityTuesday && <div><strong>Tuesday:</strong> {formData.availabilityTuesday}</div>}
-                {formData.availabilityWednesday && <div><strong>Wednesday:</strong> {formData.availabilityWednesday}</div>}
-                {formData.availabilityThursday && <div><strong>Thursday:</strong> {formData.availabilityThursday}</div>}
-                {formData.availabilityFriday && <div><strong>Friday:</strong> {formData.availabilityFriday}</div>}
-                {formData.availabilitySaturday && <div><strong>Saturday:</strong> {formData.availabilitySaturday}</div>}
+                {formData.availabilitySunday && <div><strong>{t('review.sunday')}</strong> {formData.availabilitySunday}</div>}
+                {formData.availabilityMonday && <div><strong>{t('review.monday')}</strong> {formData.availabilityMonday}</div>}
+                {formData.availabilityTuesday && <div><strong>{t('review.tuesday')}</strong> {formData.availabilityTuesday}</div>}
+                {formData.availabilityWednesday && <div><strong>{t('review.wednesday')}</strong> {formData.availabilityWednesday}</div>}
+                {formData.availabilityThursday && <div><strong>{t('review.thursday')}</strong> {formData.availabilityThursday}</div>}
+                {formData.availabilityFriday && <div><strong>{t('review.friday')}</strong> {formData.availabilityFriday}</div>}
+                {formData.availabilitySaturday && <div><strong>{t('review.saturday')}</strong> {formData.availabilitySaturday}</div>}
               </div>
             </div>
           )}
@@ -577,16 +577,16 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                 {formData.education.map((edu: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-3 rounded border">
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div><strong>School:</strong> {edu.schoolName}</div>
-                      <div><strong>Year:</strong> {edu.graduationYear}</div>
-                      <div><strong>Field:</strong> {edu.fieldOfStudy}</div>
-                      <div><strong>Degree:</strong> {edu.degreeReceived === 'yes' ? 'Yes' : 'No'}</div>
+                      <div><strong>{t('review.school')}</strong> {edu.schoolName}</div>
+                      <div><strong>{t('review.year')}</strong> {edu.graduationYear}</div>
+                      <div><strong>{t('review.field')}</strong> {edu.fieldOfStudy}</div>
+                      <div><strong>{t('review.degree')}</strong> {edu.degreeReceived === 'yes' ? t('common.yes') : t('common.no')}</div>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 mt-1">No education entries provided</p>
+              <p className="text-gray-500 mt-1">{t('review.no_education_entries')}</p>
             )}
           </div>
           
@@ -598,18 +598,18 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                 {formData.employment.map((emp: any, index: number) => (
                   <div key={index} className="bg-gray-50 p-3 rounded border">
                     <div className="space-y-1 text-xs">
-                      <div><strong>Company:</strong> {emp.companyName}</div>
-                      <div><strong>Position:</strong> {emp.jobTitle}</div>
-                      <div><strong>Duration:</strong> {emp.startDate} - {emp.endDate || 'Present'}</div>
-                      <div><strong>Supervisor:</strong> {emp.supervisorName} ({emp.supervisorPhone})</div>
-                      {emp.responsibilities && <div><strong>Responsibilities:</strong> {emp.responsibilities}</div>}
-                      {emp.reasonLeaving && <div><strong>Reason for leaving:</strong> {emp.reasonLeaving}</div>}
+                      <div><strong>{t('review.company')}</strong> {emp.companyName}</div>
+                      <div><strong>{t('review.position')}</strong> {emp.jobTitle}</div>
+                      <div><strong>{t('review.duration')}</strong> {emp.startDate} - {emp.endDate || t('review.present')}</div>
+                      <div><strong>{t('review.supervisor')}</strong> {emp.supervisorName} ({emp.supervisorPhone})</div>
+                      {emp.responsibilities && <div><strong>{t('review.responsibilities')}</strong> {emp.responsibilities}</div>}
+                      {emp.reasonLeaving && <div><strong>{t('review.reason_leaving')}</strong> {emp.reasonLeaving}</div>}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 mt-1">No employment entries provided</p>
+              <p className="text-gray-500 mt-1">{t('review.no_employment_entries')}</p>
             )}
           </div>
         </div>

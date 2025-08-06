@@ -652,18 +652,18 @@ function ApplicationFormContent() {
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        let errorMessage = `Server error (${response.status})`
+        let errorMessage = t('errors.server_error').replace('{status}', response.status.toString())
         
         try {
           const errorText = await response.text()
           if (response.status === 429) {
-            errorMessage = 'Too many requests. Please try again in a few minutes.'
+            errorMessage = t('errors.too_many_requests')
           } else if (response.status === 503) {
-            errorMessage = 'Service temporarily unavailable. Please try again later.'
+            errorMessage = t('errors.service_unavailable')
           } else if (response.status >= 500) {
-            errorMessage = 'Server error. Please try again later.'
+            errorMessage = t('errors.server_error').replace('{status}', response.status.toString())
           } else if (response.status === 413) {
-            errorMessage = 'Application data too large. Please check your uploaded files.'
+            errorMessage = t('errors.application_too_large')
           } else {
             errorMessage = errorText || errorMessage
           }
@@ -687,13 +687,13 @@ function ApplicationFormContent() {
     } catch (error) {
       console.error('Submission error details:', error)
       
-      let userFriendlyMessage = 'Failed to submit application. Please try again.'
+      let userFriendlyMessage = t('errors.submission_failed')
       
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          userFriendlyMessage = 'Request timed out. Please check your connection and try again.'
+          userFriendlyMessage = t('errors.request_timeout')
         } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-          userFriendlyMessage = 'Network error. Please check your internet connection and try again.'
+          userFriendlyMessage = t('errors.network_error')
         } else {
           userFriendlyMessage = error.message
         }

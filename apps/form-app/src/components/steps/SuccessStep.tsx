@@ -66,7 +66,7 @@ export function SuccessStep({ result }: SuccessStepProps) {
   
   const handleDownload = async () => {
     if (!result?.submissionId) {
-      alert('No submission data available for download')
+      alert(t('errors.no_submission_data'))
       return
     }
     
@@ -108,7 +108,7 @@ export function SuccessStep({ result }: SuccessStepProps) {
       }
     } catch (error) {
       console.error('Download error:', error)
-      alert('Failed to download application. Please try again or contact support.')
+      alert(t('errors.download_failed'))
     } finally {
       setIsDownloading(false)
     }

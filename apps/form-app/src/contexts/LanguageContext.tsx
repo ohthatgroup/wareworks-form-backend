@@ -37,15 +37,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       // Priority 1: URL parameter (highest priority - overrides saved preference)
       if (urlLanguage && (urlLanguage === 'en' || urlLanguage === 'es')) {
+        console.log('🌍 Setting language from URL parameter:', urlLanguage)
         setLanguageState(urlLanguage)
         sessionStorage.setItem('preferred-language', urlLanguage)
       } 
       // Priority 2: User's saved preference
       else if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'es')) {
+        console.log('🌍 Setting language from sessionStorage:', savedLanguage)
         setLanguageState(savedLanguage)
       }
       // Priority 3: Default to English for new users
       else {
+        console.log('🌍 Setting default language: en')
         setLanguageState('en')
         sessionStorage.setItem('preferred-language', 'en')
       }
@@ -68,6 +71,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           if (event.data.type === 'languageChange' && event.data.language) {
             const newLang = event.data.language as Language
             if (newLang === 'en' || newLang === 'es') {
+              console.log('🌍 Language changed from parent:', newLang)
               setLanguageState(newLang)
               sessionStorage.setItem('preferred-language', newLang)
             }
@@ -76,22 +80,28 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
         window.addEventListener('message', handleMessage)
         
-        // Send current language to parent on load
-        try {
-          window.parent.postMessage({
-            type: 'iframeLanguageUpdate',
-            language: language
-          }, '*')
-        } catch (error) {
-          console.warn('Could not communicate with parent window:', error)
-        }
-
         return () => {
           window.removeEventListener('message', handleMessage)
         }
       }
     }
-  }, [hydrated, language])
+  }, [hydrated]) // Removed 'language' from dependency array to prevent infinite loop
+
+  // Separate effect to notify parent of language changes  
+  useEffect(() => {
+    if (hydrated && typeof window !== 'undefined' && window.self !== window.top) {
+      // Send current language to parent when language changes
+      try {
+        window.parent.postMessage({
+          type: 'iframeLanguageUpdate',
+          language: language
+        }, '*')
+        console.log('🌍 Notified parent of language change:', language)
+      } catch (error) {
+        console.warn('Could not communicate with parent window:', error)
+      }
+    }
+  }, [language, hydrated]) // This one SHOULD depend on language
 
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage)

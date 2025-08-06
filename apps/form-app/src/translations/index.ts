@@ -142,6 +142,52 @@ export const translations = {
     'review.no_skills_provided': 'No skills or qualifications provided',
     'review.swing_shifts': 'Swing Shifts',
     'review.graveyard_shifts': 'Graveyard Shifts',
+    
+    // Work Authorization Review Labels
+    'review.uscis_a_number': 'USCIS A-Number *',
+    'review.work_auth_expiration': 'Work Authorization Expiration *',
+    'review.document_type': 'Document Type *',
+    'review.form_i94_admission': 'Form I-94 Admission Number *',
+    'review.foreign_passport_number': 'Foreign Passport Number *',
+    'review.country_of_issuance': 'Country of Issuance *',
+    
+    // Basic Eligibility Questions
+    'review.age_18_question': 'Are you 18 years of age or older?',
+    'review.reliable_transportation': 'Do you have reliable transportation?',
+    'review.work_authorized_us': 'Are you authorized to work in the US?',
+    
+    // Skills Labels
+    'review.skill_1': 'Skill 1:',
+    'review.skill_2': 'Skill 2:',
+    'review.skill_3': 'Skill 3:',
+    
+    // Availability Labels
+    'review.previous_application_details': 'Previous Application Details *',
+    'review.weekly_availability': 'Weekly Availability:',
+    'review.present': 'Present',
+    
+    // Day Labels
+    'review.sunday': 'Sunday:',
+    'review.monday': 'Monday:',
+    'review.tuesday': 'Tuesday:',
+    'review.wednesday': 'Wednesday:',
+    'review.thursday': 'Thursday:',
+    'review.friday': 'Friday:',
+    'review.saturday': 'Saturday:',
+    
+    // Education/Employment Labels
+    'review.school': 'School:',
+    'review.year': 'Year:',
+    'review.field': 'Field:',
+    'review.degree': 'Degree:',
+    'review.no_education_entries': 'No education entries provided',
+    'review.company': 'Company:',
+    'review.position': 'Position:',
+    'review.duration': 'Duration:',
+    'review.supervisor': 'Supervisor:',
+    'review.responsibilities': 'Responsibilities:',
+    'review.reason_leaving': 'Reason for leaving:',
+    'review.no_employment_entries': 'No employment entries provided',
     'equipment.select_level': 'Select level...',
     'equipment.no_experience': 'No Experience',
     'equipment.basic': 'Basic (< 1 year)',
@@ -286,6 +332,17 @@ export const translations = {
     'success.return_home': 'Return to WareWorks',
     'success.questions_text': 'Questions about your application? Contact us at',
 
+    // Error Messages
+    'errors.server_error': 'Server error ({status})',
+    'errors.too_many_requests': 'Too many requests. Please try again in a few minutes.',
+    'errors.service_unavailable': 'Service temporarily unavailable. Please try again later.',
+    'errors.application_too_large': 'Application data too large. Please check your uploaded files.',
+    'errors.submission_failed': 'Failed to submit application. Please try again.',
+    'errors.request_timeout': 'Request timed out. Please check your connection and try again.',
+    'errors.network_error': 'Network error. Please check your internet connection and try again.',
+    'errors.download_failed': 'Failed to download application. Please try again or contact support.',
+    'errors.no_submission_data': 'No submission data available for download',
+    
     // Common
     'common.yes': 'Yes',
     'common.no': 'No',
@@ -433,6 +490,52 @@ export const translations = {
     'review.no_skills_provided': 'No se proporcionaron habilidades o calificaciones',
     'review.swing_shifts': 'Turnos Vespertinos',
     'review.graveyard_shifts': 'Turnos Nocturnos',
+    
+    // Work Authorization Review Labels
+    'review.uscis_a_number': 'Número A de USCIS *',
+    'review.work_auth_expiration': 'Vencimiento de Autorización de Trabajo *',
+    'review.document_type': 'Tipo de Documento *',
+    'review.form_i94_admission': 'Número de Admisión del Formulario I-94 *',
+    'review.foreign_passport_number': 'Número de Pasaporte Extranjero *',
+    'review.country_of_issuance': 'País de Emisión *',
+    
+    // Basic Eligibility Questions
+    'review.age_18_question': '¿Tiene 18 años de edad o más?',
+    'review.reliable_transportation': '¿Tiene transporte confiable?',
+    'review.work_authorized_us': '¿Está autorizado para trabajar en los EE.UU.?',
+    
+    // Skills Labels
+    'review.skill_1': 'Habilidad 1:',
+    'review.skill_2': 'Habilidad 2:',
+    'review.skill_3': 'Habilidad 3:',
+    
+    // Availability Labels
+    'review.previous_application_details': 'Detalles de Aplicación Anterior *',
+    'review.weekly_availability': 'Disponibilidad Semanal:',
+    'review.present': 'Presente',
+    
+    // Day Labels
+    'review.sunday': 'Domingo:',
+    'review.monday': 'Lunes:',
+    'review.tuesday': 'Martes:',
+    'review.wednesday': 'Miércoles:',
+    'review.thursday': 'Jueves:',
+    'review.friday': 'Viernes:',
+    'review.saturday': 'Sábado:',
+    
+    // Education/Employment Labels
+    'review.school': 'Escuela:',
+    'review.year': 'Año:',
+    'review.field': 'Campo:',
+    'review.degree': 'Título:',
+    'review.no_education_entries': 'No se proporcionaron entradas de educación',
+    'review.company': 'Empresa:',
+    'review.position': 'Posición:',
+    'review.duration': 'Duración:',
+    'review.supervisor': 'Supervisor:',
+    'review.responsibilities': 'Responsabilidades:',
+    'review.reason_leaving': 'Razón para dejar:',
+    'review.no_employment_entries': 'No se proporcionaron entradas de empleo',
     'equipment.select_level': 'Seleccionar nivel...',
     'equipment.no_experience': 'Sin Experiencia',
     'equipment.basic': 'Básico (< 1 año)',
@@ -577,6 +680,17 @@ export const translations = {
     'success.return_home': 'Regresar a WareWorks',
     'success.questions_text': '¿Preguntas sobre su solicitud? Contáctenos en',
 
+    // Error Messages
+    'errors.server_error': 'Error del servidor ({status})',
+    'errors.too_many_requests': 'Demasiadas solicitudes. Inténtelo de nuevo en unos minutos.',
+    'errors.service_unavailable': 'Servicio temporalmente no disponible. Inténtelo de nuevo más tarde.',
+    'errors.application_too_large': 'Datos de solicitud demasiado grandes. Verifique sus archivos subidos.',
+    'errors.submission_failed': 'Error al enviar la solicitud. Inténtelo de nuevo.',
+    'errors.request_timeout': 'Tiempo de solicitud agotado. Verifique su conexión e inténtelo de nuevo.',
+    'errors.network_error': 'Error de red. Verifique su conexión a internet e inténtelo de nuevo.',
+    'errors.download_failed': 'Error al descargar la solicitud. Inténtelo de nuevo o contacte al soporte.',
+    'errors.no_submission_data': 'No hay datos de envío disponibles para descargar',
+    
     // Common
     'common.yes': 'Sí',
     'common.no': 'No',
