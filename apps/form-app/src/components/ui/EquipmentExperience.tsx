@@ -29,15 +29,15 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
   const forkliftCertification = watch('forkliftCertification')
   
   const yesNoOptions = [
-    { value: 'yes', label: 'Yes' },
-    { value: 'no', label: 'No' }
+    { value: 'yes', label: t('common.yes') },
+    { value: 'no', label: t('common.no') }
   ]
 
   return (
     <div className="space-y-6">
       {/* Main forklift certification question */}
       <RadioGroup
-        label="Do you have forklift certification?"
+        label={t('forklift.certification_question')}
         name="forkliftCertification"
         options={yesNoOptions}
         registration={register('forkliftCertification')}
@@ -48,7 +48,7 @@ export function EquipmentExperience({ form }: EquipmentExperienceProps) {
       {forkliftCertification === 'yes' && (
         <div className="border-t pt-6">
           <h4 className="text-md font-medium text-gray-900 mb-4">
-            Which forklift types are you certified for?
+            {t('forklift.which_types_question')}
           </h4>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

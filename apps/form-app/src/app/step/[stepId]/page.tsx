@@ -107,8 +107,9 @@ function ApplicationFormContent() {
       forkliftRidingJack: false,
       education: [],
       employment: [],
-      signature: '',
-      signatureDate: '',
+      // COMMENTED OUT - SIGNATURE FEATURE
+      // signature: '',
+      // signatureDate: '',
       submittedAt: '',
       documents: []
     }

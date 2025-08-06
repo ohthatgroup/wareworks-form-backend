@@ -147,9 +147,10 @@ const baseSchema = z.object({
     data: z.string()
   })).optional(),
   
+  // COMMENTED OUT - SIGNATURE FEATURE
   // Digital Signature
-  signature: z.string().min(1, 'Signature is required'),
-  signatureDate: z.string().optional(),
+  // signature: z.string().min(1, 'Signature is required'),
+  // signatureDate: z.string().optional(),
   
   // Metadata
   language: z.string().optional(),

@@ -2,7 +2,9 @@ import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
 import { CheckCircle, AlertCircle, Edit, Eye, Download } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
-import SignaturePad, { SignaturePadRef } from '../ui/SignaturePad'
+// COMMENTED OUT - SIGNATURE FEATURE
+// import SignaturePad, { SignaturePadRef } from '../ui/SignaturePad'
+// import { useRef } from 'react'
 import { useRef } from 'react'
 
 interface ReviewStepProps {
@@ -14,7 +16,8 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
   const { watch, formState: { errors }, setValue } = form
   const { t } = useLanguage()
   const formData = watch()
-  const signaturePadRef = useRef<SignaturePadRef>(null)
+  // COMMENTED OUT - SIGNATURE FEATURE
+  // const signaturePadRef = useRef<SignaturePadRef>(null)
 
   const hasErrors = Object.keys(errors).length > 0
 
@@ -24,15 +27,16 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
     }
   }
 
-  const handleSignatureChange = (signature: string | null) => {
-    if (signature) {
-      setValue('signature', signature)
-      setValue('signatureDate', new Date().toISOString())
-    } else {
-      setValue('signature', '')
-      setValue('signatureDate', '')
-    }
-  }
+  // COMMENTED OUT - SIGNATURE FEATURE
+  // const handleSignatureChange = (signature: string | null) => {
+  //   if (signature) {
+  //     setValue('signature', signature)
+  //     setValue('signatureDate', new Date().toISOString())
+  //   } else {
+  //     setValue('signature', '')
+  //     setValue('signatureDate', '')
+  //   }
+  // }
 
   // Map field names to their respective steps for better error reporting
   const fieldToStep: Record<string, { stepIndex: number, stepNameKey: string }> = {
@@ -416,7 +420,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Forklift Certification */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Forklift Certification</h3>
+          <h3 className="font-semibold text-primary">{t('review.forklift_certification_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(3)}
@@ -428,13 +432,13 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
         </div>
         <div className="text-sm space-y-2">
           <div>
-            <span className="font-medium">Do you have forklift certification?</span>
+            <span className="font-medium">{t('forklift.certification_question')}</span>
             <p>{formData.forkliftCertification || t('review.not_provided')}</p>
           </div>
           
           {formData.forkliftCertification === 'yes' && (
             <div>
-              <span className="font-medium">Certified Forklift Types:</span>
+              <span className="font-medium">{t('review.certified_forklift_types')}</span>
               <div className="mt-2 space-y-1">
                 {formData.forkliftSD && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SD - Sit Down Forklift</span></div>}
                 {formData.forkliftSU && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>SU - Stand Up Forklift</span></div>}
@@ -443,7 +447,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
                 {formData.forkliftCL && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>CL - Clamps</span></div>}
                 {formData.forkliftRidingJack && <div className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" /><span>Riding Jack</span></div>}
                 {!formData.forkliftSD && !formData.forkliftSU && !formData.forkliftSUR && !formData.forkliftCP && !formData.forkliftCL && !formData.forkliftRidingJack && (
-                  <p className="text-gray-500">No specific forklift types selected</p>
+                  <p className="text-gray-500">{t('forklift.no_types_selected')}</p>
                 )}
               </div>
             </div>
@@ -454,7 +458,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
       {/* Skills & Qualifications */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-primary">Skills & Qualifications</h3>
+          <h3 className="font-semibold text-primary">{t('review.skills_qualifications_title')}</h3>
           <button 
             type="button" 
             onClick={() => handleEdit(3)}
@@ -487,7 +491,7 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
               )}
             </div>
           ) : (
-            <p className="text-gray-500">No skills or qualifications provided</p>
+            <p className="text-gray-500">{t('review.no_skills_provided')}</p>
           )}
         </div>
       </div>
@@ -511,11 +515,11 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
             <p>{formData.fullTimeEmployment || t('review.not_provided')}</p>
           </div>
           <div>
-            <span className="font-medium">Swing Shifts</span>
+            <span className="font-medium">{t('review.swing_shifts')}</span>
             <p>{formData.swingShifts || t('review.not_provided')}</p>
           </div>
           <div>
-            <span className="font-medium">Graveyard Shifts</span>
+            <span className="font-medium">{t('review.graveyard_shifts')}</span>
             <p>{formData.graveyardShifts || t('review.not_provided')}</p>
           </div>
           <div>
@@ -699,14 +703,14 @@ export function ReviewStep({ form, onEditStep }: ReviewStepProps) {
         </div>
       </div>
 
-      {/* Digital Signature */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      {/* COMMENTED OUT - SIGNATURE FEATURE */}
+      {/* <div className="bg-white border border-gray-200 rounded-lg p-6">
         <SignaturePad
           ref={signaturePadRef}
           onSignatureChange={handleSignatureChange}
           error={errors.signature?.message}
         />
-      </div>
+      </div> */}
     </div>
   )
 }

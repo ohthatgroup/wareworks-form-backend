@@ -11,11 +11,12 @@ export const translations = {
     'steps.documents.title': 'Documents',
     'steps.review.title': 'Review & Submit',
 
+    // COMMENTED OUT - SIGNATURE FEATURE
     // Signature
-    'signature.label': 'Digital Signature',
-    'signature.instruction': 'Sign above using your mouse, finger, or stylus',
-    'signature.clear': 'Clear',
-    'signature.required': 'Signature is required to submit application',
+    // 'signature.label': 'Digital Signature',
+    // 'signature.instruction': 'Sign above using your mouse, finger, or stylus',
+    // 'signature.clear': 'Clear',
+    // 'signature.required': 'Signature is required to submit application',
 
     // Personal Information
     'personal_info.legal_first_name': 'Legal First Name',
@@ -128,6 +129,19 @@ export const translations = {
     'equipment.cl_description': 'Forklift with clamp attachment',
     'equipment.riding_jack_label': 'Riding Jack',
     'equipment.riding_jack_description': 'Electric pallet jack/riding jack',
+    
+    // Forklift Certification
+    'forklift.certification_question': 'Do you have forklift certification?',
+    'forklift.which_types_question': 'Which forklift types are you certified for?',
+    'forklift.no_types_selected': 'No specific forklift types selected',
+    
+    // Review Section Labels
+    'review.forklift_certification_title': 'Forklift Certification',
+    'review.skills_qualifications_title': 'Skills & Qualifications',
+    'review.certified_forklift_types': 'Certified Forklift Types:',
+    'review.no_skills_provided': 'No skills or qualifications provided',
+    'review.swing_shifts': 'Swing Shifts',
+    'review.graveyard_shifts': 'Graveyard Shifts',
     'equipment.select_level': 'Select level...',
     'equipment.no_experience': 'No Experience',
     'equipment.basic': 'Basic (< 1 year)',
@@ -288,11 +302,12 @@ export const translations = {
     'steps.documents.title': 'Documentos',
     'steps.review.title': 'Revisar y Enviar',
 
+    // COMMENTED OUT - SIGNATURE FEATURE
     // Signature
-    'signature.label': 'Firma Digital',
-    'signature.instruction': 'Firme arriba usando su ratón, dedo o lápiz óptico',
-    'signature.clear': 'Borrar',
-    'signature.required': 'Se requiere firma para enviar la solicitud',
+    // 'signature.label': 'Firma Digital',
+    // 'signature.instruction': 'Firme arriba usando su ratón, dedo o lápiz óptico',
+    // 'signature.clear': 'Borrar',
+    // 'signature.required': 'Se requiere firma para enviar la solicitud',
 
     // Personal Information
     'personal_info.legal_first_name': 'Nombre Legal',
@@ -405,6 +420,19 @@ export const translations = {
     'equipment.cl_description': 'Montacargas con accesorio de abrazadera',
     'equipment.riding_jack_label': 'Gato Móvil',
     'equipment.riding_jack_description': 'Gato de paletas eléctrico/gato móvil',
+    
+    // Forklift Certification
+    'forklift.certification_question': '¿Tiene certificación de montacargas?',
+    'forklift.which_types_question': '¿Para qué tipos de montacargas está certificado?',
+    'forklift.no_types_selected': 'No se seleccionaron tipos específicos de montacargas',
+    
+    // Review Section Labels
+    'review.forklift_certification_title': 'Certificación de Montacargas',
+    'review.skills_qualifications_title': 'Habilidades y Calificaciones',
+    'review.certified_forklift_types': 'Tipos de Montacargas Certificados:',
+    'review.no_skills_provided': 'No se proporcionaron habilidades o calificaciones',
+    'review.swing_shifts': 'Turnos Vespertinos',
+    'review.graveyard_shifts': 'Turnos Nocturnos',
     'equipment.select_level': 'Seleccionar nivel...',
     'equipment.no_experience': 'Sin Experiencia',
     'equipment.basic': 'Básico (< 1 año)',

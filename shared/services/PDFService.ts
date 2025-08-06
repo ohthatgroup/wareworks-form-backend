@@ -63,8 +63,9 @@ export class PDFService {
         console.log('📄 No uploaded documents to merge')
       }
 
+      // COMMENTED OUT - SIGNATURE FEATURE
       // Add digital signature if provided
-      await this.addSignatureToApplicationPDF(pdfDoc, form, data)
+      // await this.addSignatureToApplicationPDF(pdfDoc, form, data)
       
       // Generate separate I-9 form if needed
       let i9Buffer: Buffer | null = null
@@ -252,12 +253,13 @@ export class PDFService {
       })
     }
     
+    // COMMENTED OUT - SIGNATURE FEATURE
     // Signature Date (current date split into components)
-    const currentDate = new Date()
-    const sigDateParts = this.splitDate(currentDate.toISOString())
-    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, sigDateParts.month)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, sigDateParts.day)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, sigDateParts.year)
+    // const currentDate = new Date()
+    // const sigDateParts = this.splitDate(currentDate.toISOString())
+    // this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, sigDateParts.month)
+    // this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, sigDateParts.day)
+    // this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, sigDateParts.year)
   }
 
   private setTextField(form: PDFForm, fieldName: string, value: string | undefined) {
@@ -783,37 +785,38 @@ export class PDFService {
     }
   }
 
+  // COMMENTED OUT - SIGNATURE FEATURE
   // Handle signature in WareWorks Application PDF
-  private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData) {
-    if (!data.signature) {
-      console.log('📝 No signature provided, skipping signature field')
-      return
-    }
+  // private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData) {
+  //   if (!data.signature) {
+  //     console.log('📝 No signature provided, skipping signature field')
+  //     return
+  //   }
 
-    console.log('🖊️ Processing digital signature for application PDF')
+  //   console.log('🖊️ Processing digital signature for application PDF')
 
-    try {
-      // Fill signature text field with the person's name
-      this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signature, data.signature)
-      console.log(`🖊️ Signature filled: ${data.signature}`)
+  //   try {
+  //     // Fill signature text field with the person's name
+  //     this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signature, data.signature)
+  //     console.log(`🖊️ Signature filled: ${data.signature}`)
 
-      // Fill signature date fields
-      if (data.signatureDate) {
-        const signatureDate = new Date(data.signatureDate)
+  //     // Fill signature date fields
+  //     if (data.signatureDate) {
+  //       const signatureDate = new Date(data.signatureDate)
         
-        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, 
-          (signatureDate.getMonth() + 1).toString().padStart(2, '0'))
-        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, 
-          signatureDate.getDate().toString().padStart(2, '0'))
-        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, 
-          signatureDate.getFullYear().toString())
+  //       this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, 
+  //         (signatureDate.getMonth() + 1).toString().padStart(2, '0'))
+  //       this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, 
+  //         signatureDate.getDate().toString().padStart(2, '0'))
+  //       this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, 
+  //         signatureDate.getFullYear().toString())
           
-        console.log(`📅 Signature date filled: ${signatureDate.toLocaleDateString()}`)
-      }
+  //       console.log(`📅 Signature date filled: ${signatureDate.toLocaleDateString()}`)
+  //     }
 
-    } catch (error) {
-      console.error('❌ Failed to process signature:', error)
-      // Continue without signature rather than failing entire PDF generation
-    }
-  }
+  //   } catch (error) {
+  //     console.error('❌ Failed to process signature:', error)
+  //     // Continue without signature rather than failing entire PDF generation
+  //   }
+  // }
 }
