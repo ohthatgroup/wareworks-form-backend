@@ -1,5 +1,6 @@
 import { ValidatedApplicationData } from '../validation/schemas'
-import { PDFDocument, PDFForm, PDFTextField, PDFCheckBox, rgb } from 'pdf-lib'
+import { PDFDocument, PDFForm, PDFTextField, PDFCheckBox, rgb, StandardFonts } from 'pdf-lib'
+import fontkit from 'fontkit'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 import { pdfFieldMappings, i9FieldMappings, FieldMapping } from '../config/pdfFieldMappings'
@@ -49,6 +50,10 @@ export class PDFService {
       
       // Load the PDF document
       const pdfDoc = await PDFDocument.load(templateBytes)
+      
+      // Register fontkit for custom fonts
+      pdfDoc.registerFontkit(fontkit)
+      
       const form = pdfDoc.getForm()
       
       // Fill the form fields based on template analysis
@@ -63,9 +68,8 @@ export class PDFService {
         console.log('📄 No uploaded documents to merge')
       }
 
-      // COMMENTED OUT - SIGNATURE FEATURE
       // Add digital signature if provided
-      // await this.addSignatureToApplicationPDF(pdfDoc, form, data)
+      await this.addSignatureToApplicationPDF(pdfDoc, form, data)
       
       // Generate separate I-9 form if needed
       let i9Buffer: Buffer | null = null
@@ -253,13 +257,12 @@ export class PDFService {
       })
     }
     
-    // COMMENTED OUT - SIGNATURE FEATURE
     // Signature Date (current date split into components)
-    // const currentDate = new Date()
-    // const sigDateParts = this.splitDate(currentDate.toISOString())
-    // this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, sigDateParts.month)
-    // this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, sigDateParts.day)
-    // this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, sigDateParts.year)
+    const currentDate = new Date()
+    const sigDateParts = this.splitDate(currentDate.toISOString())
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, sigDateParts.month)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, sigDateParts.day)
+    this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, sigDateParts.year)
   }
 
   private setTextField(form: PDFForm, fieldName: string, value: string | undefined) {
@@ -306,6 +309,112 @@ export class PDFService {
     }
 
     console.warn(`No working field found for mapping. Primary: "${mapping.primary}", Value: "${value}"`)
+  }
+
+  private async setSignatureFieldWithMapping(pdfDoc: PDFDocument, form: PDFForm, mapping: FieldMapping, value: string | undefined) {
+    if (!value) return
+
+    // Load High Empathy handwriting font first
+    const handwritingFont = await this.loadHighEmpathyFont(pdfDoc)
+
+    // Try to find the signature field to get its position
+    let signatureField: PDFTextField | null = null
+    let fieldName = ''
+
+    // Try primary field name first
+    try {
+      signatureField = form.getField(mapping.primary) as PDFTextField
+      fieldName = mapping.primary
+    } catch (error) {
+      // Try fallback field names
+      if (mapping.fallbacks) {
+        for (const fallback of mapping.fallbacks) {
+          try {
+            signatureField = form.getField(fallback) as PDFTextField
+            fieldName = fallback
+            break
+          } catch (error) {
+            // Continue trying other fallbacks
+          }
+        }
+      }
+    }
+
+    if (!signatureField) {
+      console.warn(`No working signature field found for mapping. Primary: "${mapping.primary}", Value: "${value}"`)
+      return
+    }
+
+    try {
+      const pages = pdfDoc.getPages()
+      
+      // Target page 4 (index 3, since arrays are 0-based) where signature field is located
+      const targetPage = pages[3]
+      
+      if (!targetPage) {
+        console.warn('Page 4 not found in PDF')
+        return
+      }
+      
+      // Clear the original form field (make it transparent/empty)
+      signatureField.setText('')
+      
+      // Use exact coordinates found by analysis tool
+      const signatureX = 162.328
+      const signatureY = 82.0697
+      const fieldWidth = 150
+      const fieldHeight = 22
+      
+      // Calculate appropriate font size based on field height
+      const fontSize = Math.min(fieldHeight * 0.7, 20) // 70% of field height, max 20pt
+      
+      // Adjust Y position to center vertically in the field (PDF coordinates are bottom-left origin)
+      const adjustedY = signatureY + (fieldHeight - fontSize) / 2
+      
+      targetPage.drawText(value, {
+        x: signatureX + 3, // Small left padding
+        y: adjustedY,
+        size: fontSize,
+        font: handwritingFont,
+        color: rgb(0, 0, 0), // Black color
+      })
+
+      console.log(`🖊️ Signature drawn on Page 4 signature field with High Empathy handwriting font: ${value}`)
+      console.log(`📍 Field position: x=${signatureX}, y=${signatureY}, size=${fieldWidth}x${fieldHeight}`)
+      console.log(`📍 Text position: x=${signatureX + 3}, y=${adjustedY}, fontSize=${fontSize}`)
+      
+    } catch (error) {
+      console.warn('Could not draw signature on page, falling back to form field:', error)
+      // Fallback: just set the form field text normally
+      signatureField.setText(value)
+    }
+  }
+
+  private async loadHighEmpathyFont(pdfDoc: PDFDocument) {
+    try {
+      // Handle path resolution for both standalone and Next.js contexts
+      const baseDir = process.cwd()
+      let fontPath: string
+      
+      // Check if we're in Next.js context (already in apps/form-app)
+      if (baseDir.endsWith('form-app') || baseDir.includes('form-app') && !baseDir.endsWith('wareworks-form-backend')) {
+        fontPath = path.join(baseDir, 'public', 'fonts', 'High Empathy.otf')
+      } else {
+        // We're in root directory context
+        fontPath = path.join(baseDir, 'apps', 'form-app', 'public', 'fonts', 'High Empathy.otf')
+      }
+      
+      console.log(`📝 Loading High Empathy font from: ${fontPath}`)
+      const fontBytes = await fs.readFile(fontPath)
+      const font = await pdfDoc.embedFont(fontBytes)
+      console.log('✅ High Empathy font loaded successfully')
+      return font
+      
+    } catch (error) {
+      console.warn('⚠️ Could not load High Empathy font, falling back to standard font:', error)
+      // Fallback to a standard font if custom font fails
+      return await pdfDoc.embedFont(StandardFonts.HelveticaOblique)
+    }
   }
 
   private setCheckboxField(form: PDFForm, fieldName: string, checked: boolean) {
@@ -785,38 +894,37 @@ export class PDFService {
     }
   }
 
-  // COMMENTED OUT - SIGNATURE FEATURE
   // Handle signature in WareWorks Application PDF
-  // private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData) {
-  //   if (!data.signature) {
-  //     console.log('📝 No signature provided, skipping signature field')
-  //     return
-  //   }
+  private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData) {
+    if (!data.signature) {
+      console.log('📝 No signature provided, skipping signature field')
+      return
+    }
 
-  //   console.log('🖊️ Processing digital signature for application PDF')
+    console.log('🖊️ Processing digital signature for application PDF')
 
-  //   try {
-  //     // Fill signature text field with the person's name
-  //     this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signature, data.signature)
-  //     console.log(`🖊️ Signature filled: ${data.signature}`)
+    try {
+      // Fill signature text field with the person's name using handwriting font
+      await this.setSignatureFieldWithMapping(pdfDoc, form, pdfFieldMappings.signature.signature, data.signature)
+      console.log(`🖊️ Signature filled with handwriting font: ${data.signature}`)
 
-  //     // Fill signature date fields
-  //     if (data.signatureDate) {
-  //       const signatureDate = new Date(data.signatureDate)
+      // Fill signature date fields
+      if (data.signatureDate) {
+        const signatureDate = new Date(data.signatureDate)
         
-  //       this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, 
-  //         (signatureDate.getMonth() + 1).toString().padStart(2, '0'))
-  //       this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, 
-  //         signatureDate.getDate().toString().padStart(2, '0'))
-  //       this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, 
-  //         signatureDate.getFullYear().toString())
+        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateMonth, 
+          (signatureDate.getMonth() + 1).toString().padStart(2, '0'))
+        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateDay, 
+          signatureDate.getDate().toString().padStart(2, '0'))
+        this.setTextFieldWithMapping(form, pdfFieldMappings.signature.signatureDateYear, 
+          signatureDate.getFullYear().toString())
           
-  //       console.log(`📅 Signature date filled: ${signatureDate.toLocaleDateString()}`)
-  //     }
+        console.log(`📅 Signature date filled: ${signatureDate.toLocaleDateString()}`)
+      }
 
-  //   } catch (error) {
-  //     console.error('❌ Failed to process signature:', error)
-  //     // Continue without signature rather than failing entire PDF generation
-  //   }
-  // }
+    } catch (error) {
+      console.error('❌ Failed to process signature:', error)
+      // Continue without signature rather than failing entire PDF generation
+    }
+  }
 }

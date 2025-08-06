@@ -19,6 +19,7 @@
     "typescript": "^5.2.0"
   },
   "dependencies": {
+    "fontkit": "^2.0.4",
     "pdf-lib": "^1.17.1"
   }
 }
