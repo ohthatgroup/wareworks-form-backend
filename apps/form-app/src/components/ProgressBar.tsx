@@ -1,5 +1,7 @@
 import { useLanguage } from '../contexts/LanguageContext'
 import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { navigateWithLanguage } from '../utils/navigation'
 
 interface ProgressBarProps {
   currentStep: number
@@ -17,6 +19,7 @@ export function ProgressBar({
   completedSteps = []
 }: ProgressBarProps) {
   const { t, language, setLanguage } = useLanguage()
+  const router = useRouter()
   const progress = ((currentStep + 1) / totalSteps) * 100
   const mobileScrollRef = useRef<HTMLDivElement>(null)
 
@@ -24,6 +27,15 @@ export function ProgressBar({
     if (onStepClick && (stepIndex <= currentStep || completedSteps.includes(stepIndex))) {
       onStepClick(stepIndex)
     }
+  }
+
+  const handleLanguageChange = (newLanguage: 'en' | 'es') => {
+    // Update the language context
+    setLanguage(newLanguage)
+    
+    // Navigate to current page with new language parameter to ensure URL consistency
+    const currentPath = window.location.pathname
+    navigateWithLanguage(router, currentPath, newLanguage, 'replace')
   }
 
   const isStepClickable = (stepIndex: number) => {
@@ -77,7 +89,7 @@ export function ProgressBar({
             </svg>
             <select
               value={language}
-              onChange={(e) => setLanguage(e.target.value as 'en' | 'es')}
+              onChange={(e) => handleLanguageChange(e.target.value as 'en' | 'es')}
               className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-primary focus:border-primary"
             >
               <option value="en">{language === 'en' ? 'English' : 'Inglés'}</option>
