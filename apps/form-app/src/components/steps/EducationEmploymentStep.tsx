@@ -89,7 +89,15 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
         {educationFields.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>{t('education.no_entries_message') || 'Click "Add Education" to add your educational background.'}</p>
+            <p className="mb-4">{t('education.no_entries_message') || 'Click "Add Education" to add your educational background.'}</p>
+            <button
+              type="button"
+              onClick={addEducation}
+              className="btn-secondary text-sm flex items-center gap-2 mx-auto"
+            >
+              <Plus size={16} />
+              {t('education.add_button')}
+            </button>
           </div>
         ) : null}
 
@@ -169,7 +177,15 @@ export function EducationEmploymentStep({ form }: EducationEmploymentStepProps) 
 
         {employmentFields.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>{t('employment.no_entries_message')}</p>
+            <p className="mb-4">{t('employment.no_entries_message')}</p>
+            <button
+              type="button"
+              onClick={addEmployment}
+              className="btn-secondary text-sm flex items-center gap-2 mx-auto"
+            >
+              <Plus size={16} />
+              {t('employment.add_button')}
+            </button>
           </div>
         ) : null}
 

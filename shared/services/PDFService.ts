@@ -98,6 +98,111 @@ export class PDFService {
     }
   }
 
+  async generateBilingualApplicationPDF(data: ValidatedApplicationData): Promise<{ englishPDF: Buffer; spanishPDF: Buffer; i9PDF: Buffer | null }> {
+    if (!process.env.ENABLE_PDF_GENERATION || process.env.ENABLE_PDF_GENERATION !== 'true') {
+      throw new Error('PDF generation disabled')
+    }
+
+    try {
+      console.log('Generating bilingual PDFs for application:', data.submissionId)
+      
+      // Generate English PDF
+      const englishResult = await this.generateSingleApplicationPDF(data, 'english')
+      let englishPDF: Buffer
+      let i9PDF: Buffer | null = null
+      
+      if (Buffer.isBuffer(englishResult)) {
+        englishPDF = englishResult
+      } else {
+        englishPDF = englishResult.applicationPDF
+        i9PDF = englishResult.i9PDF
+      }
+      
+      // Generate Spanish PDF
+      const spanishPDF = await this.generateSingleApplicationPDF(data, 'spanish') as Buffer
+      
+      return {
+        englishPDF,
+        spanishPDF,
+        i9PDF
+      }
+      
+    } catch (error) {
+      console.error('Bilingual PDF generation error:', error)
+      throw new Error(`Failed to generate bilingual PDFs: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
+  private async generateSingleApplicationPDF(data: ValidatedApplicationData, language: 'english' | 'spanish'): Promise<Buffer | { applicationPDF: Buffer; i9PDF: Buffer }> {
+    try {
+      console.log(`Generating ${language} PDF for application:`, data.submissionId)
+      
+      // Determine template path based on language
+      const baseDir = process.cwd()
+      let templatePath: string
+      
+      const templateName = language === 'spanish' ? 'Wareworks Application - ES.pdf' : 'Wareworks Application.pdf'
+      
+      // Check if we're in Next.js context (already in apps/form-app)
+      if (baseDir.endsWith('form-app') || baseDir.includes('form-app') && !baseDir.endsWith('wareworks-form-backend')) {
+        templatePath = path.join(baseDir, 'public', 'templates', templateName)
+      } else {
+        // We're in root directory context
+        templatePath = path.join(baseDir, 'apps', 'form-app', 'public', 'templates', templateName)
+      }
+      
+      console.log(`📁 Loading ${language} template from: ${templatePath}`)
+      const templateBytes = await fs.readFile(templatePath)
+      
+      // Load the PDF document
+      const pdfDoc = await PDFDocument.load(templateBytes)
+      
+      // Register fontkit for custom fonts
+      pdfDoc.registerFontkit(fontkit)
+      
+      const form = pdfDoc.getForm()
+      
+      // Fill the form fields based on template analysis
+      await this.fillApplicationFields(form, data)
+      
+      // Merge uploaded documents if any (only for English version to avoid duplication)
+      if (language === 'english' && data.documents && data.documents.length > 0) {
+        console.log(`📎 Merging ${data.documents.length} uploaded documents...`)
+        await this.mergeUploadedDocuments(pdfDoc, data.documents)
+        console.log('✅ Document merging completed')
+      } else if (language === 'spanish') {
+        console.log('📄 Skipping document merge for Spanish version')
+      }
+
+      // Add digital signature if provided
+      await this.addSignatureToApplicationPDF(pdfDoc, form, data)
+      
+      // Generate separate I-9 form only for English version
+      let i9Buffer: Buffer | null = null
+      if (language === 'english' && this.hasI9Documents(data)) {
+        i9Buffer = await this.addI9Form(pdfDoc, data)
+      }
+      
+      // Serialize the application PDF
+      const applicationPdfBytes = await pdfDoc.save()
+      const applicationBuffer = Buffer.from(applicationPdfBytes)
+      
+      // Return both PDFs if I-9 is needed (English only)
+      if (i9Buffer) {
+        return {
+          applicationPDF: applicationBuffer,
+          i9PDF: i9Buffer
+        }
+      } else {
+        return applicationBuffer
+      }
+
+    } catch (error) {
+      console.error(`${language} PDF generation error:`, error)
+      throw new Error(`Failed to generate ${language} PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
   private async fillApplicationFields(form: PDFForm, data: ValidatedApplicationData) {
     // Personal Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.personalInfo.legalFirstName, data.legalFirstName)
@@ -457,6 +562,12 @@ export class PDFService {
     this.setCheckboxField(form, 'CB_3', false) // Lawful permanent resident  
     this.setCheckboxField(form, 'CB_4', false) // Alien authorized to work
     
+    // If no citizenship status provided, leave all unchecked
+    if (!citizenshipStatus || citizenshipStatus.trim() === '') {
+      console.log('No citizenship status provided - leaving all checkboxes unchecked')
+      return
+    }
+    
     // Set the appropriate checkbox based on status
     switch (citizenshipStatus) {
       case 'us_citizen':
@@ -473,9 +584,9 @@ export class PDFService {
         this.setCheckboxField(form, 'CB_4', true) // Alien authorized to work
         break
       default:
-        console.warn(`Unknown citizenship status: ${citizenshipStatus}`)
-        // Default to authorized alien if status is unclear
-        this.setCheckboxField(form, 'CB_4', true)
+        console.warn(`Unknown or empty citizenship status: ${citizenshipStatus}`)
+        // Leave all checkboxes unchecked if status is unclear or empty
+        console.log('No citizenship status selected - leaving all checkboxes unchecked')
         break
     }
   }

@@ -64,17 +64,17 @@ export async function POST(request: NextRequest) {
         // Continue without PDF - don't fail the entire submission
       }
 
-      // Send email notification with all attachments
+      // Send bilingual email notification with both English and Spanish PDFs
       try {
         if (process.env.ENABLE_EMAIL_NOTIFICATIONS === 'true') {
           const emailService = new EmailService()
-          await emailService.sendApplicationNotification(submissionData, pdfResult)
-          console.log('Email notification sent successfully with all attachments')
+          await emailService.sendBilingualApplicationNotification(submissionData)
+          console.log('Bilingual email notification sent successfully with English and Spanish PDFs')
         } else {
           console.log('Email notifications disabled')
         }
       } catch (emailError) {
-        console.error('Email sending failed:', emailError)
+        console.error('Bilingual email sending failed:', emailError)
         // Continue without email - don't fail the entire submission
       }
 

@@ -11,12 +11,11 @@ export const translations = {
     'steps.documents.title': 'Documents',
     'steps.review.title': 'Review & Submit',
 
-    // COMMENTED OUT - SIGNATURE FEATURE
     // Signature
-    // 'signature.label': 'Digital Signature',
-    // 'signature.instruction': 'Sign above using your mouse, finger, or stylus',
-    // 'signature.clear': 'Clear',
-    // 'signature.required': 'Signature is required to submit application',
+    'signature.label': 'Digital Signature',
+    'signature.instruction': 'Sign above using your mouse, finger, or stylus',
+    'signature.clear': 'Clear',
+    'signature.required': 'Signature is required to submit application',
 
     // Personal Information
     'personal_info.legal_first_name': 'Legal First Name',
@@ -316,6 +315,7 @@ export const translations = {
     'review.legal_acknowledgment_title': 'Legal Acknowledgment',
     'review.legal_text_1': 'By submitting this application, I certify that all information provided is true and complete to the best of my knowledge. I understand that any false information may result in disqualification from employment or termination if hired.',
     'review.legal_text_2': 'I authorize WareWorks to verify the information provided and to conduct background checks as permitted by law.',
+    'review.signature_title': 'Signature',
     'review.preview_title': 'Preview',
     'review.download_title': 'Download',
 
@@ -361,12 +361,11 @@ export const translations = {
     'steps.documents.title': 'Documentos',
     'steps.review.title': 'Revisar y Enviar',
 
-    // COMMENTED OUT - SIGNATURE FEATURE
     // Signature
-    // 'signature.label': 'Firma Digital',
-    // 'signature.instruction': 'Firme arriba usando su ratón, dedo o lápiz óptico',
-    // 'signature.clear': 'Borrar',
-    // 'signature.required': 'Se requiere firma para enviar la solicitud',
+    'signature.label': 'Firma Digital',
+    'signature.instruction': 'Firme arriba usando su ratón, dedo o lápiz óptico',
+    'signature.clear': 'Borrar',
+    'signature.required': 'Se requiere firma para enviar la solicitud',
 
     // Personal Information
     'personal_info.legal_first_name': 'Nombre Legal',
@@ -666,6 +665,7 @@ export const translations = {
     'review.legal_acknowledgment_title': 'Reconocimiento Legal',
     'review.legal_text_1': 'Al enviar esta solicitud, certifico que toda la información proporcionada es verdadera y completa según mi conocimiento. Entiendo que cualquier información falsa puede resultar en descalificación del empleo o terminación si soy contratado.',
     'review.legal_text_2': 'Autorizo a WareWorks a verificar la información proporcionada y a realizar verificaciones de antecedentes según lo permitido por la ley.',
+    'review.signature_title': 'Firma',
     'review.preview_title': 'Vista Previa',
     'review.download_title': 'Descargar',
 

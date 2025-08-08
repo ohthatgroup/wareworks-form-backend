@@ -165,6 +165,7 @@ export function SuccessStep({ result }: SuccessStepProps) {
           
           <a 
             href="https://wareworks.me" 
+            target="_parent"
             className="btn-primary flex items-center justify-center gap-2 no-underline"
           >
             <Home size={20} />
