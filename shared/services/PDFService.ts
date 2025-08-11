@@ -378,6 +378,8 @@ export class PDFService {
       const field = form.getField(fieldName) as PDFTextField
       if (field) {
         field.setText(value)
+        // Set mobile-friendly font size
+        field.setFontSize(10)
       }
     } catch (error) {
       console.warn(`Could not set field "${fieldName}":`, error)
@@ -392,6 +394,8 @@ export class PDFService {
       const field = form.getField(mapping.primary) as PDFTextField
       if (field) {
         field.setText(value)
+        // Set mobile-friendly font size (10pt works well for most mobile screens)
+        field.setFontSize(10)
         return
       }
     } catch (error) {
@@ -405,6 +409,8 @@ export class PDFService {
           const field = form.getField(fallback) as PDFTextField
           if (field) {
             field.setText(value)
+            // Set mobile-friendly font size
+            field.setFontSize(10)
             console.log(`Used fallback field "${fallback}" for value: ${value}`)
             return
           }
