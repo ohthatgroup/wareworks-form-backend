@@ -64,8 +64,10 @@ export class EmailService {
         attachments: attachments
       }
 
-      // Use our custom send-email function (which uses Mailgun with your API key)
-      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
+      // Use Netlify Emails plugin or custom send-email function
+      const emailEndpoint = process.env.NETLIFY_EMAILS_PROVIDER 
+        ? `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/send`
+        : `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
       
       const response = await fetch(emailEndpoint, {
         method: 'POST',
@@ -111,7 +113,7 @@ export class EmailService {
         submissionId: data.submissionId,
         recipient: hrEmail,
         environment: process.env.NODE_ENV,
-        mailgunConfigured: !!(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN)
+        mailgunConfigured: !!(process.env.NETLIFY_EMAILS_PROVIDER_API_KEY || (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN))
       })
       
       throw new Error(`Failed to send email notification: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -167,8 +169,10 @@ export class EmailService {
         attachmentTypes: attachments.map(a => ({ name: a.filename, type: a.contentType }))
       })
 
-      // Use our custom send-email function (which uses Mailgun with your API key)
-      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
+      // Use Netlify Emails plugin or custom send-email function
+      const emailEndpoint = process.env.NETLIFY_EMAILS_PROVIDER 
+        ? `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/send`
+        : `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
       
       const response = await fetch(emailEndpoint, {
         method: 'POST',
@@ -215,7 +219,7 @@ export class EmailService {
         submissionId: data.submissionId,
         recipient: hrEmail,
         environment: process.env.NODE_ENV,
-        mailgunConfigured: !!(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN)
+        mailgunConfigured: !!(process.env.NETLIFY_EMAILS_PROVIDER_API_KEY || (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN))
       })
       
       throw new Error(`Failed to send bilingual email notification: ${error instanceof Error ? error.message : 'Unknown error'}`)
