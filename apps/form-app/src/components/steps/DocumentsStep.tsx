@@ -229,28 +229,53 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
 
   const ScreenshotTipsModal = () => (
     showScreenshotTips && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+      <div 
+        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        style={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex: 9999,
+          minHeight: '100vh' 
+        }}
+      >
+        <div 
+          className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-2xl border"
+          style={{ 
+            maxHeight: '90vh', 
+            overflowY: 'auto',
+            position: 'relative',
+            zIndex: 10000
+          }}
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">{t('documents.screenshot_tips_title')}</h3>
-            <button onClick={() => setShowScreenshotTips(false)} className="text-gray-400 hover:text-gray-600">
+            <button 
+              onClick={() => setShowScreenshotTips(false)} 
+              className="text-gray-400 hover:text-gray-600 p-1 rounded"
+              style={{ zIndex: 10001 }}
+            >
               <X size={20} />
             </button>
           </div>
-          <ul className="space-y-2 text-sm text-gray-600">
+          <ul className="space-y-3 text-sm text-gray-600">
             {[1, 2, 3, 4, 5].map((index) => (
               <li key={index} className="flex items-start">
-                <span className="text-primary mr-2">•</span>
+                <span className="text-blue-600 mr-2 font-bold">•</span>
                 <span>{t(`documents.screenshot_tips_${index}`)}</span>
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-sm text-blue-600 bg-blue-50 p-3 rounded">
-            {t('documents.screenshot_instructions')}
-          </p>
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800 font-medium">
+              💡 {t('documents.screenshot_instructions')}
+            </p>
+          </div>
           <button 
             onClick={() => setShowScreenshotTips(false)}
-            className="mt-4 w-full btn-primary"
+            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
           >
             {t('common.complete')}
           </button>
@@ -260,7 +285,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative" style={{ minHeight: showScreenshotTips ? '100vh' : 'auto' }}>
       <ScreenshotTipsModal />
       
       {/* Info banner about image-only uploads */}
