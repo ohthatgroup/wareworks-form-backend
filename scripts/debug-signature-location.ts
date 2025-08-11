@@ -90,7 +90,7 @@ async function debugSignatureLocation() {
     const pdfBytes = await pdfDoc.save()
     const outputDir = path.join(process.cwd(), 'scripts', 'output')
     await fs.mkdir(outputDir, { recursive: true })
-    const outputPath = path.join(outputDir, `signature-location-debug-${Date.now()}.pdf`)
+    const outputPath = path.join(outputDir, `signature-location-debug-spanish-${Date.now()}.pdf`)
     await fs.writeFile(outputPath, pdfBytes)
     
     console.log('\n💾 Saved debug PDF to:', outputPath)

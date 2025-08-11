@@ -250,8 +250,11 @@ export class PDFService {
     
     // Position Information
     this.setTextFieldWithMapping(form, pdfFieldMappings.position.positionApplied, data.positionApplied)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscovery, data.jobDiscovery)
-    this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscoveryContinued, data.jobDiscoveryContinued)
+    const jobDiscoveryOverflow = this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscovery, data.jobDiscovery)
+    // Auto-populate jobDiscoveryContinued with overflow text
+    if (jobDiscoveryOverflow) {
+      this.setTextFieldWithMapping(form, pdfFieldMappings.position.jobDiscoveryContinued, jobDiscoveryOverflow)
+    }
     this.setTextFieldWithMapping(form, pdfFieldMappings.position.expectedSalary, data.expectedSalary)
     
     // Checkbox Questions
@@ -322,10 +325,14 @@ export class PDFService {
           this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactYes, emp.mayContact === 'yes')
           this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company1MayContactNo, emp.mayContact === 'no')
           
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Responsibilities, emp.responsibilities)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ResponsibilitiesContinued, emp.responsibilitiesContinued)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeaving, emp.reasonForLeaving)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeavingContinued, emp.reasonLeavingContinued)
+          const responsibilitiesOverflow = this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1Responsibilities, emp.responsibilities)
+          if (responsibilitiesOverflow) {
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ResponsibilitiesContinued, responsibilitiesOverflow)
+          }
+          const reasonLeavingOverflow = this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeaving, emp.reasonForLeaving)
+          if (reasonLeavingOverflow) {
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company1ReasonLeavingContinued, reasonLeavingOverflow)
+          }
           
         } else if (index === 1) {
           this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Name, emp.companyName || '')
@@ -355,10 +362,14 @@ export class PDFService {
           this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactYes, emp.mayContact === 'yes')
           this.setCheckboxFieldWithMapping(form, pdfFieldMappings.employment.company2MayContactNo, emp.mayContact === 'no')
           
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Responsibilities, emp.responsibilities)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ResponsibilitiesContinued, emp.responsibilitiesContinued)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeaving, emp.reasonForLeaving)
-          this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeavingContinued, emp.reasonLeavingContinued)
+          const responsibilities2Overflow = this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2Responsibilities, emp.responsibilities)
+          if (responsibilities2Overflow) {
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ResponsibilitiesContinued, responsibilities2Overflow)
+          }
+          const reasonLeaving2Overflow = this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeaving, emp.reasonForLeaving)
+          if (reasonLeaving2Overflow) {
+            this.setTextFieldWithMapping(form, pdfFieldMappings.employment.company2ReasonLeavingContinued, reasonLeaving2Overflow)
+          }
         }
       })
     }
@@ -393,10 +404,23 @@ export class PDFService {
     try {
       const field = form.getField(mapping.primary) as PDFTextField
       if (field) {
-        field.setText(value)
-        // Set mobile-friendly font size (10pt works well for most mobile screens)
-        field.setFontSize(10)
-        return
+        // Use estimated visual limits since PDF fields don't have max length constraints
+        const estimatedLimit = this.getEstimatedFieldLimit(mapping.primary)
+        if (estimatedLimit > 0 && value.length > estimatedLimit) {
+          // Split text at word boundary near the limit
+          const splitPoint = this.findWordBoundary(value, estimatedLimit)
+          const mainText = value.substring(0, splitPoint).trim()
+          const overflowText = value.substring(splitPoint).trim()
+          
+          field.setText(mainText)
+          field.setFontSize(10)
+          console.log(`📄 Text split for "${mapping.primary}": main(${mainText.length}) + overflow(${overflowText.length}) chars`)
+          return overflowText // Return overflow text for "Continued" field
+        } else {
+          field.setText(value)
+          field.setFontSize(10)
+          return null // No overflow
+        }
       }
     } catch (error) {
       console.warn(`Primary field "${mapping.primary}" not found:`, error)
@@ -408,11 +432,22 @@ export class PDFService {
         try {
           const field = form.getField(fallback) as PDFTextField
           if (field) {
-            field.setText(value)
-            // Set mobile-friendly font size
-            field.setFontSize(10)
-            console.log(`Used fallback field "${fallback}" for value: ${value}`)
-            return
+            const estimatedLimit = this.getEstimatedFieldLimit(fallback)
+            if (estimatedLimit > 0 && value.length > estimatedLimit) {
+              const splitPoint = this.findWordBoundary(value, estimatedLimit)
+              const mainText = value.substring(0, splitPoint).trim()
+              const overflowText = value.substring(splitPoint).trim()
+              
+              field.setText(mainText)
+              field.setFontSize(10)
+              console.log(`Used fallback field "${fallback}" with text split`)
+              return overflowText
+            } else {
+              field.setText(value)
+              field.setFontSize(10)
+              console.log(`Used fallback field "${fallback}" for value: ${value}`)
+              return null
+            }
           }
         } catch (error) {
           console.warn(`Fallback field "${fallback}" not found:`, error)
@@ -421,9 +456,51 @@ export class PDFService {
     }
 
     console.warn(`No working field found for mapping. Primary: "${mapping.primary}", Value: "${value}"`)
+    return null
   }
 
-  private async setSignatureFieldWithMapping(pdfDoc: PDFDocument, form: PDFForm, mapping: FieldMapping, value: string | undefined) {
+  private findWordBoundary(text: string, maxLength: number): number {
+    if (text.length <= maxLength) return text.length
+    
+    // Find the last space before the max length
+    for (let i = maxLength; i >= 0; i--) {
+      if (text[i] === ' ' || text[i] === '\n' || text[i] === '\t') {
+        return i
+      }
+    }
+    
+    // If no word boundary found, split at max length
+    return maxLength
+  }
+
+  private getEstimatedFieldLimit(fieldName: string): number {
+    // Estimated visual limits based on typical PDF field sizes (at 10pt font)
+    const fieldLimits: Record<string, number> = {
+      // Long text fields that commonly overflow
+      'How did you discover this job opening': 200,
+      'Company Responsibilities 1': 300,
+      'Company Reason for Leaving 1': 200,
+      'Company Responsibilities 2': 300,
+      'Company Reason for Leaving 2': 200,
+      
+      // Medium fields
+      'Applicable Skills  Qualifications 1': 150,
+      'Applicable Skills  Qualifications 2': 150,
+      'Applicable Skills  Qualifications 3': 150,
+      
+      // Short fields (names, addresses, etc.) - no limit needed
+      'Position Applied For': 0,
+      'Expected Salary': 0,
+      'Applicant Legal First Name': 0,
+      'Applicant Legal Last Name': 0,
+      'Company Name and Location 1': 0,
+      'Company Name and Location 2': 0,
+    }
+    
+    return fieldLimits[fieldName] || 0 // Return 0 for fields that don't need splitting
+  }
+
+  private async setSignatureFieldWithMapping(pdfDoc: PDFDocument, form: PDFForm, mapping: FieldMapping, value: string | undefined, isSpanishPDF: boolean = false) {
     if (!value) return
 
     // Load High Empathy handwriting font first
@@ -471,9 +548,9 @@ export class PDFService {
       // Clear the original form field (make it transparent/empty)
       signatureField.setText('')
       
-      // Use exact coordinates found by analysis tool
-      const signatureX = 162.328
-      const signatureY = 82.0697
+      // Use coordinates for Spanish PDF (different from English)
+      const signatureX = 138.948
+      const signatureY = 55.9305
       const fieldWidth = 150
       const fieldHeight = 22
       

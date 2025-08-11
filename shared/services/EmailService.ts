@@ -196,6 +196,7 @@ export class EmailService {
         subject: subject,
         submissionId: data.submissionId,
         totalAttachments: attachments.length,
+        attachmentSizes: attachments.map(a => ({ name: a.filename, size: `${Math.round(a.content.length * 0.75)} bytes` })),
         attachmentTypes: attachments.map(a => ({ name: a.filename, type: a.contentType }))
       })
 
