@@ -6,6 +6,102 @@ import * as fs from 'fs/promises'
 import * as path from 'path'
 import { pdfFieldMappings, i9FieldMappings, FieldMapping } from '../config/pdfFieldMappings'
 
+// Field treatment categories based on capacity analysis
+interface FieldTreatment {
+  category: 'fixed' | 'name' | 'medium' | 'long' | 'continuation'
+  safeLimit: number
+  minFontSize?: number
+  maxFontSize?: number
+  allowWrapping?: boolean
+}
+
+// Field categorization map with treatment strategies
+const FIELD_TREATMENTS: Record<string, FieldTreatment> = {
+  // Category A: Fixed Format Fields (UI validation only)
+  'Applicant SSN - P1': { category: 'fixed', safeLimit: 3 },
+  'Applicant SSN - P2': { category: 'fixed', safeLimit: 2 },
+  'Applicant SSN - P3': { category: 'fixed', safeLimit: 4 },
+  'Applicant DOB - Month': { category: 'fixed', safeLimit: 2 },
+  'Applicant DOB - Day': { category: 'fixed', safeLimit: 2 },
+  'Applicant DOB - Year': { category: 'fixed', safeLimit: 4 },
+  'Applicant State': { category: 'fixed', safeLimit: 2 },
+  'Applicant Zip Code': { category: 'fixed', safeLimit: 10 },
+  'Applicant Home Phone': { category: 'fixed', safeLimit: 14 },
+  'Applicant Cell Phone Number': { category: 'fixed', safeLimit: 14 },
+  'Emergency Contact Phone Number': { category: 'fixed', safeLimit: 14 },
+  
+  // Hours fields (4-7 chars max)
+  'Sunday Hours': { category: 'fixed', safeLimit: 6 },
+  'Monday  Hours': { category: 'fixed', safeLimit: 6 },
+  'Tuesday  Hours': { category: 'fixed', safeLimit: 6 },
+  'Wednesday  Hours': { category: 'fixed', safeLimit: 8 },
+  'Thursday  Hours': { category: 'fixed', safeLimit: 6 },
+  'Friday  Hours': { category: 'fixed', safeLimit: 9 },
+  'Saturday Hours': { category: 'fixed', safeLimit: 5 },
+  
+  // Company date fields
+  'Company Date Started 1 - Month': { category: 'fixed', safeLimit: 2 },
+  'Company Date Started 1 - Day': { category: 'fixed', safeLimit: 2 },
+  'Company Date Started 1 - Year': { category: 'fixed', safeLimit: 4 },
+  'Company Date Ended 1 - Month': { category: 'fixed', safeLimit: 2 },
+  'Company Date Ended 1 - Day': { category: 'fixed', safeLimit: 2 },
+  'Company Date Ended 1 - Year': { category: 'fixed', safeLimit: 4 },
+  'Company Date Started 2 - Month': { category: 'fixed', safeLimit: 2 },
+  'Company Date Started 2 - Day': { category: 'fixed', safeLimit: 2 },
+  'Company Date Started 2 - Year': { category: 'fixed', safeLimit: 4 },
+  'Company Date Ended 2 - Month': { category: 'fixed', safeLimit: 2 },
+  'Company Date Ended 2 - Day': { category: 'fixed', safeLimit: 2 },
+  'Company Date Ended 2 - Year': { category: 'fixed', safeLimit: 4 },
+  
+  // Category B: Names (dynamic font sizing only, 7-10pt)
+  'Applicant Legal First Name': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
+  'Applicant Legal Last Name': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
+  'Applicant Middle Initials': { category: 'name', safeLimit: 2, minFontSize: 7, maxFontSize: 10 },
+  'Emergency Contact Name': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
+  'Emergency Contact Relationship': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
+  'Company Supervisor Name 1': { category: 'name', safeLimit: 20, minFontSize: 7, maxFontSize: 10 },
+  'Company Supervisor Name 2': { category: 'name', safeLimit: 20, minFontSize: 7, maxFontSize: 10 },
+  
+  // Category C: Medium Text (dynamic font + limited wrapping, 7-10pt)
+  'Position Applied For': { category: 'medium', safeLimit: 25, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Expected Salary': { category: 'medium', safeLimit: 12, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Applicant Street Address': { category: 'medium', safeLimit: 21, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Applicant City': { category: 'medium', safeLimit: 18, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Applicant Email': { category: 'medium', safeLimit: 32, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Name and Location 1': { category: 'medium', safeLimit: 27, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Name and Location 2': { category: 'medium', safeLimit: 27, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Starting Position 1': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Starting Position 2': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Ending Position 1': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Ending Position 2': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Telephone Number 1': { category: 'medium', safeLimit: 7, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'Company Telephone Number 2': { category: 'medium', safeLimit: 7, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'School Name and Location 1': { category: 'medium', safeLimit: 29, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'School Name and Location 2': { category: 'medium', safeLimit: 29, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'School Year 1': { category: 'medium', safeLimit: 14, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'School Year 2': { category: 'medium', safeLimit: 14, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'School Major 1': { category: 'medium', safeLimit: 15, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  'School Major 2': { category: 'medium', safeLimit: 15, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  
+  // Category D: Long Text (full dynamic treatment with overflow, 7-10pt)
+  'How did you discover this job opening': { category: 'long', safeLimit: 21, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'If yes please specify when and where': { category: 'long', safeLimit: 12, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Applicable Skills  Qualifications 1': { category: 'long', safeLimit: 45, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Applicable Skills  Qualifications 2': { category: 'long', safeLimit: 45, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Applicable Skills  Qualifications 3': { category: 'long', safeLimit: 45, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Company Responsibilities 1': { category: 'long', safeLimit: 35, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Company Responsibilities 2': { category: 'long', safeLimit: 35, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Company Reason for Leaving 1': { category: 'long', safeLimit: 33, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  'Company Reason for Leaving 2': { category: 'long', safeLimit: 33, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  
+  // Category E: Continuation Fields (auto-populated overflow)
+  'How did you discover this job opening - Continued': { category: 'continuation', safeLimit: 11, minFontSize: 7, maxFontSize: 10 },
+  'Company Responsibilities 1 Continued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 },
+  'Company Responsibilities 2 Continued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 },
+  'Company Reason for Leaving 1 Conitnued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 },
+  'Company Reason for Leaving 2 Continued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 }
+}
+
 export class PDFService {
   private templateAnalysis: any
 
@@ -404,24 +500,62 @@ export class PDFService {
     try {
       const field = form.getField(mapping.primary) as PDFTextField
       if (field) {
-        // Use estimated visual limits since PDF fields don't have max length constraints
-        const estimatedLimit = this.getEstimatedFieldLimit(mapping.primary)
-        if (estimatedLimit > 0 && value.length > estimatedLimit) {
-          // Split text at word boundary near the limit
-          const splitPoint = this.findWordBoundary(value, estimatedLimit)
-          const mainText = value.substring(0, splitPoint).trim()
-          const overflowText = value.substring(splitPoint).trim()
-          
-          field.setText(mainText)
-          const fontSize = this.calculateOptimalFontSize(mainText, field, mapping.primary)
-          field.setFontSize(fontSize)
-          console.log(`📄 Text split for "${mapping.primary}": main(${mainText.length}) + overflow(${overflowText.length}) chars, fontSize=${fontSize}pt`)
-          return overflowText // Return overflow text for "Continued" field
-        } else {
+        // Get field treatment strategy
+        const treatment = FIELD_TREATMENTS[mapping.primary]
+        
+        if (!treatment) {
+          // No treatment defined, use original logic
           field.setText(value)
-          const fontSize = this.calculateOptimalFontSize(value, field, mapping.primary)
-          field.setFontSize(fontSize)
-          return null // No overflow
+          field.setFontSize(10)
+          return null
+        }
+
+        // Calculate optimal font size
+        const fontSize = this.calculateOptimalFontSize(value, field, mapping.primary)
+
+        // Handle different treatment categories
+        switch (treatment.category) {
+          case 'fixed':
+            // Fixed format fields: no overflow handling, just set text and font
+            field.setText(value.substring(0, treatment.safeLimit))
+            field.setFontSize(fontSize)
+            return null
+
+          case 'name':
+          case 'medium':
+            // Names and medium text: dynamic font sizing only
+            field.setText(value)
+            field.setFontSize(fontSize)
+            return null
+
+          case 'long':
+            // Long text fields: full treatment with overflow to continuation fields
+            if (value.length > treatment.safeLimit) {
+              const splitPoint = this.findWordBoundary(value, treatment.safeLimit)
+              const mainText = value.substring(0, splitPoint).trim()
+              const overflowText = value.substring(splitPoint).trim()
+              
+              field.setText(mainText)
+              field.setFontSize(fontSize)
+              console.log(`📄 Text split for "${mapping.primary}": main(${mainText.length}) + overflow(${overflowText.length}) chars, fontSize=${fontSize}pt`)
+              return overflowText
+            } else {
+              field.setText(value)
+              field.setFontSize(fontSize)
+              return null
+            }
+
+          case 'continuation':
+            // Continuation fields: auto-populated from overflow
+            field.setText(value)
+            field.setFontSize(fontSize)
+            return null
+
+          default:
+            // Fallback to original behavior
+            field.setText(value)
+            field.setFontSize(fontSize)
+            return null
         }
       }
     } catch (error) {
@@ -498,6 +632,44 @@ export class PDFService {
     }
     
     return fieldLimits[fieldName] || 0 // Return 0 for fields that don't need splitting
+  }
+
+  private calculateOptimalFontSize(text: string, field: PDFTextField, fieldName: string): number {
+    // Get treatment strategy for this field
+    const treatment = FIELD_TREATMENTS[fieldName]
+    if (!treatment) {
+      // Default to 10pt for unmapped fields
+      return 10
+    }
+
+    // Fixed format fields always use 10pt
+    if (treatment.category === 'fixed') {
+      return 10
+    }
+
+    // For other categories, calculate optimal size based on text length
+    const minSize = treatment.minFontSize || 7
+    const maxSize = treatment.maxFontSize || 10
+    const safeLimit = treatment.safeLimit
+
+    // If text fits within safe limit, use max font size
+    if (text.length <= safeLimit) {
+      return maxSize
+    }
+
+    // Calculate optimal font size based on overflow ratio
+    const overflowRatio = text.length / safeLimit
+    
+    if (overflowRatio <= 1.2) {
+      // Slight overflow: reduce to 9pt
+      return Math.max(9, minSize)
+    } else if (overflowRatio <= 1.5) {
+      // Moderate overflow: reduce to 8pt
+      return Math.max(8, minSize)
+    } else {
+      // Heavy overflow: use minimum font size
+      return minSize
+    }
   }
 
   private async setSignatureFieldWithMapping(pdfDoc: PDFDocument, form: PDFForm, mapping: FieldMapping, value: string | undefined, isSpanish: boolean = false) {

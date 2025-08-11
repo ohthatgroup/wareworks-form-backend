@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
-import { Upload, X, Eye, Download } from 'lucide-react'
+import { Upload, X, Eye, Download, Info } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translateKey } from '../../types/translations'
 
@@ -13,6 +13,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const { register, formState: { errors }, setValue, watch } = form
   const { t } = useLanguage()
   const documents = watch('documents') || []
+  const [showScreenshotTips, setShowScreenshotTips] = useState(false)
   
   // Group documents by category for display
   const documentsByCategory = documents.reduce((acc: {[key: string]: any[]}, doc) => {
@@ -102,6 +103,21 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
 
   const handleFileUpload = async (category: string, files: FileList) => {
     const fileArray = Array.from(files)
+    
+    // Validate file types (only images allowed)
+    const invalidFiles = fileArray.filter(file => !['image/jpeg', 'image/jpg', 'image/png'].includes(file.type))
+    
+    if (invalidFiles.length > 0) {
+      alert(`${t('documents.file_errors.only_images_allowed')}\n\n${t('documents.screenshot_instructions')}`)
+      return
+    }
+    
+    // Check file sizes
+    const oversizedFiles = fileArray.filter(file => file.size > 10 * 1024 * 1024)
+    if (oversizedFiles.length > 0) {
+      alert(`${t('documents.file_errors.file_too_large')}: ${oversizedFiles.map(f => f.name).join(', ')}`)
+      return
+    }
     
     // Convert new files to document format
     const newDocuments = await Promise.all(
@@ -211,8 +227,60 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     )
   }
 
+  const ScreenshotTipsModal = () => (
+    showScreenshotTips && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">{t('documents.screenshot_tips_title')}</h3>
+            <button onClick={() => setShowScreenshotTips(false)} className="text-gray-400 hover:text-gray-600">
+              <X size={20} />
+            </button>
+          </div>
+          <ul className="space-y-2 text-sm text-gray-600">
+            {[1, 2, 3, 4, 5].map((index) => (
+              <li key={index} className="flex items-start">
+                <span className="text-primary mr-2">•</span>
+                <span>{t(`documents.screenshot_tips_${index}`)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm text-blue-600 bg-blue-50 p-3 rounded">
+            {t('documents.screenshot_instructions')}
+          </p>
+          <button 
+            onClick={() => setShowScreenshotTips(false)}
+            className="mt-4 w-full btn-primary"
+          >
+            {t('common.complete')}
+          </button>
+        </div>
+      </div>
+    )
+  )
+
   return (
     <div className="space-y-6">
+      <ScreenshotTipsModal />
+      
+      {/* Info banner about image-only uploads */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start">
+          <Info className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+          <div className="flex-1">
+            <p className="text-sm text-blue-800">
+              <strong>{t('documents.only_images_note')}</strong> {t('documents.screenshot_instructions')}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowScreenshotTips(true)}
+              className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              {t('documents.screenshot_tips_title')}
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-6">
         {/* Government ID */}
@@ -228,15 +296,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 <input
                   id="id-upload"
                   type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
+                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                  multiple
                   className="sr-only"
                   onChange={(e) => e.target.files && handleFileUpload('id', e.target.files)}
                 />
               </label>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
-              {t('documents.id_description')}
-            </p>
+            <div className="mt-2 text-sm text-gray-500">
+              <p>{t('documents.id_description')}</p>
+              <p className="mt-1 text-xs text-blue-600">{t('documents.only_images_note')}</p>
+            </div>
           </div>
           {documentsByCategory['id'] && renderDocumentList('id', documentsByCategory['id'])}
         </div>
@@ -254,15 +324,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 <input
                   id="resume-upload"
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                  multiple
                   className="sr-only"
                   onChange={(e) => e.target.files && handleFileUpload('resume', e.target.files)}
                 />
               </label>
             </div>
-            <p className="mt-2 text-sm text-gray-500">
-              {t('documents.resume_description')}
-            </p>
+            <div className="mt-2 text-sm text-gray-500">
+              <p>{t('documents.resume_description')}</p>
+              <p className="mt-1 text-xs text-blue-600">{t('documents.only_images_note')}</p>
+            </div>
           </div>
           {documentsByCategory['resume'] && renderDocumentList('resume', documentsByCategory['resume'])}
         </div>
@@ -291,16 +363,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                         <input
                           id={`${forklift.key}-cert-upload`}
                           type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
+                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                           multiple
                           className="sr-only"
                           onChange={(e) => e.target.files && handleFileUpload(`${forklift.key}-cert`, e.target.files)}
                         />
                       </label>
                     </div>
-                    <p className="mt-2 text-sm text-primary">
-                      Upload your official {forklift.label.toLowerCase()} certification documents
-                    </p>
+                    <div className="mt-2 text-sm text-primary">
+                      <p>Upload your official {forklift.label.toLowerCase()} certification documents</p>
+                      <p className="text-xs text-blue-600 mt-1">{t('documents.only_images_note')}</p>
+                    </div>
                   </div>
                   {documentsByCategory[`${forklift.key}-cert`] && renderDocumentList(`${forklift.key}-cert`, documentsByCategory[`${forklift.key}-cert`])}
                 </div>
@@ -320,16 +393,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                         <input
                           id={`${skill.key}-cert-upload`}
                           type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
+                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                           multiple
                           className="sr-only"
                           onChange={(e) => e.target.files && handleFileUpload(`${skill.key}-cert`, e.target.files)}
                         />
                       </label>
                     </div>
-                    <p className="mt-2 text-sm text-primary">
-                      {t('documents.documentation_for')} {skill.label}
-                    </p>
+                    <div className="mt-2 text-sm text-primary">
+                      <p>{t('documents.documentation_for')} {skill.label}</p>
+                      <p className="text-xs text-blue-600 mt-1">{t('documents.only_images_note')}</p>
+                    </div>
                   </div>
                   {documentsByCategory[`${skill.key}-cert`] && renderDocumentList(`${skill.key}-cert`, documentsByCategory[`${skill.key}-cert`])}
                 </div>

@@ -83,61 +83,57 @@ export class FileUploadService {
     return results
   }
 
-  async validateFile(file: UploadedFile): Promise<boolean> {
+  async validateFile(file: UploadedFile): Promise<{ isValid: boolean, errorKey?: string }> {
     // Basic file validation
     const maxSize = 10 * 1024 * 1024 // 10MB
     const allowedTypes = [
-      'application/pdf',
       'image/jpeg',
       'image/jpg', 
-      'image/png',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'image/png'
     ]
 
     if (file.size > maxSize) {
       console.warn(`File too large: ${file.name} (${file.size} bytes)`)
-      return false
+      return { isValid: false, errorKey: 'file_too_large' }
     }
 
     if (!allowedTypes.includes(file.mimeType)) {
-      console.warn(`Invalid file type: ${file.name} (${file.mimeType})`)
-      return false
+      console.warn(`Invalid file type: ${file.name} (${file.mimeType}) - only images allowed`)
+      return { isValid: false, errorKey: 'only_images_allowed' }
     }
 
     // Additional security check - verify file content matches extension
     const extension = file.name.split('.').pop()?.toLowerCase()
     const expectedMimeTypes: { [key: string]: string[] } = {
-      'pdf': ['application/pdf'],
       'jpg': ['image/jpeg', 'image/jpg'],
       'jpeg': ['image/jpeg', 'image/jpg'],
-      'png': ['image/png'],
-      'doc': ['application/msword'],
-      'docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+      'png': ['image/png']
     }
 
     if (extension && expectedMimeTypes[extension]) {
       if (!expectedMimeTypes[extension].includes(file.mimeType)) {
         console.warn(`File extension/MIME type mismatch: ${file.name}`)
-        return false
+        return { isValid: false, errorKey: 'file_type_mismatch' }
       }
     }
 
-    return true
+    return { isValid: true }
   }
 
-  async validateAllFiles(files: UploadedFile[]): Promise<UploadedFile[]> {
+  async validateAllFiles(files: UploadedFile[]): Promise<{ validFiles: UploadedFile[], errors: Array<{ fileName: string, errorKey: string }> }> {
     const validFiles: UploadedFile[] = []
+    const errors: Array<{ fileName: string, errorKey: string }> = []
     
     for (const file of files) {
-      const isValid = await this.validateFile(file)
-      if (isValid) {
+      const validation = await this.validateFile(file)
+      if (validation.isValid) {
         validFiles.push(file)
       } else {
-        console.warn(`Skipping invalid file: ${file.name}`)
+        console.warn(`Skipping invalid file: ${file.name} - ${validation.errorKey}`)
+        errors.push({ fileName: file.name, errorKey: validation.errorKey || 'unknown_error' })
       }
     }
     
-    return validFiles
+    return { validFiles, errors }
   }
 }

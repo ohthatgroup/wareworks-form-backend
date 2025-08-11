@@ -45,6 +45,19 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
+    // Validate file type - only allow images
+    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png']
+    if (!allowedMimeTypes.includes(uploadRequest.contentType)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          error: 'Only image files are allowed',
+          errorKey: 'only_images_allowed',
+          message: 'Please take a screenshot of your document and upload the image file instead.'
+        })
+      }
+    }
+
     // Convert base64 to buffer
     const buffer = Buffer.from(uploadRequest.data, 'base64')
     
