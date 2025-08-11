@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { ValidatedApplicationData } from '@/shared/validation/schemas'
-import { Upload, X, Eye, Download, Info } from 'lucide-react'
+import { Upload, Eye, Download, Info, X } from 'lucide-react'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { translateKey } from '../../types/translations'
 
@@ -13,7 +13,6 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const { register, formState: { errors }, setValue, watch } = form
   const { t } = useLanguage()
   const documents = watch('documents') || []
-  const [showScreenshotTips, setShowScreenshotTips] = useState(false)
   
   // Group documents by category for display
   const documentsByCategory = documents.reduce((acc: {[key: string]: any[]}, doc) => {
@@ -277,82 +276,18 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     )
   }
 
-  const ScreenshotTipsModal = () => (
-    showScreenshotTips && (
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-        style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0, 
-          zIndex: 9999,
-          minHeight: '100vh' 
-        }}
-      >
-        <div 
-          className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-2xl border"
-          style={{ 
-            maxHeight: '90vh', 
-            overflowY: 'auto',
-            position: 'relative',
-            zIndex: 10000
-          }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">{t('documents.screenshot_tips_title')}</h3>
-            <button 
-              onClick={() => setShowScreenshotTips(false)} 
-              className="text-gray-400 hover:text-gray-600 p-1 rounded"
-              style={{ zIndex: 10001 }}
-            >
-              <X size={20} />
-            </button>
-          </div>
-          <ul className="space-y-3 text-sm text-gray-600">
-            {[1, 2, 3, 4, 5].map((index) => (
-              <li key={index} className="flex items-start">
-                <span className="text-blue-600 mr-2 font-bold">•</span>
-                <span>{t(`documents.screenshot_tips_${index}`)}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 font-medium">
-              💡 {t('documents.screenshot_instructions')}
-            </p>
-          </div>
-          <button 
-            onClick={() => setShowScreenshotTips(false)}
-            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
-          >
-            {t('common.complete')}
-          </button>
-        </div>
-      </div>
-    )
-  )
 
   return (
-    <div className="space-y-6 relative" style={{ minHeight: showScreenshotTips ? '100vh' : 'auto' }}>
-      <ScreenshotTipsModal />
+    <div className="space-y-6 relative">
       
-      {/* Info banner about image-only uploads */}
+      {/* Info banner about file types */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start">
           <Info className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
           <div className="flex-1">
             <p className="text-sm text-blue-800">
-              <strong>{t('documents.only_images_note')}</strong> {t('documents.screenshot_instructions')}
+              <strong>{t('documents.only_images_note')}</strong>
             </p>
-            <button
-              type="button"
-              onClick={() => setShowScreenshotTips(true)}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
-            >
-              {t('documents.screenshot_tips_title')}
-            </button>
           </div>
         </div>
       </div>

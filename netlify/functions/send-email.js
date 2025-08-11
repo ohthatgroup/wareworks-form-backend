@@ -69,18 +69,36 @@ async function sendViaMailgun(emailData) {
   });
   
   try {
-    const data = await mg.messages.create(process.env.MAILGUN_DOMAIN, {
-      from: `Wareworks Test <postmaster@${process.env.MAILGUN_DOMAIN}>`,
+    // Prepare message data
+    const messageData = {
+      from: `Wareworks Applications <postmaster@${process.env.MAILGUN_DOMAIN}>`,
       to: [emailData.to],
       subject: emailData.subject,
       text: emailData.text,
-    });
+    };
+    
+    // Add attachments if provided
+    if (emailData.attachments && emailData.attachments.length > 0) {
+      messageData.attachment = emailData.attachments.map(att => {
+        return {
+          data: Buffer.from(att.content, 'base64'),
+          filename: att.filename,
+          contentType: att.contentType || 'application/octet-stream'
+        };
+      });
+      
+      console.log(`📎 Preparing ${emailData.attachments.length} attachments for Mailgun:`, 
+        emailData.attachments.map(a => ({ name: a.filename, size: `${Math.round(a.content.length * 0.75)} bytes` })));
+    }
+
+    const data = await mg.messages.create(process.env.MAILGUN_DOMAIN, messageData);
 
     console.log('Email sent via Mailgun successfully:', {
       id: data.id,
       message: data.message,
       to: emailData.to,
-      subject: emailData.subject
+      subject: emailData.subject,
+      attachments: emailData.attachments?.length || 0
     });
     
     return data;
