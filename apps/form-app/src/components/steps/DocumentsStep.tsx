@@ -101,14 +101,64 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     return 'certification'
   }
 
+  // Get allowed file types based on category
+  const getAllowedFileTypes = (category: string): string[] => {
+    if (category === 'id') {
+      // ID documents: JPG only (PNG removed per requirement)
+      return ['image/jpeg', 'image/jpg']
+    } else if (category === 'resume' || category.includes('-cert')) {
+      // Resume and certifications: PDF, DOC, DOCX
+      return [
+        'application/pdf',
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+      ]
+    }
+    // Default to ID requirements
+    return ['image/jpeg', 'image/jpg']
+  }
+
+  // Get accept attribute string for file inputs
+  const getAcceptString = (category: string): string => {
+    if (category === 'id') {
+      return '.jpg,.jpeg,image/jpeg'
+    } else if (category === 'resume' || category.includes('-cert')) {
+      return '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    }
+    return '.jpg,.jpeg,image/jpeg'
+  }
+
+  // Get error message for invalid file types
+  const getFileTypeErrorMessage = (category: string): string => {
+    if (category === 'id') {
+      return t('documents.file_errors.id_only_jpg_allowed') || 'Only JPG image files are allowed for ID documents'
+    } else if (category === 'resume') {
+      return t('documents.file_errors.resume_only_docs_allowed') || 'Only PDF, DOC, or DOCX files are allowed for resumes'
+    } else if (category.includes('-cert')) {
+      return t('documents.file_errors.cert_only_docs_allowed') || 'Only PDF, DOC, or DOCX files are allowed for certifications'
+    }
+    return 'Invalid file type'
+  }
+
+  // Get file type instructions
+  const getFileTypeInstructions = (category: string): string => {
+    if (category === 'id') {
+      return t('documents.screenshot_instructions') || 'Please take a screenshot of your ID document and save as JPG format.'
+    } else {
+      return 'Please upload your document as a PDF, DOC, or DOCX file.'
+    }
+  }
+
   const handleFileUpload = async (category: string, files: FileList) => {
     const fileArray = Array.from(files)
     
-    // Validate file types (only images allowed)
-    const invalidFiles = fileArray.filter(file => !['image/jpeg', 'image/jpg', 'image/png'].includes(file.type))
+    // Validate file types based on category
+    const allowedTypes = getAllowedFileTypes(category)
+    const invalidFiles = fileArray.filter(file => !allowedTypes.includes(file.type))
     
     if (invalidFiles.length > 0) {
-      alert(`${t('documents.file_errors.only_images_allowed')}\n\n${t('documents.screenshot_instructions')}`)
+      const errorMessage = getFileTypeErrorMessage(category)
+      alert(`${errorMessage}\n\n${getFileTypeInstructions(category)}`)
       return
     }
     
@@ -321,7 +371,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 <input
                   id="id-upload"
                   type="file"
-                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                  accept={getAcceptString('id')}
                   multiple
                   className="sr-only"
                   onChange={(e) => e.target.files && handleFileUpload('id', e.target.files)}
@@ -349,7 +399,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                 <input
                   id="resume-upload"
                   type="file"
-                  accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                  accept={getAcceptString('resume')}
                   multiple
                   className="sr-only"
                   onChange={(e) => e.target.files && handleFileUpload('resume', e.target.files)}
@@ -388,7 +438,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                         <input
                           id={`${forklift.key}-cert-upload`}
                           type="file"
-                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                          accept={getAcceptString(`${forklift.key}-cert`)}
                           multiple
                           className="sr-only"
                           onChange={(e) => e.target.files && handleFileUpload(`${forklift.key}-cert`, e.target.files)}
@@ -418,7 +468,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                         <input
                           id={`${skill.key}-cert-upload`}
                           type="file"
-                          accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                          accept={getAcceptString(`${skill.key}-cert`)}
                           multiple
                           className="sr-only"
                           onChange={(e) => e.target.files && handleFileUpload(`${skill.key}-cert`, e.target.files)}

@@ -1116,6 +1116,12 @@ export class PDFService {
           await this.addImageToDocument(pdfDoc, doc)
           console.log('  ✅ Image embedded on new page')
           
+        } else if (this.isDocumentFile(doc.mimeType)) {
+          console.log('  📄 Processing document file...')
+          // For DOC/DOCX files, add a reference page (cannot embed directly)
+          await this.addDocumentReferencePage(pdfDoc, doc)
+          console.log('  ✅ Document reference page added')
+          
         } else {
           console.warn(`  ⚠️ Unsupported document type: ${doc.mimeType}`)
         }
@@ -1292,6 +1298,93 @@ export class PDFService {
     } catch (error) {
       console.error('❌ Failed to process signature:', error)
       // Continue without signature rather than failing entire PDF generation
+    }
+  }
+
+  // Helper method to check if a file is a document type (DOC/DOCX)
+  private isDocumentFile(mimeType: string): boolean {
+    return mimeType === 'application/msword' || 
+           mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  }
+
+  // Add a reference page for document files (DOC/DOCX) that cannot be embedded directly
+  private async addDocumentReferencePage(pdfDoc: PDFDocument, doc: any) {
+    const page = pdfDoc.addPage([612, 792]) // Standard letter size
+    const { width, height } = page.getSize()
+    
+    // Load font
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+    
+    // Header
+    page.drawText('DOCUMENT REFERENCE', {
+      x: 50,
+      y: height - 100,
+      size: 20,
+      font: boldFont,
+      color: rgb(0, 0, 0),
+    })
+    
+    // Document info
+    const docInfo = [
+      { label: 'Document Name:', value: doc.name },
+      { label: 'File Type:', value: this.getDocumentTypeDisplay(doc.mimeType) },
+      { label: 'File Size:', value: `${(doc.size / 1024).toFixed(1)} KB` },
+      { label: 'Upload Category:', value: doc.category || 'Unknown' }
+    ]
+    
+    let yPosition = height - 160
+    docInfo.forEach(info => {
+      // Label
+      page.drawText(info.label, {
+        x: 50,
+        y: yPosition,
+        size: 12,
+        font: boldFont,
+        color: rgb(0, 0, 0),
+      })
+      
+      // Value
+      page.drawText(info.value, {
+        x: 180,
+        y: yPosition,
+        size: 12,
+        font: font,
+        color: rgb(0, 0, 0),
+      })
+      
+      yPosition -= 25
+    })
+    
+    // Note
+    page.drawText('Note: This document was uploaded as part of the application.', {
+      x: 50,
+      y: yPosition - 30,
+      size: 10,
+      font: font,
+      color: rgb(0.3, 0.3, 0.3),
+    })
+    
+    page.drawText('The original file is available separately for review.', {
+      x: 50,
+      y: yPosition - 50,
+      size: 10,
+      font: font,
+      color: rgb(0.3, 0.3, 0.3),
+    })
+  }
+
+  // Get display name for document type
+  private getDocumentTypeDisplay(mimeType: string): string {
+    switch (mimeType) {
+      case 'application/msword':
+        return 'Microsoft Word Document (.doc)'
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return 'Microsoft Word Document (.docx)'
+      case 'application/pdf':
+        return 'PDF Document (.pdf)'
+      default:
+        return 'Unknown Document Type'
     }
   }
 }

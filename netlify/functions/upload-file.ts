@@ -4,6 +4,7 @@ interface UploadRequest {
   key: string
   data: string // base64
   contentType: string
+  category?: string // Document category: 'id', 'resume', 'certification'
 }
 
 export const handler: Handler = async (event, context) => {
@@ -45,15 +46,17 @@ export const handler: Handler = async (event, context) => {
       }
     }
 
-    // Validate file type - only allow images
-    const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png']
+    // Validate file type based on document category
+    const category = uploadRequest.category || 'id' // Default to 'id' for backwards compatibility
+    const allowedMimeTypes = getValidMimeTypes(category)
+    
     if (!allowedMimeTypes.includes(uploadRequest.contentType)) {
       return {
         statusCode: 400,
         body: JSON.stringify({ 
-          error: 'Only image files are allowed',
-          errorKey: 'only_images_allowed',
-          message: 'Please take a screenshot of your document and upload the image file instead.'
+          error: getFileTypeError(category),
+          errorKey: 'invalid_file_type',
+          message: getFileTypeMessage(category)
         })
       }
     }
@@ -130,4 +133,50 @@ async function uploadToNetlifyBlobs(key: string, buffer: Buffer, contentType: st
 
   // Return the public URL for the uploaded file
   return `${process.env.NETLIFY_BLOBS_URL}/api/v1/blobs/${key}?download=false`
+}
+
+// Helper functions for file type validation
+function getValidMimeTypes(category: string): string[] {
+  switch (category) {
+    case 'id':
+      // ID documents: JPG only (PNG removed per requirement)
+      return ['image/jpeg', 'image/jpg']
+    case 'resume':
+    case 'certification':
+      // Resume and certifications: PDF, DOC, DOCX
+      return [
+        'application/pdf',
+        'application/msword', // .doc
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+      ]
+    default:
+      // Default to ID requirements for backwards compatibility
+      return ['image/jpeg', 'image/jpg']
+  }
+}
+
+function getFileTypeError(category: string): string {
+  switch (category) {
+    case 'id':
+      return 'Only JPG image files are allowed for ID documents'
+    case 'resume':
+      return 'Only PDF, DOC, or DOCX files are allowed for resumes'
+    case 'certification':
+      return 'Only PDF, DOC, or DOCX files are allowed for certifications'
+    default:
+      return 'Invalid file type'
+  }
+}
+
+function getFileTypeMessage(category: string): string {
+  switch (category) {
+    case 'id':
+      return 'Please take a screenshot of your ID document and save as JPG format.'
+    case 'resume':
+      return 'Please upload your resume as a PDF, DOC, or DOCX file.'
+    case 'certification':
+      return 'Please upload your certification as a PDF, DOC, or DOCX file.'
+    default:
+      return 'Please use a supported file format.'
+  }
 }

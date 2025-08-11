@@ -52,7 +52,8 @@ export class FileUploadService {
         body: JSON.stringify({
           key: blobKey,
           data: file.data,
-          contentType: file.mimeType
+          contentType: file.mimeType,
+          category: this.mapDocumentTypeToCategory(file.type)
         })
       })
 
@@ -86,29 +87,23 @@ export class FileUploadService {
   async validateFile(file: UploadedFile): Promise<{ isValid: boolean, errorKey?: string }> {
     // Basic file validation
     const maxSize = 10 * 1024 * 1024 // 10MB
-    const allowedTypes = [
-      'image/jpeg',
-      'image/jpg', 
-      'image/png'
-    ]
-
+    
     if (file.size > maxSize) {
       console.warn(`File too large: ${file.name} (${file.size} bytes)`)
       return { isValid: false, errorKey: 'file_too_large' }
     }
 
+    // Get allowed types based on document type
+    const allowedTypes = this.getAllowedMimeTypes(file.type)
+    
     if (!allowedTypes.includes(file.mimeType)) {
-      console.warn(`Invalid file type: ${file.name} (${file.mimeType}) - only images allowed`)
-      return { isValid: false, errorKey: 'only_images_allowed' }
+      console.warn(`Invalid file type: ${file.name} (${file.mimeType}) for type ${file.type}`)
+      return { isValid: false, errorKey: this.getValidationErrorKey(file.type) }
     }
 
     // Additional security check - verify file content matches extension
     const extension = file.name.split('.').pop()?.toLowerCase()
-    const expectedMimeTypes: { [key: string]: string[] } = {
-      'jpg': ['image/jpeg', 'image/jpg'],
-      'jpeg': ['image/jpeg', 'image/jpg'],
-      'png': ['image/png']
-    }
+    const expectedMimeTypes = this.getExpectedMimeTypes()
 
     if (extension && expectedMimeTypes[extension]) {
       if (!expectedMimeTypes[extension].includes(file.mimeType)) {
@@ -135,5 +130,62 @@ export class FileUploadService {
     }
     
     return { validFiles, errors }
+  }
+
+  // Helper methods for file type validation
+  private mapDocumentTypeToCategory(type: 'identification' | 'resume' | 'certification'): string {
+    switch (type) {
+      case 'identification':
+        return 'id'
+      case 'resume':
+        return 'resume'
+      case 'certification':
+        return 'certification'
+      default:
+        return 'id'
+    }
+  }
+
+  private getAllowedMimeTypes(type: 'identification' | 'resume' | 'certification'): string[] {
+    switch (type) {
+      case 'identification':
+        // ID documents: JPG only (PNG removed per requirement)
+        return ['image/jpeg', 'image/jpg']
+      case 'resume':
+      case 'certification':
+        // Resume and certifications: PDF, DOC, DOCX
+        return [
+          'application/pdf',
+          'application/msword', // .doc
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        ]
+      default:
+        return ['image/jpeg', 'image/jpg']
+    }
+  }
+
+  private getValidationErrorKey(type: 'identification' | 'resume' | 'certification'): string {
+    switch (type) {
+      case 'identification':
+        return 'id_only_jpg_allowed'
+      case 'resume':
+        return 'resume_only_docs_allowed'
+      case 'certification':
+        return 'cert_only_docs_allowed'
+      default:
+        return 'invalid_file_type'
+    }
+  }
+
+  private getExpectedMimeTypes(): { [key: string]: string[] } {
+    return {
+      // Image formats
+      'jpg': ['image/jpeg', 'image/jpg'],
+      'jpeg': ['image/jpeg', 'image/jpg'],
+      // Document formats
+      'pdf': ['application/pdf'],
+      'doc': ['application/msword'],
+      'docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+    }
   }
 }
