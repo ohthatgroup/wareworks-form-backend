@@ -64,17 +64,15 @@ export class EmailService {
         attachments: attachments
       }
 
-      // Use Netlify Email Integration
-      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/send`
+      // Use our custom send-email function (which uses Mailgun with your API key)
+      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
       
       const response = await fetch(emailEndpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'netlify-emails-secret': process.env.NETLIFY_EMAILS_SECRET || ''
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: `WareWorks Application System <noreply@mg.wareworks.me>`,
           to: hrEmail,
           subject: subject,
           text: this.generatePlainTextEmail(data, attachments.length),
@@ -169,17 +167,15 @@ export class EmailService {
         attachmentTypes: attachments.map(a => ({ name: a.filename, type: a.contentType }))
       })
 
-      // Use Netlify Email Integration
-      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/send`
+      // Use our custom send-email function (which uses Mailgun with your API key)
+      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
       
       const response = await fetch(emailEndpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'netlify-emails-secret': process.env.NETLIFY_EMAILS_SECRET || ''
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: `WareWorks Application System <noreply@mg.wareworks.me>`,
           to: hrEmail,
           subject: subject,
           text: this.generateBilingualPlainTextEmail(data, attachments.length),
