@@ -3,9 +3,9 @@
   publish = "apps/form-app/.next"
 
 # Functions handled by Next.js App Router
-# [functions]
-#   directory = "netlify/functions"
-#   node_bundler = "nft"
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "nft"
 
 [[plugins]]
   package = "@netlify/plugin-emails"
