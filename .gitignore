@@ -123,3 +123,4 @@ FILE_ANALYSIS.md
 **/*password*
 /test-output
 /scripts/output
+/scripts

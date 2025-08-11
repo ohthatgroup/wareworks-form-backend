@@ -70,7 +70,7 @@ export class PDFService {
       }
 
       // Add digital signature if provided
-      await this.addSignatureToApplicationPDF(pdfDoc, form, data)
+      await this.addSignatureToApplicationPDF(pdfDoc, form, data, false)
       
       // Generate separate I-9 form if needed
       let i9Buffer: Buffer | null = null
@@ -175,7 +175,7 @@ export class PDFService {
       }
 
       // Add digital signature if provided
-      await this.addSignatureToApplicationPDF(pdfDoc, form, data)
+      await this.addSignatureToApplicationPDF(pdfDoc, form, data, language === 'spanish')
       
       // Generate separate I-9 form only for English version
       let i9Buffer: Buffer | null = null
@@ -413,12 +413,14 @@ export class PDFService {
           const overflowText = value.substring(splitPoint).trim()
           
           field.setText(mainText)
-          field.setFontSize(10)
-          console.log(`📄 Text split for "${mapping.primary}": main(${mainText.length}) + overflow(${overflowText.length}) chars`)
+          const fontSize = this.calculateOptimalFontSize(mainText, field, mapping.primary)
+          field.setFontSize(fontSize)
+          console.log(`📄 Text split for "${mapping.primary}": main(${mainText.length}) + overflow(${overflowText.length}) chars, fontSize=${fontSize}pt`)
           return overflowText // Return overflow text for "Continued" field
         } else {
           field.setText(value)
-          field.setFontSize(10)
+          const fontSize = this.calculateOptimalFontSize(value, field, mapping.primary)
+          field.setFontSize(fontSize)
           return null // No overflow
         }
       }
@@ -477,30 +479,28 @@ export class PDFService {
     // Estimated visual limits based on typical PDF field sizes (at 10pt font)
     const fieldLimits: Record<string, number> = {
       // Long text fields that commonly overflow
-      'How did you discover this job opening': 200,
-      'Company Responsibilities 1': 300,
-      'Company Reason for Leaving 1': 200,
-      'Company Responsibilities 2': 300,
-      'Company Reason for Leaving 2': 200,
-      
-      // Medium fields
-      'Applicable Skills  Qualifications 1': 150,
-      'Applicable Skills  Qualifications 2': 150,
-      'Applicable Skills  Qualifications 3': 150,
+      'How did you discover this job opening': 21,
+      'Company Responsibilities 1': 35,
+      'Company Reason for Leaving 1': 33,
+      'Company Responsibilities 2': 35,
+      'Company Reason for Leaving 2': 33,
+      'Applicable Skills  Qualifications 1': 45,
+      'Applicable Skills  Qualifications 2': 45,
+      'Applicable Skills  Qualifications 3': 45,
       
       // Short fields (names, addresses, etc.) - no limit needed
-      'Position Applied For': 0,
-      'Expected Salary': 0,
-      'Applicant Legal First Name': 0,
-      'Applicant Legal Last Name': 0,
-      'Company Name and Location 1': 0,
-      'Company Name and Location 2': 0,
+      'Position Applied For': 25,
+      'Expected Salary': 12,
+      'Applicant Legal First Name': 15,
+      'Applicant Legal Last Name': 15,
+      'Company Name and Location 1': 27,
+      'Company Name and Location 2': 27,
     }
     
     return fieldLimits[fieldName] || 0 // Return 0 for fields that don't need splitting
   }
 
-  private async setSignatureFieldWithMapping(pdfDoc: PDFDocument, form: PDFForm, mapping: FieldMapping, value: string | undefined, isSpanishPDF: boolean = false) {
+  private async setSignatureFieldWithMapping(pdfDoc: PDFDocument, form: PDFForm, mapping: FieldMapping, value: string | undefined, isSpanish: boolean = false) {
     if (!value) return
 
     // Load High Empathy handwriting font first
@@ -548,9 +548,9 @@ export class PDFService {
       // Clear the original form field (make it transparent/empty)
       signatureField.setText('')
       
-      // Use coordinates for Spanish PDF (different from English)
-      const signatureX = 138.948
-      const signatureY = 55.9305
+      // Use appropriate coordinates based on template
+      const signatureX = isSpanish ? 138.948 : 162.328
+      const signatureY = isSpanish ? 55.9305 : 82.0697
       const fieldWidth = 150
       const fieldHeight = 22
       
@@ -1090,7 +1090,7 @@ export class PDFService {
   }
 
   // Handle signature in WareWorks Application PDF
-  private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData) {
+  private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData, isSpanish: boolean = false) {
     if (!data.signature) {
       console.log('📝 No signature provided, skipping signature field')
       return
@@ -1100,7 +1100,7 @@ export class PDFService {
 
     try {
       // Fill signature text field with the person's name using handwriting font
-      await this.setSignatureFieldWithMapping(pdfDoc, form, pdfFieldMappings.signature.signature, data.signature)
+      await this.setSignatureFieldWithMapping(pdfDoc, form, pdfFieldMappings.signature.signature, data.signature, isSpanish)
       console.log(`🖊️ Signature filled with handwriting font: ${data.signature}`)
 
       // Fill signature date fields
