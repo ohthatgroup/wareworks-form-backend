@@ -64,8 +64,8 @@ export class EmailService {
         attachments: attachments
       }
 
-      // Use Netlify Email Integration API
-      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/application-notification`
+      // Use Netlify Email Integration
+      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/send`
       
       const response = await fetch(emailEndpoint, {
         method: 'POST',
@@ -74,45 +74,14 @@ export class EmailService {
           'netlify-emails-secret': process.env.NETLIFY_EMAILS_SECRET || ''
         },
         body: JSON.stringify({
-          from: `WareWorks Application System <noreply@sandbox83befb52fc8e44b19aa5d51bef784443.mailgun.org>`,
+          from: `WareWorks Application System <noreply@mg.wareworks.me>`,
           to: hrEmail,
           subject: subject,
-          parameters: {
-            // Required fields
-            legalFirstName: data.legalFirstName,
-            legalLastName: data.legalLastName,
-            socialSecurityNumber: data.socialSecurityNumber,
-            streetAddress: data.streetAddress,
-            city: data.city,
-            state: data.state,
-            zipCode: data.zipCode,
-            phoneNumber: data.phoneNumber,
-            
-            // Contact information  
-            applicantEmail: data.email || 'Not provided',
-            homePhone: data.homePhone || 'Not provided',
-            aptNumber: data.aptNumber || 'Not provided',
-            
-            // Emergency contact
-            emergencyName: data.emergencyName || 'Not provided',
-            emergencyPhone: data.emergencyPhone || 'Not provided',
-            emergencyRelationship: data.emergencyRelationship || 'Not provided',
-            
-            // Application details
-            submissionId: data.submissionId,
-            submittedAt: data.submittedAt,
-            position: data.positionApplied || 'Not specified',
-            expectedSalary: data.expectedSalary || 'Not specified',
-            jobDiscovery: data.jobDiscovery || 'Not specified',
-            citizenshipStatus: data.citizenshipStatus || 'Not specified',
-            
-            // Attachment info
-            attachmentCount: attachments.length
-          },
+          text: this.generatePlainTextEmail(data, attachments.length),
           attachments: attachments.map(att => ({
             content: att.content,
             filename: att.filename,
-            type: att.contentType.split('/')[1] // 'application/pdf' -> 'pdf'
+            contentType: att.contentType
           }))
         })
       })
@@ -200,16 +169,8 @@ export class EmailService {
         attachmentTypes: attachments.map(a => ({ name: a.filename, type: a.contentType }))
       })
 
-      // Use Netlify's Email Extension (powered by Mailgun)
-      const emailData = {
-        to: hrEmail,
-        subject: subject,
-        text: this.generateBilingualPlainTextEmail(data, attachments.length),
-        attachments: attachments
-      }
-
-      // Use Netlify Email Integration API
-      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/application-notification`
+      // Use Netlify Email Integration
+      const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/emails/send`
       
       const response = await fetch(emailEndpoint, {
         method: 'POST',
@@ -218,45 +179,14 @@ export class EmailService {
           'netlify-emails-secret': process.env.NETLIFY_EMAILS_SECRET || ''
         },
         body: JSON.stringify({
-          from: `WareWorks Application System <noreply@sandbox83befb52fc8e44b19aa5d51bef784443.mailgun.org>`,
+          from: `WareWorks Application System <noreply@mg.wareworks.me>`,
           to: hrEmail,
           subject: subject,
-          parameters: {
-            // Required fields
-            legalFirstName: data.legalFirstName,
-            legalLastName: data.legalLastName,
-            socialSecurityNumber: data.socialSecurityNumber,
-            streetAddress: data.streetAddress,
-            city: data.city,
-            state: data.state,
-            zipCode: data.zipCode,
-            phoneNumber: data.phoneNumber,
-            
-            // Contact information  
-            applicantEmail: data.email || 'Not provided',
-            homePhone: data.homePhone || 'Not provided',
-            aptNumber: data.aptNumber || 'Not provided',
-            
-            // Emergency contact
-            emergencyName: data.emergencyName || 'Not provided',
-            emergencyPhone: data.emergencyPhone || 'Not provided',
-            emergencyRelationship: data.emergencyRelationship || 'Not provided',
-            
-            // Application details
-            submissionId: data.submissionId,
-            submittedAt: data.submittedAt,
-            position: data.positionApplied || 'Not specified',
-            expectedSalary: data.expectedSalary || 'Not specified',
-            jobDiscovery: data.jobDiscovery || 'Not specified',
-            citizenshipStatus: data.citizenshipStatus || 'Not specified',
-            
-            // Attachment info
-            attachmentCount: attachments.length
-          },
+          text: this.generateBilingualPlainTextEmail(data, attachments.length),
           attachments: attachments.map(att => ({
             content: att.content,
             filename: att.filename,
-            type: att.contentType.split('/')[1] // 'application/pdf' -> 'pdf'
+            contentType: att.contentType
           }))
         })
       })

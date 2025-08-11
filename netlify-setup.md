@@ -24,7 +24,7 @@ Internet Traffic → Netlify CDN → Edge Network → Origin Servers
 ```
 
 ### Domain Architecture
-- **Primary Domain**: `apply.wareworks.me` (Production)
+- **Primary Domain**: `mg.wareworks.me` (Production)
 - **Staging Domain**: `staging--wareworks-backend.netlify.app`
 - **Preview Deploys**: `deploy-preview-{id}--wareworks-backend.netlify.app`
 - **CDN**: Global edge network with 40+ locations
@@ -66,8 +66,8 @@ netlify init
 **Core Configuration:**
 ```bash
 NODE_VERSION=20
-NEXT_PUBLIC_API_URL=https://apply.wareworks.me
-ALLOWED_ORIGINS=https://wareworks.me,https://apply.wareworks.me
+NEXT_PUBLIC_API_URL=https://mg.wareworks.me
+ALLOWED_ORIGINS=https://wareworks.me,https://mg.wareworks.me
 ```
 
 **Feature Flags:**
@@ -80,14 +80,14 @@ ENABLE_FILE_UPLOADS=true
 **Email Service (Mailgun):**
 ```bash
 MAILGUN_API_KEY=key-xxxxxxxxxxxxxxxxx
-MAILGUN_DOMAIN=apply.wareworks.me
+MAILGUN_DOMAIN=mg.wareworks.me
 HR_EMAIL=hr@wareworks.me
 ADMIN_EMAIL=admins@warework.me
 ```
 
 **File Storage (Netlify Blobs):**
 ```bash
-NETLIFY_BLOBS_URL=https://apply.wareworks.me
+NETLIFY_BLOBS_URL=https://mg.wareworks.me
 NETLIFY_ACCESS_TOKEN=your_netlify_access_token
 ```
 
@@ -102,7 +102,7 @@ GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
 **Step 1: Add Domain in Netlify**
 1. **Netlify Dashboard → Site Settings → Domain Management**
 2. **Click "Add custom domain"**
-3. **Enter**: `apply.wareworks.me`
+3. **Enter**: `mg.wareworks.me`
 4. **Verify ownership** (if required)
 
 **Step 2: DNS Configuration**
@@ -140,10 +140,10 @@ TTL: Auto (or 300 seconds)
 
 # Environment-specific settings
 [context.production.environment]
-  NEXT_PUBLIC_API_URL = "https://apply.wareworks.me"
+  NEXT_PUBLIC_API_URL = "https://mg.wareworks.me"
 
 [context.deploy-preview.environment]
-  NEXT_PUBLIC_API_URL = "https://apply.wareworks.me"
+  NEXT_PUBLIC_API_URL = "https://mg.wareworks.me"
 ```
 
 ### Enhanced Production Configuration
@@ -199,7 +199,7 @@ TTL: Auto (or 300 seconds)
   for = "/.netlify/functions/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
-    Access-Control-Allow-Origin = "https://wareworks.me, https://apply.wareworks.me"
+    Access-Control-Allow-Origin = "https://wareworks.me, https://mg.wareworks.me"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
     Access-Control-Allow-Headers = "Content-Type, Authorization"
 ```
@@ -209,16 +209,16 @@ TTL: Auto (or 300 seconds)
 ### Production Function URLs
 ```bash
 # Main application submission
-POST https://apply.wareworks.me/.netlify/functions/submit-application
+POST https://mg.wareworks.me/.netlify/functions/submit-application
 
 # Email notifications (internal)
-POST https://apply.wareworks.me/.netlify/functions/send-email
+POST https://mg.wareworks.me/.netlify/functions/send-email
 
 # File uploads
-POST https://apply.wareworks.me/.netlify/functions/upload-file
+POST https://mg.wareworks.me/.netlify/functions/upload-file
 
 # Health check (Next.js API route)
-GET https://apply.wareworks.me/api/health
+GET https://mg.wareworks.me/api/health
 ```
 
 ### Function Configuration
@@ -484,13 +484,13 @@ netlify env:list
 ### Domain & SSL Issues
 ```bash
 # Check DNS propagation
-dig apply.wareworks.me
+dig mg.wareworks.me
 
 # Verify SSL certificate
-curl -I https://apply.wareworks.me
+curl -I https://mg.wareworks.me
 
 # Check redirect configuration
-curl -I http://apply.wareworks.me
+curl -I http://mg.wareworks.me
 ```
 
 ## 📊 Cost & Usage Monitoring
@@ -533,15 +533,15 @@ netlify functions:log --level=debug
 **DNS Records Required:**
 ```
 Type: TXT
-Name: apply.wareworks.me
+Name: mg.wareworks.me
 Value: v=spf1 include:mailgun.org ~all
 
 Type: CNAME  
-Name: email.apply.wareworks.me
+Name: email.mg.wareworks.me
 Value: mailgun.org
 
 Type: TXT
-Name: k1._domainkey.apply.wareworks.me  
+Name: k1._domainkey.mg.wareworks.me  
 Value: [Provided by Mailgun]
 ```
 
@@ -572,6 +572,6 @@ Value: [Provided by Mailgun]
 
 **🔗 Quick Links:**
 - [Netlify Dashboard](https://app.netlify.com/sites/wareworks-backend)
-- [Production Site](https://apply.wareworks.me)
+- [Production Site](https://mg.wareworks.me)
 - [Function Logs](https://app.netlify.com/sites/wareworks-backend/functions)
 - [Analytics](https://app.netlify.com/sites/wareworks-backend/analytics)
