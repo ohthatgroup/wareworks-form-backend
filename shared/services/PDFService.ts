@@ -261,13 +261,11 @@ export class PDFService {
       // Fill the form fields based on template analysis
       await this.fillApplicationFields(form, data)
       
-      // Merge uploaded documents if any (only for English version to avoid duplication)
-      if (language === 'english' && data.documents && data.documents.length > 0) {
-        console.log(`📎 Merging ${data.documents.length} uploaded documents...`)
+      // Merge uploaded documents if any
+      if (data.documents && data.documents.length > 0) {
+        console.log(`📎 Merging ${data.documents.length} uploaded documents for ${language} version...`)
         await this.mergeUploadedDocuments(pdfDoc, data.documents)
         console.log('✅ Document merging completed')
-      } else if (language === 'spanish') {
-        console.log('📄 Skipping document merge for Spanish version')
       }
 
       // Add digital signature if provided
