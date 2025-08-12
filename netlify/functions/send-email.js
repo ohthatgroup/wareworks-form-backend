@@ -27,14 +27,7 @@ exports.handler = async (event, context) => {
     }
 
     // Check if Mailgun is configured
-    const mailgunConfigured = !!(process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN);
-    console.log('Mailgun config check:', {
-      MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? 'set' : 'NOT SET',
-      MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN || 'NOT SET',
-      mailgunConfigured
-    });
-    if (mailgunConfigured) {
-      console.log('Calling sendViaMailgun...');
+    if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
       await sendViaMailgun(emailData)
     } else {
       // Fallback to console logging for development/when not configured
