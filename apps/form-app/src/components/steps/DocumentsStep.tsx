@@ -13,6 +13,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const { register, formState: { errors }, setValue, watch } = form
   const { t } = useLanguage()
   const documents = watch('documents') || []
+  const [draggedOver, setDraggedOver] = React.useState<string | null>(null)
   
   // Group documents by category for display
   const documentsByCategory = documents.reduce((acc: {[key: string]: any[]}, doc) => {
@@ -171,14 +172,14 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       return
     }
     
-    // Process files through backend (with conversion if needed)
+    // Process files through backend validation
     const newDocuments = []
     
     for (const file of fileArray) {
       try {
         const base64Data = await fileToBase64(file)
         
-        // Call backend upload function for validation and conversion
+        // Call backend upload function for validation
         const uploadResponse = await fetch('/.netlify/functions/upload-file', {
           method: 'POST',
           headers: {
@@ -204,23 +205,19 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           continue // Skip this file, continue with others
         }
 
-        // File processed successfully (may have been converted)
+        // File processed successfully - no conversion needed
         const processedDocument = {
           type: getDocumentType(category),
           category: category,
-          name: uploadResult.converted ? uploadResult.key.split('_').slice(1).join('_') : file.name,
-          size: uploadResult.converted ? base64Data.length * 0.75 : file.size, // Approximate size
-          mimeType: uploadResult.converted ? 'application/pdf' : file.type,
-          data: uploadResult.url.startsWith('data:') ? 
+          name: file.name,
+          size: file.size,
+          mimeType: file.type,
+          data: uploadResult.url && uploadResult.url.startsWith('data:') ? 
             uploadResult.url.split(',')[1] : // Extract base64 from data URL
-            base64Data,
-          converted: uploadResult.converted || false
+            base64Data // Use original base64 data
         }
 
-        if (uploadResult.converted) {
-          console.log(`✅ Document converted: ${file.name} → ${processedDocument.name}`)
-        }
-
+        console.log(`✅ Document uploaded: ${file.name} (${file.type})`)
         newDocuments.push(processedDocument)
 
       } catch (error) {
@@ -275,6 +272,33 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Error downloading document:', error)
+    }
+  }
+
+  // Drag and drop handlers that work in iframe
+  const handleDragOver = (e: React.DragEvent, category: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDraggedOver(category)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    // Only clear if we're leaving the drop zone completely
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDraggedOver(null)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent, category: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDraggedOver(null)
+    
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      handleFileUpload(category, files)
     }
   }
 
@@ -335,8 +359,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           <label className="form-label">
             {t('documents.id_label')} <span className="text-red-500">*</span>
           </label>
-          <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
-            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+          <div 
+            className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              draggedOver === 'id' 
+                ? 'border-primary bg-primary/10' 
+                : 'border-gray-300 hover:border-primary'
+            }`}
+            onDragOver={(e) => handleDragOver(e, 'id')}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, 'id')}
+          >
+            <Upload className={`mx-auto h-12 w-12 ${draggedOver === 'id' ? 'text-primary' : 'text-gray-400'}`} />
             <div className="mt-4">
               <label htmlFor="id-upload" className="cursor-pointer">
                 <span className="btn-primary inline-block">{t('documents.choose_file')}</span>
@@ -351,7 +384,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               </label>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              <p>{t('documents.id_description')}</p>
+              <p>{draggedOver === 'id' ? t('documents.drop_files') || 'Drop files here' : t('documents.id_description')}</p>
               <p className="mt-1 text-xs text-blue-600">{t('documents.id_file_types') || 'Accepts: JPEG, JPG, PNG image files'}</p>
             </div>
           </div>
@@ -363,8 +396,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           <label className="form-label">
             {t('documents.resume_label')}
           </label>
-          <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
-            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+          <div 
+            className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              draggedOver === 'resume' 
+                ? 'border-primary bg-primary/10' 
+                : 'border-gray-300 hover:border-primary'
+            }`}
+            onDragOver={(e) => handleDragOver(e, 'resume')}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, 'resume')}
+          >
+            <Upload className={`mx-auto h-12 w-12 ${draggedOver === 'resume' ? 'text-primary' : 'text-gray-400'}`} />
             <div className="mt-4">
               <label htmlFor="resume-upload" className="cursor-pointer">
                 <span className="btn-secondary inline-block">{t('documents.choose_file')}</span>
@@ -379,7 +421,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               </label>
             </div>
             <div className="mt-2 text-sm text-gray-500">
-              <p>{t('documents.resume_description')}</p>
+              <p>{draggedOver === 'resume' ? t('documents.drop_files') || 'Drop files here' : t('documents.resume_description')}</p>
               <p className="mt-1 text-xs text-blue-600">{t('documents.resume_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
             </div>
           </div>
@@ -402,8 +444,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                   <label className="form-label">
                     {forklift.label} Certification
                   </label>
-                  <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
-                    <Upload className="mx-auto h-12 w-12 text-primary" />
+                  <div 
+                    className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                      draggedOver === `${forklift.key}-cert`
+                        ? 'border-primary bg-primary/20' 
+                        : 'border-primary/30 hover:border-primary bg-primary/5'
+                    }`}
+                    onDragOver={(e) => handleDragOver(e, `${forklift.key}-cert`)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, `${forklift.key}-cert`)}
+                  >
+                    <Upload className={`mx-auto h-12 w-12 ${draggedOver === `${forklift.key}-cert` ? 'text-primary-dark' : 'text-primary'}`} />
                     <div className="mt-4">
                       <label htmlFor={`${forklift.key}-cert-upload`} className="cursor-pointer">
                         <span className="btn-primary inline-block">{t('documents.upload_certification')}</span>
@@ -418,7 +469,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <div className="mt-2 text-sm text-primary">
-                      <p>Upload your official {forklift.label.toLowerCase()} certification documents</p>
+                      <p>{draggedOver === `${forklift.key}-cert` ? t('documents.drop_files') || 'Drop files here' : `Upload your official ${forklift.label.toLowerCase()} certification documents`}</p>
                       <p className="text-xs text-blue-600 mt-1">{t('documents.cert_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
                     </div>
                   </div>
@@ -432,8 +483,17 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                   <label className="form-label">
                     {skill.label} {t('documents.certification_label')}
                   </label>
-                  <div className="mt-2 border-2 border-dashed border-primary/30 rounded-lg p-6 text-center hover:border-primary transition-colors bg-primary/5">
-                    <Upload className="mx-auto h-12 w-12 text-primary" />
+                  <div 
+                    className={`mt-2 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                      draggedOver === `${skill.key}-cert`
+                        ? 'border-primary bg-primary/20' 
+                        : 'border-primary/30 hover:border-primary bg-primary/5'
+                    }`}
+                    onDragOver={(e) => handleDragOver(e, `${skill.key}-cert`)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, `${skill.key}-cert`)}
+                  >
+                    <Upload className={`mx-auto h-12 w-12 ${draggedOver === `${skill.key}-cert` ? 'text-primary-dark' : 'text-primary'}`} />
                     <div className="mt-4">
                       <label htmlFor={`${skill.key}-cert-upload`} className="cursor-pointer">
                         <span className="btn-primary inline-block">{t('documents.upload_certification')}</span>
@@ -448,7 +508,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <div className="mt-2 text-sm text-primary">
-                      <p>{t('documents.documentation_for')} {skill.label}</p>
+                      <p>{draggedOver === `${skill.key}-cert` ? t('documents.drop_files') || 'Drop files here' : `${t('documents.documentation_for')} ${skill.label}`}</p>
                       <p className="text-xs text-blue-600 mt-1">{t('documents.cert_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
                     </div>
                   </div>
