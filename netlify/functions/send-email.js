@@ -26,13 +26,12 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // For simple setup, we'll use Netlify's built-in email capabilities
-    // If MAILGUN_API_KEY is set, use Mailgun directly
+    // Check if Mailgun is configured
     if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
       await sendViaMailgun(emailData)
     } else {
-      // Fallback to console logging for development
-      console.log('Email would be sent:', {
+      // Fallback to console logging for development/when not configured
+      console.log('⚠️ Mailgun not configured. Email would be sent:', {
         to: emailData.to,
         subject: emailData.subject,
         text: emailData.text.substring(0, 100) + '...',

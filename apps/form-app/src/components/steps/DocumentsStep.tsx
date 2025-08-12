@@ -103,8 +103,8 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   // Get allowed file types based on category
   const getAllowedFileTypes = (category: string): string[] => {
     if (category === 'id') {
-      // ID documents: JPG only (PNG removed per requirement)
-      return ['image/jpeg', 'image/jpg']
+      // ID documents: JPEG, JPG, PNG
+      return ['image/jpeg', 'image/jpg', 'image/png']
     } else if (category === 'resume' || category.includes('-cert')) {
       // Resume and certifications: PDF, DOC, DOCX
       return [
@@ -114,23 +114,23 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       ]
     }
     // Default to ID requirements
-    return ['image/jpeg', 'image/jpg']
+    return ['image/jpeg', 'image/jpg', 'image/png']
   }
 
   // Get accept attribute string for file inputs
   const getAcceptString = (category: string): string => {
     if (category === 'id') {
-      return '.jpg,.jpeg,image/jpeg'
+      return '.jpg,.jpeg,.png,image/jpeg,image/png'
     } else if (category === 'resume' || category.includes('-cert')) {
       return '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     }
-    return '.jpg,.jpeg,image/jpeg'
+    return '.jpg,.jpeg,.png,image/jpeg,image/png'
   }
 
   // Get error message for invalid file types
   const getFileTypeErrorMessage = (category: string): string => {
     if (category === 'id') {
-      return t('documents.file_errors.id_only_jpg_allowed') || 'Only JPG image files are allowed for ID documents'
+      return t('documents.file_errors.id_only_images_allowed') || 'Only JPEG, JPG, or PNG image files are allowed for ID documents'
     } else if (category === 'resume') {
       return t('documents.file_errors.resume_only_docs_allowed') || 'Only PDF, DOC, or DOCX files are allowed for resumes'
     } else if (category.includes('-cert')) {
@@ -142,9 +142,9 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   // Get file type instructions
   const getFileTypeInstructions = (category: string): string => {
     if (category === 'id') {
-      return t('documents.screenshot_instructions') || 'Please take a screenshot of your ID document and save as JPG format.'
+      return t('documents.id_instructions') || 'Please upload your ID document as JPEG, JPG, or PNG image file.'
     } else {
-      return 'Please upload your document as a PDF, DOC, or DOCX file.'
+      return t('documents.docs_instructions') || 'Please upload your document as a PDF, DOC, or DOCX file.'
     }
   }
 
@@ -280,17 +280,6 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   return (
     <div className="space-y-6 relative">
       
-      {/* Info banner about file types */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-start">
-          <Info className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
-          <div className="flex-1">
-            <p className="text-sm text-blue-800">
-              <strong>{t('documents.only_images_note')}</strong>
-            </p>
-          </div>
-        </div>
-      </div>
 
       <div className="space-y-6">
         {/* Government ID */}
@@ -315,7 +304,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             </div>
             <div className="mt-2 text-sm text-gray-500">
               <p>{t('documents.id_description')}</p>
-              <p className="mt-1 text-xs text-blue-600">{t('documents.only_images_note')}</p>
+              <p className="mt-1 text-xs text-blue-600">{t('documents.id_file_types') || 'Accepts: JPEG, JPG, PNG image files'}</p>
             </div>
           </div>
           {documentsByCategory['id'] && renderDocumentList('id', documentsByCategory['id'])}
@@ -343,7 +332,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             </div>
             <div className="mt-2 text-sm text-gray-500">
               <p>{t('documents.resume_description')}</p>
-              <p className="mt-1 text-xs text-blue-600">{t('documents.only_images_note')}</p>
+              <p className="mt-1 text-xs text-blue-600">{t('documents.resume_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
             </div>
           </div>
           {documentsByCategory['resume'] && renderDocumentList('resume', documentsByCategory['resume'])}
@@ -382,7 +371,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                     </div>
                     <div className="mt-2 text-sm text-primary">
                       <p>Upload your official {forklift.label.toLowerCase()} certification documents</p>
-                      <p className="text-xs text-blue-600 mt-1">{t('documents.only_images_note')}</p>
+                      <p className="text-xs text-blue-600 mt-1">{t('documents.cert_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
                     </div>
                   </div>
                   {documentsByCategory[`${forklift.key}-cert`] && renderDocumentList(`${forklift.key}-cert`, documentsByCategory[`${forklift.key}-cert`])}
@@ -412,7 +401,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                     </div>
                     <div className="mt-2 text-sm text-primary">
                       <p>{t('documents.documentation_for')} {skill.label}</p>
-                      <p className="text-xs text-blue-600 mt-1">{t('documents.only_images_note')}</p>
+                      <p className="text-xs text-blue-600 mt-1">{t('documents.cert_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
                     </div>
                   </div>
                   {documentsByCategory[`${skill.key}-cert`] && renderDocumentList(`${skill.key}-cert`, documentsByCategory[`${skill.key}-cert`])}

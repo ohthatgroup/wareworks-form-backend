@@ -149,8 +149,8 @@ export class FileUploadService {
   private getAllowedMimeTypes(type: 'identification' | 'resume' | 'certification'): string[] {
     switch (type) {
       case 'identification':
-        // ID documents: JPG only (PNG removed per requirement)
-        return ['image/jpeg', 'image/jpg']
+        // ID documents: JPEG, JPG, PNG
+        return ['image/jpeg', 'image/jpg', 'image/png']
       case 'resume':
       case 'certification':
         // Resume and certifications: PDF, DOC, DOCX
@@ -160,14 +160,14 @@ export class FileUploadService {
           'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
         ]
       default:
-        return ['image/jpeg', 'image/jpg']
+        return ['image/jpeg', 'image/jpg', 'image/png']
     }
   }
 
   private getValidationErrorKey(type: 'identification' | 'resume' | 'certification'): string {
     switch (type) {
       case 'identification':
-        return 'id_only_jpg_allowed'
+        return 'id_only_images_allowed'
       case 'resume':
         return 'resume_only_docs_allowed'
       case 'certification':
@@ -182,6 +182,7 @@ export class FileUploadService {
       // Image formats
       'jpg': ['image/jpeg', 'image/jpg'],
       'jpeg': ['image/jpeg', 'image/jpg'],
+      'png': ['image/png'],
       // Document formats
       'pdf': ['application/pdf'],
       'doc': ['application/msword'],

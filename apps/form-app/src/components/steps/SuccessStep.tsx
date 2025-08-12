@@ -13,6 +13,7 @@ export function SuccessStep({ result }: SuccessStepProps) {
   const handleStartNewApplication = () => {
     if (typeof window !== 'undefined') {
       console.log('🆕 Starting new application - clearing all data')
+      
       // Preserve language preference during cleanup
       const languagePreference = sessionStorage.getItem('preferred-language')
       // Clear all form-related data
@@ -21,8 +22,11 @@ export function SuccessStep({ result }: SuccessStepProps) {
       if (languagePreference) {
         sessionStorage.setItem('preferred-language', languagePreference)
       }
-      // Redirect to first step
-      window.location.href = '/step/1'
+      
+      // Force reload with timestamp to bust cache
+      const timestamp = Date.now()
+      const currentLang = languagePreference || 'en'
+      window.location.href = `/step/1?refresh=${timestamp}&lang=${currentLang}`
     }
   }
   
@@ -179,7 +183,7 @@ export function SuccessStep({ result }: SuccessStepProps) {
               onClick={handleStartNewApplication}
               className="text-sm text-gray-600 hover:text-primary underline"
             >
-              Submit Another Application
+              {t('success.submit_another') || 'Submit Another Application'}
             </button>
           </div>
           <p className="text-sm text-gray-500 text-center">

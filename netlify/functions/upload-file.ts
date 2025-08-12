@@ -139,8 +139,8 @@ async function uploadToNetlifyBlobs(key: string, buffer: Buffer, contentType: st
 function getValidMimeTypes(category: string): string[] {
   switch (category) {
     case 'id':
-      // ID documents: JPG only (PNG removed per requirement)
-      return ['image/jpeg', 'image/jpg']
+      // ID documents: JPEG, JPG, PNG
+      return ['image/jpeg', 'image/jpg', 'image/png']
     case 'resume':
     case 'certification':
       // Resume and certifications: PDF, DOC, DOCX
@@ -151,14 +151,14 @@ function getValidMimeTypes(category: string): string[] {
       ]
     default:
       // Default to ID requirements for backwards compatibility
-      return ['image/jpeg', 'image/jpg']
+      return ['image/jpeg', 'image/jpg', 'image/png']
   }
 }
 
 function getFileTypeError(category: string): string {
   switch (category) {
     case 'id':
-      return 'Only JPG image files are allowed for ID documents'
+      return 'Only JPEG, JPG, or PNG image files are allowed for ID documents'
     case 'resume':
       return 'Only PDF, DOC, or DOCX files are allowed for resumes'
     case 'certification':
@@ -171,7 +171,7 @@ function getFileTypeError(category: string): string {
 function getFileTypeMessage(category: string): string {
   switch (category) {
     case 'id':
-      return 'Please take a screenshot of your ID document and save as JPG format.'
+      return 'Please upload your ID document as JPEG, JPG, or PNG image file.'
     case 'resume':
       return 'Please upload your resume as a PDF, DOC, or DOCX file.'
     case 'certification':
