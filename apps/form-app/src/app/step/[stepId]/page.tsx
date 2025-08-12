@@ -229,12 +229,31 @@ function ApplicationFormContent() {
       
       timeoutId = setTimeout(() => {
         try {
-          const bodyHeight = document.body.scrollHeight;
-          const htmlHeight = document.documentElement.scrollHeight;
-          const height = Math.max(bodyHeight, htmlHeight);
+          // Get the actual content height more accurately
+          const body = document.body;
+          const html = document.documentElement;
           
-          // Only send if height actually changed
-          if (height !== lastHeight) {
+          // Reset any previous height constraints
+          body.style.height = 'auto';
+          html.style.height = 'auto';
+          
+          // Force a reflow to get accurate measurements
+          body.offsetHeight;
+          
+          // Get the true content height
+          const contentHeight = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html.clientHeight,
+            html.scrollHeight,
+            html.offsetHeight
+          );
+          
+          // Add small buffer for any margins/padding
+          const height = contentHeight + 20;
+          
+          // Only send if height actually changed significantly (avoid tiny fluctuations)
+          if (Math.abs(height - lastHeight) > 5) {
             lastHeight = height;
             window.parent.postMessage({
               type: 'iframe-resize',
@@ -245,27 +264,31 @@ function ApplicationFormContent() {
         } catch (error) {
           console.warn('Could not send height to parent:', error);
         }
-      }, 300);
+      }, 100); // Reduced timeout for more responsive updates
     };
 
-    // Initial height send
-    sendHeightToParent();
+    // Initial height send after a brief delay to let content render
+    setTimeout(sendHeightToParent, 50);
 
-    // Only observe the main form container for content changes
+    // Observe the main container for size changes
     const resizeObserver = new ResizeObserver(() => {
       sendHeightToParent();
     });
 
+    // Observe the main content container
     const formContainer = document.querySelector('.mx-auto');
     if (formContainer) {
       resizeObserver.observe(formContainer);
     }
 
+    // Also observe body for any dynamic content changes
+    resizeObserver.observe(document.body);
+
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       resizeObserver.disconnect();
     };
-  }, [isEmbedded, currentStep, currentStepId]); // Re-run when step changes or success page loads
+  }, [isEmbedded, currentStep, currentStepId]); // Re-run when step changes
 
   // Additional height adjustment specifically for success page
   useEffect(() => {
@@ -273,9 +296,25 @@ function ApplicationFormContent() {
       // Wait for DOM to fully render the success page, then adjust height
       const timer = setTimeout(() => {
         try {
-          const bodyHeight = document.body.scrollHeight;
-          const htmlHeight = document.documentElement.scrollHeight;
-          const height = Math.max(bodyHeight, htmlHeight);
+          const body = document.body;
+          const html = document.documentElement;
+          
+          // Reset height constraints
+          body.style.height = 'auto';
+          html.style.height = 'auto';
+          
+          // Force reflow and get accurate height
+          body.offsetHeight;
+          
+          const contentHeight = Math.max(
+            body.scrollHeight,
+            body.offsetHeight,
+            html.clientHeight,
+            html.scrollHeight,
+            html.offsetHeight
+          );
+          
+          const height = contentHeight + 20;
           
           window.parent.postMessage({
             type: 'iframe-resize',
@@ -285,7 +324,7 @@ function ApplicationFormContent() {
         } catch (error) {
           console.warn('Could not send height to parent for success page:', error);
         }
-      }, 500); // Give more time for success page to fully render
+      }, 300); // Give time for success page to fully render
       
       return () => clearTimeout(timer);
     }
