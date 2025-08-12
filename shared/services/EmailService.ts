@@ -125,7 +125,7 @@ export class EmailService {
     }
 
     const hrEmail = process.env.HR_EMAIL || 'inbox@ohthatgrp.com'
-    const subject = `New Application - ${data.legalFirstName} ${data.legalLastName} - ${data.state} (Bilingual)`
+    const subject = `New Application - ${data.legalFirstName} ${data.legalLastName} - ${data.state}`
 
     try {
       // Generate both English and Spanish PDFs
