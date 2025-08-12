@@ -3,8 +3,9 @@
   publish = "apps/form-app/.next"
 
 [build.environment]
-  # Add LibreOffice binary to PATH for document conversion
-  LIBREOFFICE_PATH = "/opt/libreoffice/program/soffice"
+  # Document conversion note: LibreOffice is not available in Netlify build environment
+  # DOC/DOCX files will show user-friendly error message requesting PDF format
+  DOCUMENT_CONVERSION_AVAILABLE = "false"
 
 # Functions handled by Next.js App Router
 [functions]
@@ -16,12 +17,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Install LibreOffice for document conversion
-[[plugins]]
-  package = "netlify-plugin-apt"
-  [plugins.inputs]
-    packages = ["libreoffice"]
 
 # API routes are handled by Next.js App Router automatically
 # No redirects needed for /api/* - Next.js will handle these

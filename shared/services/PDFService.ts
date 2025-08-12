@@ -156,13 +156,9 @@ export class PDFService {
       // Fill the form fields based on template analysis
       await this.fillApplicationFields(form, data)
       
-      // Merge uploaded documents if any
+      // Skip merging uploaded documents - they will be sent as separate attachments
       if (data.documents && data.documents.length > 0) {
-        console.log(`📎 Merging ${data.documents.length} uploaded documents...`)
-        await this.mergeUploadedDocuments(pdfDoc, data.documents)
-        console.log('✅ Document merging completed')
-      } else {
-        console.log('📄 No uploaded documents to merge')
+        console.log(`📄 Skipping merge of ${data.documents.length} uploaded documents (will be sent as separate attachments)`)
       }
 
       // Add digital signature if provided
@@ -261,11 +257,9 @@ export class PDFService {
       // Fill the form fields based on template analysis
       await this.fillApplicationFields(form, data)
       
-      // Merge uploaded documents if any
+      // Skip merging uploaded documents - they will be sent as separate attachments
       if (data.documents && data.documents.length > 0) {
-        console.log(`📎 Merging ${data.documents.length} uploaded documents for ${language} version...`)
-        await this.mergeUploadedDocuments(pdfDoc, data.documents)
-        console.log('✅ Document merging completed')
+        console.log(`📄 Skipping merge of ${data.documents.length} uploaded documents for ${language} version (will be sent as separate attachments)`)
       }
 
       // Add digital signature if provided
@@ -1081,190 +1075,6 @@ export class PDFService {
     }
   }
 
-  private async mergeUploadedDocuments(pdfDoc: PDFDocument, documents: any[]) {
-    for (const doc of documents) {
-      try {
-        console.log(`📋 Processing document: ${doc.name} (${doc.mimeType}, ${doc.size} bytes)`)
-        
-        if (doc.mimeType === 'application/pdf') {
-          console.log('  📄 Merging PDF document...')
-          // Convert base64 to buffer
-          const docBuffer = Buffer.from(doc.data, 'base64')
-          console.log(`  📦 Decoded buffer size: ${docBuffer.length} bytes`)
-          
-          const uploadedDoc = await PDFDocument.load(docBuffer)
-          const pageCount = uploadedDoc.getPageCount()
-          console.log(`  📑 PDF has ${pageCount} pages`)
-          
-          // Add a title page before the PDF content
-          await this.addDocumentTitlePage(pdfDoc, doc)
-          console.log(`  📋 Added title page for "${doc.name}"`)
-          
-          // Copy pages from uploaded document
-          const pages = await pdfDoc.copyPages(uploadedDoc, uploadedDoc.getPageIndices())
-          pages.forEach((page) => pdfDoc.addPage(page))
-          console.log(`  ✅ Added ${pages.length} pages to main document`)
-          
-        } else if (doc.mimeType.startsWith('image/')) {
-          console.log('  🖼️ Embedding image document...')
-          // Add title page first
-          await this.addDocumentTitlePage(pdfDoc, doc)
-          console.log(`  📋 Added title page for "${doc.name}"`)
-          // Then add the image
-          await this.addImageToDocument(pdfDoc, doc)
-          console.log('  ✅ Image embedded on new page')
-          
-        } else if (this.isDocumentFile(doc.mimeType)) {
-          console.log('  📄 Processing document file...')
-          // For DOC/DOCX files, add a reference page (cannot embed directly)
-          await this.addDocumentReferencePage(pdfDoc, doc)
-          console.log('  ✅ Document reference page added')
-          
-        } else {
-          console.warn(`  ⚠️ Unsupported document type: ${doc.mimeType}`)
-        }
-      } catch (error) {
-        console.warn(`❌ Could not merge document ${doc.name}:`, error)
-      }
-    }
-    
-    const finalPageCount = pdfDoc.getPageCount()
-    console.log(`📊 Final document has ${finalPageCount} total pages`)
-  }
-
-  private async addImageToDocument(pdfDoc: PDFDocument, doc: any) {
-    try {
-      const page = pdfDoc.addPage()
-      const { width, height } = page.getSize()
-      
-      const imageBuffer = Buffer.from(doc.data, 'base64')
-      let image
-      
-      if (doc.mimeType === 'image/jpeg' || doc.mimeType === 'image/jpg') {
-        image = await pdfDoc.embedJpg(imageBuffer)
-      } else if (doc.mimeType === 'image/png') {
-        image = await pdfDoc.embedPng(imageBuffer)
-      } else {
-        return // Unsupported image type
-      }
-      
-      // Scale image to fit page
-      const imageAspectRatio = image.width / image.height
-      const pageAspectRatio = width / height
-      
-      let imageWidth, imageHeight
-      if (imageAspectRatio > pageAspectRatio) {
-        imageWidth = width - 100 // 50px margin on each side
-        imageHeight = imageWidth / imageAspectRatio
-      } else {
-        imageHeight = height - 100 // 50px margin on top and bottom
-        imageWidth = imageHeight * imageAspectRatio
-      }
-      
-      // Center the image on the page
-      const x = (width - imageWidth) / 2
-      const y = (height - imageHeight) / 2
-      
-      page.drawImage(image, { x, y, width: imageWidth, height: imageHeight })
-      
-    } catch (error) {
-      console.warn(`Could not add image ${doc.name}:`, error)
-    }
-  }
-
-  private async addDocumentTitlePage(pdfDoc: PDFDocument, doc: any) {
-    try {
-      const page = pdfDoc.addPage()
-      const { width, height } = page.getSize()
-      
-      // Get document category title
-      const categoryTitle = this.getDocumentCategoryTitle(doc)
-      
-      // Draw border
-      page.drawRectangle({
-        x: 50,
-        y: 50,
-        width: width - 100,
-        height: height - 100,
-        borderColor: rgb(0.2, 0.2, 0.2),
-        borderWidth: 2
-      })
-      
-      // Draw title
-      page.drawText(categoryTitle, {
-        x: 80,
-        y: height - 120,
-        size: 24,
-        color: rgb(0.1, 0.1, 0.4) // Dark blue
-      })
-      
-      // Draw filename
-      page.drawText(`File: ${doc.name}`, {
-        x: 80,
-        y: height - 160,
-        size: 14,
-        color: rgb(0, 0, 0)
-      })
-      
-      // Draw file info
-      const fileSize = (doc.size / 1024).toFixed(1) + ' KB'
-      page.drawText(`Size: ${fileSize}`, {
-        x: 80,
-        y: height - 180,
-        size: 12,
-        color: rgb(0.3, 0.3, 0.3)
-      })
-      
-      // Draw separator line
-      page.drawLine({
-        start: { x: 80, y: height - 200 },
-        end: { x: width - 80, y: height - 200 },
-        thickness: 1,
-        color: rgb(0.7, 0.7, 0.7)
-      })
-      
-      // Add note about document content
-      page.drawText('Document content follows on next page(s)', {
-        x: 80,
-        y: height - 230,
-        size: 10,
-        color: rgb(0.5, 0.5, 0.5)
-      })
-      
-    } catch (error) {
-      console.warn(`Could not add title page for ${doc.name}:`, error)
-    }
-  }
-
-  private getDocumentCategoryTitle(doc: any): string {
-    const category = doc.category || (doc.type === 'identification' ? 'id' : doc.type === 'resume' ? 'resume' : 'certification')
-    
-    switch (category) {
-      case 'id':
-        return 'Government Identification Document'
-      case 'resume':
-        return 'Resume / CV'
-      case 'forkliftSD-cert':
-        return 'SD - Sit Down Forklift Certification'
-      case 'forkliftSU-cert':
-        return 'SU - Stand Up Forklift Certification'
-      case 'forkliftSUR-cert':
-        return 'SUR - Stand Up Reach Certification'
-      case 'forkliftCP-cert':
-        return 'CP - Cherry Picker Certification'
-      case 'forkliftCL-cert':
-        return 'CL - Clamps Certification'
-      case 'forkliftRidingJack-cert':
-        return 'Riding Jack Certification'
-      case 'skills1-cert':
-      case 'skills2-cert':
-      case 'skills3-cert':
-        return 'Skills Certification Document'
-      default:
-        return 'Uploaded Document'
-    }
-  }
-
   // Handle signature in WareWorks Application PDF
   private async addSignatureToApplicationPDF(pdfDoc: PDFDocument, form: PDFForm, data: ValidatedApplicationData, isSpanish: boolean = false) {
     if (!data.signature) {
@@ -1296,93 +1106,6 @@ export class PDFService {
     } catch (error) {
       console.error('❌ Failed to process signature:', error)
       // Continue without signature rather than failing entire PDF generation
-    }
-  }
-
-  // Helper method to check if a file is a document type (DOC/DOCX)
-  private isDocumentFile(mimeType: string): boolean {
-    return mimeType === 'application/msword' || 
-           mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-  }
-
-  // Add a reference page for document files (DOC/DOCX) that cannot be embedded directly
-  private async addDocumentReferencePage(pdfDoc: PDFDocument, doc: any) {
-    const page = pdfDoc.addPage([612, 792]) // Standard letter size
-    const { width, height } = page.getSize()
-    
-    // Load font
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
-    const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
-    
-    // Header
-    page.drawText('DOCUMENT REFERENCE', {
-      x: 50,
-      y: height - 100,
-      size: 20,
-      font: boldFont,
-      color: rgb(0, 0, 0),
-    })
-    
-    // Document info
-    const docInfo = [
-      { label: 'Document Name:', value: doc.name },
-      { label: 'File Type:', value: this.getDocumentTypeDisplay(doc.mimeType) },
-      { label: 'File Size:', value: `${(doc.size / 1024).toFixed(1)} KB` },
-      { label: 'Upload Category:', value: doc.category || 'Unknown' }
-    ]
-    
-    let yPosition = height - 160
-    docInfo.forEach(info => {
-      // Label
-      page.drawText(info.label, {
-        x: 50,
-        y: yPosition,
-        size: 12,
-        font: boldFont,
-        color: rgb(0, 0, 0),
-      })
-      
-      // Value
-      page.drawText(info.value, {
-        x: 180,
-        y: yPosition,
-        size: 12,
-        font: font,
-        color: rgb(0, 0, 0),
-      })
-      
-      yPosition -= 25
-    })
-    
-    // Note
-    page.drawText('Note: This document was uploaded as part of the application.', {
-      x: 50,
-      y: yPosition - 30,
-      size: 10,
-      font: font,
-      color: rgb(0.3, 0.3, 0.3),
-    })
-    
-    page.drawText('The original file is available separately for review.', {
-      x: 50,
-      y: yPosition - 50,
-      size: 10,
-      font: font,
-      color: rgb(0.3, 0.3, 0.3),
-    })
-  }
-
-  // Get display name for document type
-  private getDocumentTypeDisplay(mimeType: string): string {
-    switch (mimeType) {
-      case 'application/msword':
-        return 'Microsoft Word Document (.doc)'
-      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-        return 'Microsoft Word Document (.docx)'
-      case 'application/pdf':
-        return 'PDF Document (.pdf)'
-      default:
-        return 'Unknown Document Type'
     }
   }
 }
