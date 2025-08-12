@@ -267,7 +267,6 @@ export class EmailService {
   private generatePlainTextEmail(data: ValidatedApplicationData, attachmentCount: number): string {
     return `Applicant Information:
 - Name: ${data.legalFirstName} ${data.legalLastName}
-- Position: ${data.positionApplied}
 - Email: ${data.email}
 - Phone: ${data.phoneNumber}
 - Address: ${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}
@@ -280,7 +279,6 @@ Application Details:
   private generateBilingualPlainTextEmail(data: ValidatedApplicationData, attachmentCount: number): string {
     return `Applicant Information:
 - Name: ${data.legalFirstName} ${data.legalLastName}
-- Position: ${data.positionApplied}
 - Email: ${data.email}
 - Phone: ${data.phoneNumber}
 - Address: ${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}
