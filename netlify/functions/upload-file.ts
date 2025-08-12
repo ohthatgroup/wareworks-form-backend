@@ -1,4 +1,5 @@
 import { Handler } from '@netlify/functions'
+import { DocumentConverter } from '../../shared/services/DocumentConverter'
 
 interface UploadRequest {
   key: string
@@ -62,38 +63,85 @@ export const handler: Handler = async (event, context) => {
     }
 
     // Convert base64 to buffer
-    const buffer = Buffer.from(uploadRequest.data, 'base64')
+    let buffer = Buffer.from(uploadRequest.data, 'base64')
+    let finalContentType = uploadRequest.contentType
+    let finalKey = uploadRequest.key
     
     // File size limit (10MB)
     if (buffer.length > 10 * 1024 * 1024) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'File too large (max 10MB)' })
+        body: JSON.stringify({ 
+          error: 'File too large (max 10MB)',
+          errorKey: 'file_too_large'
+        })
+      }
+    }
+
+    // Convert DOC/DOCX files to PDF during upload
+    if (needsDocumentConversion(uploadRequest.contentType, finalKey)) {
+      console.log(`🔄 Converting document during upload: ${finalKey}`)
+      
+      try {
+        const converter = new DocumentConverter()
+        const conversionResult = await converter.convertToPdf(buffer, finalKey)
+        
+        if (!conversionResult.success) {
+          console.warn(`Document conversion failed during upload: ${finalKey} - ${conversionResult.error}`)
+          return {
+            statusCode: 400,
+            body: JSON.stringify({ 
+              error: conversionResult.error,
+              errorKey: 'document_conversion_failed'
+            })
+          }
+        }
+
+        // Update file data with converted PDF
+        buffer = conversionResult.pdfBuffer!
+        finalContentType = 'application/pdf'
+        finalKey = finalKey.replace(/\.(doc|docx)$/i, '.pdf')
+        
+        console.log(`✅ Document converted during upload: ${uploadRequest.key} → ${finalKey} (${buffer.length} bytes)`)
+
+      } catch (error) {
+        console.error(`Document conversion error during upload for ${finalKey}:`, error)
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ 
+            error: 'Document could not be processed. Please save as PDF and try again.',
+            errorKey: 'document_conversion_failed'
+          })
+        }
       }
     }
 
     // Use Netlify Blobs if available
     if (process.env.NETLIFY_BLOBS_URL) {
-      const blobUrl = await uploadToNetlifyBlobs(uploadRequest.key, buffer, uploadRequest.contentType)
+      const blobUrl = await uploadToNetlifyBlobs(finalKey, buffer, finalContentType)
       
       return {
         statusCode: 200,
         body: JSON.stringify({ 
           message: 'File uploaded successfully',
           url: blobUrl,
-          key: uploadRequest.key
+          key: finalKey,
+          originalKey: uploadRequest.key,
+          converted: finalKey !== uploadRequest.key
         })
       }
     } else {
       // Fallback: just return success (files will be stored as base64 in form data)
-      console.log(`File upload simulated: ${uploadRequest.key}`)
+      console.log(`File upload simulated: ${finalKey}`)
       
       return {
         statusCode: 200,
         body: JSON.stringify({ 
           message: 'File processed (stored as base64)',
-          url: `data:${uploadRequest.contentType};base64,${uploadRequest.data}`,
-          key: uploadRequest.key
+          url: `data:${finalContentType};base64,${buffer.toString('base64')}`,
+          key: finalKey,
+          originalKey: uploadRequest.key,
+          converted: finalKey !== uploadRequest.key
         })
       }
     }
@@ -133,6 +181,16 @@ async function uploadToNetlifyBlobs(key: string, buffer: Buffer, contentType: st
 
   // Return the public URL for the uploaded file
   return `${process.env.NETLIFY_BLOBS_URL}/api/v1/blobs/${key}?download=false`
+}
+
+// Helper function to check if document conversion is needed
+function needsDocumentConversion(contentType: string, filename: string): boolean {
+  const docTypes = [
+    'application/msword', // .doc
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+  ]
+  
+  return docTypes.includes(contentType)
 }
 
 // Helper functions for file type validation

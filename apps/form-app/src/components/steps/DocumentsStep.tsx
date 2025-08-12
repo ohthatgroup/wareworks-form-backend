@@ -171,24 +171,69 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       return
     }
     
-    // Convert new files to document format
-    const newDocuments = await Promise.all(
-      fileArray.map(async (file) => {
+    // Process files through backend (with conversion if needed)
+    const newDocuments = []
+    
+    for (const file of fileArray) {
+      try {
         const base64Data = await fileToBase64(file)
-        return {
+        
+        // Call backend upload function for validation and conversion
+        const uploadResponse = await fetch('/.netlify/functions/upload-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            key: `${Date.now()}_${file.name}`,
+            data: base64Data,
+            contentType: file.type,
+            category: category
+          })
+        })
+
+        const uploadResult = await uploadResponse.json()
+
+        if (!uploadResponse.ok) {
+          // Handle backend validation errors with translation
+          const errorMessage = uploadResult.errorKey ? 
+            t(`documents.file_errors.${uploadResult.errorKey}`) || uploadResult.error :
+            uploadResult.error || 'Upload failed'
+          
+          alert(`${file.name}: ${errorMessage}`)
+          continue // Skip this file, continue with others
+        }
+
+        // File processed successfully (may have been converted)
+        const processedDocument = {
           type: getDocumentType(category),
           category: category,
-          name: file.name,
-          size: file.size,
-          mimeType: file.type,
-          data: base64Data
+          name: uploadResult.converted ? uploadResult.key.split('_').slice(1).join('_') : file.name,
+          size: uploadResult.converted ? base64Data.length * 0.75 : file.size, // Approximate size
+          mimeType: uploadResult.converted ? 'application/pdf' : file.type,
+          data: uploadResult.url.startsWith('data:') ? 
+            uploadResult.url.split(',')[1] : // Extract base64 from data URL
+            base64Data,
+          converted: uploadResult.converted || false
         }
-      })
-    )
+
+        if (uploadResult.converted) {
+          console.log(`✅ Document converted: ${file.name} → ${processedDocument.name}`)
+        }
+
+        newDocuments.push(processedDocument)
+
+      } catch (error) {
+        console.error('File upload error:', error)
+        alert(`${file.name}: ${t('documents.file_errors.unknown_error') || 'Upload failed'}`)
+      }
+    }
     
-    // Add to existing documents
-    const updatedDocuments = [...documents, ...newDocuments]
-    setValue('documents', updatedDocuments, { shouldValidate: true })
+    if (newDocuments.length > 0) {
+      // Add successfully processed documents
+      const updatedDocuments = [...documents, ...newDocuments]
+      setValue('documents', updatedDocuments, { shouldValidate: true })
+    }
   }
 
   const removeDocument = (category: string, index: number) => {
