@@ -1,4 +1,5 @@
 import { ValidatedApplicationData } from '../validation/schemas'
+import { DocumentConverter } from './DocumentConverter'
 
 interface UploadedFile {
   type: 'identification' | 'resume' | 'certification'
@@ -9,6 +10,12 @@ interface UploadedFile {
 }
 
 export class FileUploadService {
+  private documentConverter: DocumentConverter
+
+  constructor() {
+    this.documentConverter = new DocumentConverter()
+  }
+
   async uploadFiles(files: UploadedFile[]): Promise<{ [key: string]: string }> {
     if (!process.env.ENABLE_FILE_UPLOADS || process.env.ENABLE_FILE_UPLOADS !== 'true') {
       console.log('File uploads disabled, storing as base64')
@@ -84,7 +91,7 @@ export class FileUploadService {
     return results
   }
 
-  async validateFile(file: UploadedFile): Promise<{ isValid: boolean, errorKey?: string }> {
+  async validateFile(file: UploadedFile): Promise<{ isValid: boolean, errorKey?: string, convertedFile?: UploadedFile }> {
     // Basic file validation
     const maxSize = 10 * 1024 * 1024 // 10MB
     
@@ -112,6 +119,41 @@ export class FileUploadService {
       }
     }
 
+    // Convert DOC/DOCX files to PDF during validation
+    if (this.documentConverter.needsConversion(file.name)) {
+      console.log(`🔄 Converting document to PDF: ${file.name}`)
+      
+      try {
+        // Convert base64 to buffer for conversion
+        const fileBuffer = Buffer.from(file.data, 'base64')
+        
+        // Attempt conversion
+        const conversionResult = await this.documentConverter.convertToPdf(fileBuffer, file.name)
+        
+        if (!conversionResult.success) {
+          console.warn(`Document conversion failed: ${file.name} - ${conversionResult.error}`)
+          return { isValid: false, errorKey: 'document_conversion_failed' }
+        }
+
+        // Create converted file object
+        const convertedFile: UploadedFile = {
+          ...file,
+          name: file.name.replace(/\.(doc|docx)$/i, '.pdf'),
+          mimeType: 'application/pdf',
+          data: conversionResult.pdfBuffer!.toString('base64'),
+          size: conversionResult.pdfBuffer!.length
+        }
+
+        console.log(`✅ Document converted successfully: ${file.name} → ${convertedFile.name} (${convertedFile.size} bytes)`)
+        
+        return { isValid: true, convertedFile }
+
+      } catch (error) {
+        console.error(`Document conversion error for ${file.name}:`, error)
+        return { isValid: false, errorKey: 'document_conversion_failed' }
+      }
+    }
+
     return { isValid: true }
   }
 
@@ -122,7 +164,9 @@ export class FileUploadService {
     for (const file of files) {
       const validation = await this.validateFile(file)
       if (validation.isValid) {
-        validFiles.push(file)
+        // Use converted file if available, otherwise use original file
+        const fileToAdd = validation.convertedFile || file
+        validFiles.push(fileToAdd)
       } else {
         console.warn(`Skipping invalid file: ${file.name} - ${validation.errorKey}`)
         errors.push({ fileName: file.name, errorKey: validation.errorKey || 'unknown_error' })

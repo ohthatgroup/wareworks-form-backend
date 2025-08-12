@@ -288,6 +288,7 @@ export const translations = {
     'documents.file_errors.resume_only_docs_allowed': 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for resumes',
     'documents.file_errors.cert_only_docs_allowed': 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for certifications',
     'documents.file_errors.file_type_mismatch': 'File type does not match the extension',
+    'documents.file_errors.document_conversion_failed': 'Document could not be processed. Please save as PDF and try again.',
     'documents.file_errors.unknown_error': 'Unknown file error occurred',
 
     // Review
@@ -652,6 +653,7 @@ export const translations = {
     'documents.file_errors.resume_only_docs_allowed': 'Solo se permiten archivos PDF, DOC, DOCX, JPEG, JPG o PNG para currículums',
     'documents.file_errors.cert_only_docs_allowed': 'Solo se permiten archivos PDF, DOC, DOCX, JPEG, JPG o PNG para certificaciones',
     'documents.file_errors.file_type_mismatch': 'El tipo de archivo no coincide con la extensión',
+    'documents.file_errors.document_conversion_failed': 'No se pudo procesar el documento. Guarde como PDF e intente de nuevo.',
     'documents.file_errors.unknown_error': 'Ocurrió un error de archivo desconocido',
 
     // Review

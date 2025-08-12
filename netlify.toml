@@ -2,6 +2,10 @@
   command = "npm ci && cd apps/form-app && npm run build"
   publish = "apps/form-app/.next"
 
+[build.environment]
+  # Add LibreOffice binary to PATH for document conversion
+  LIBREOFFICE_PATH = "/opt/libreoffice/program/soffice"
+
 # Functions handled by Next.js App Router
 [functions]
   directory = "netlify/functions"
@@ -12,6 +16,12 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Install LibreOffice for document conversion
+[[plugins]]
+  package = "netlify-plugin-apt"
+  [plugins.inputs]
+    packages = ["libreoffice"]
 
 # API routes are handled by Next.js App Router automatically
 # No redirects needed for /api/* - Next.js will handle these
