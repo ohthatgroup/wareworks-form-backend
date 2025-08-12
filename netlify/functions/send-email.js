@@ -26,6 +26,14 @@ exports.handler = async (event, context) => {
       }
     }
 
+    // Debug environment variables
+    console.log('🔍 Environment check:', {
+      MAILGUN_API_KEY: process.env.MAILGUN_API_KEY ? `${process.env.MAILGUN_API_KEY.substring(0, 8)}...` : 'NOT SET',
+      MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN || 'NOT SET',
+      ENABLE_EMAIL_NOTIFICATIONS: process.env.ENABLE_EMAIL_NOTIFICATIONS || 'NOT SET',
+      HR_EMAIL: process.env.HR_EMAIL || 'NOT SET'
+    })
+
     // Check if Mailgun is configured
     if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
       await sendViaMailgun(emailData)
