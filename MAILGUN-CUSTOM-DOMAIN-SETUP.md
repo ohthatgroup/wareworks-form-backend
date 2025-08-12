@@ -1,7 +1,7 @@
 # 📧 Mailgun Custom Domain Setup Guide
 
 ## Overview
-This guide walks you through setting up Mailgun with a custom domain (`mg.wareworks.me`) to replace the default sandbox domain.
+This guide walks you through setting up Mailgun with a custom domain to replace the default sandbox domain.
 
 ## Current vs New Configuration
 
@@ -13,8 +13,8 @@ From: noreply@sandbox83befb52fc8e44b19aa5d51bef784443.mailgun.org
 
 ### After (Custom Domain) 
 ```bash
-MAILGUN_DOMAIN=mg.wareworks.me
-From: noreply@mg.wareworks.me
+MAILGUN_DOMAIN=your_custom_domain.com
+From: noreply@your_custom_domain.com
 ```
 
 ## Step-by-Step Setup
