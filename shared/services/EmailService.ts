@@ -265,73 +265,28 @@ export class EmailService {
   }
 
   private generatePlainTextEmail(data: ValidatedApplicationData, attachmentCount: number): string {
-    return `
-New Employment Application Received
-
-Applicant Information:
+    return `Applicant Information:
 - Name: ${data.legalFirstName} ${data.legalLastName}
 - Position: ${data.positionApplied}
 - Email: ${data.email}
 - Phone: ${data.phoneNumber}
 - Address: ${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}
 
-Emergency Contact:
-- Name: ${data.emergencyName}
-- Phone: ${data.emergencyPhone}
-- Relationship: ${data.emergencyRelationship}
-
 Application Details:
 - Submission ID: ${data.submissionId}
-- Submitted: ${data.submittedAt}
-- Expected Salary: ${data.expectedSalary || 'Not specified'}
-- How they found the job: ${data.jobDiscovery || 'Not specified'}
-- Citizenship Status: ${data.citizenshipStatus || 'Not specified'}
-
-Attachments (${attachmentCount} files):
-- Application PDF with all form data
-- I-9 Form PDF (if citizenship requires work authorization)
-- Uploaded documents (ID, resume, certifications as provided)
-
-Please review all attached documents for complete application details.
-
-This is an automated notification from the Wareworks application system.
-    `.trim()
+- Submitted: ${data.submittedAt}`
   }
 
   private generateBilingualPlainTextEmail(data: ValidatedApplicationData, attachmentCount: number): string {
-    return `
-New Employment Application Received (Bilingual)
-
-Applicant Information:
+    return `Applicant Information:
 - Name: ${data.legalFirstName} ${data.legalLastName}
 - Position: ${data.positionApplied}
 - Email: ${data.email}
 - Phone: ${data.phoneNumber}
 - Address: ${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}
 
-Emergency Contact:
-- Name: ${data.emergencyName}
-- Phone: ${data.emergencyPhone}
-- Relationship: ${data.emergencyRelationship}
-
 Application Details:
 - Submission ID: ${data.submissionId}
-- Submitted: ${data.submittedAt}
-- Expected Salary: ${data.expectedSalary || 'Not specified'}
-- How they found the job: ${data.jobDiscovery || 'Not specified'}
-- Citizenship Status: ${data.citizenshipStatus || 'Not specified'}
-
-Attachments (${attachmentCount} files):
-- English Application PDF with all form data and uploaded documents
-- Spanish Application PDF with same form data (no uploaded documents to avoid duplication)
-- I-9 Form PDF (if citizenship requires work authorization)
-
-HR can choose to work with either the English or Spanish version of the application form.
-Both PDFs contain the same applicant data, just in different languages.
-
-Please review all attached documents for complete application details.
-
-This is an automated notification from the Wareworks application system.
-    `.trim()
+- Submitted: ${data.submittedAt}`
   }
 }
