@@ -143,11 +143,14 @@ function getValidMimeTypes(category: string): string[] {
       return ['image/jpeg', 'image/jpg', 'image/png']
     case 'resume':
     case 'certification':
-      // Resume and certifications: PDF, DOC, DOCX
+      // Resume and certifications: PDF, DOC, DOCX, and images
       return [
         'application/pdf',
         'application/msword', // .doc
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'image/jpeg',
+        'image/jpg', 
+        'image/png'
       ]
     default:
       // Default to ID requirements for backwards compatibility
@@ -160,9 +163,9 @@ function getFileTypeError(category: string): string {
     case 'id':
       return 'Only JPEG, JPG, or PNG image files are allowed for ID documents'
     case 'resume':
-      return 'Only PDF, DOC, or DOCX files are allowed for resumes'
+      return 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for resumes'
     case 'certification':
-      return 'Only PDF, DOC, or DOCX files are allowed for certifications'
+      return 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for certifications'
     default:
       return 'Invalid file type'
   }
@@ -173,9 +176,9 @@ function getFileTypeMessage(category: string): string {
     case 'id':
       return 'Please upload your ID document as JPEG, JPG, or PNG image file.'
     case 'resume':
-      return 'Please upload your resume as a PDF, DOC, or DOCX file.'
+      return 'Please upload your resume as a PDF, DOC, DOCX, JPEG, JPG, or PNG file.'
     case 'certification':
-      return 'Please upload your certification as a PDF, DOC, or DOCX file.'
+      return 'Please upload your certification as a PDF, DOC, DOCX, JPEG, JPG, or PNG file.'
     default:
       return 'Please use a supported file format.'
   }

@@ -153,11 +153,14 @@ export class FileUploadService {
         return ['image/jpeg', 'image/jpg', 'image/png']
       case 'resume':
       case 'certification':
-        // Resume and certifications: PDF, DOC, DOCX
+        // Resume and certifications: PDF, DOC, DOCX, and images
         return [
           'application/pdf',
           'application/msword', // .doc
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+          'image/jpeg',
+          'image/jpg', 
+          'image/png'
         ]
       default:
         return ['image/jpeg', 'image/jpg', 'image/png']

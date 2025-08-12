@@ -106,11 +106,14 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       // ID documents: JPEG, JPG, PNG
       return ['image/jpeg', 'image/jpg', 'image/png']
     } else if (category === 'resume' || category.includes('-cert')) {
-      // Resume and certifications: PDF, DOC, DOCX
+      // Resume and certifications: PDF, DOC, DOCX, and images
       return [
         'application/pdf',
         'application/msword', // .doc
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // .docx
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'image/jpeg',
+        'image/jpg', 
+        'image/png'
       ]
     }
     // Default to ID requirements
@@ -122,7 +125,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     if (category === 'id') {
       return '.jpg,.jpeg,.png,image/jpeg,image/png'
     } else if (category === 'resume' || category.includes('-cert')) {
-      return '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      return '.pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png'
     }
     return '.jpg,.jpeg,.png,image/jpeg,image/png'
   }
@@ -132,9 +135,9 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     if (category === 'id') {
       return t('documents.file_errors.id_only_images_allowed') || 'Only JPEG, JPG, or PNG image files are allowed for ID documents'
     } else if (category === 'resume') {
-      return t('documents.file_errors.resume_only_docs_allowed') || 'Only PDF, DOC, or DOCX files are allowed for resumes'
+      return t('documents.file_errors.resume_only_docs_allowed') || 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for resumes'
     } else if (category.includes('-cert')) {
-      return t('documents.file_errors.cert_only_docs_allowed') || 'Only PDF, DOC, or DOCX files are allowed for certifications'
+      return t('documents.file_errors.cert_only_docs_allowed') || 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for certifications'
     }
     return 'Invalid file type'
   }
