@@ -49,7 +49,7 @@ Auth: Internal service calls only
 # File uploads
 POST /.netlify/functions/upload-file
 Content-Type: application/json
-Max File Size: 10MB per file
+Max File Size: 2MB per file
 ```
 
 ### Next.js App Router APIs
@@ -268,7 +268,7 @@ netlify deploy --prod
 - ✅ **8-Step Progressive Form** with 80+ fields
 - ✅ **Multi-language Support** (English/Spanish) 
 - ✅ **Real-time Validation** with Zod schemas
-- ✅ **File Upload System** (PDF, DOC, Images up to 10MB)
+- ✅ **File Upload System** (PDF, DOC, Images up to 2MB)
 - ✅ **PDF Generation** with form field population
 - ✅ **Email Notifications** via Mailgun
 - ✅ **Rate Limiting** (3 submissions per 15 min per IP)
@@ -327,7 +327,7 @@ netlify deploy --prod
 ### Performance Metrics
 - **Page Load Time**: < 2 seconds (LCP)
 - **Function Cold Start**: < 500ms
-- **File Upload Speed**: < 5 seconds for 10MB
+- **File Upload Speed**: < 5 seconds for 2MB
 - **Form Completion Rate**: Tracked via analytics
 - **Error Rate**: < 0.1% for successful submissions
 

@@ -88,11 +88,17 @@ export class FileUploadService {
   }
 
   async validateFile(file: UploadedFile): Promise<{ isValid: boolean, errorKey?: string }> {
-    // Basic file validation
-    const maxSize = 10 * 1024 * 1024 // 10MB
+    // Dynamic file validation matching upload-file.ts logic
+    const category = this.mapDocumentTypeToCategory(file.type)
+    
+    // Use same logic as upload-file.ts
+    let maxSize = 2 * 1024 * 1024 // Default 2MB
+    if (category && category.includes('-cert')) {
+      maxSize = 1 * 1024 * 1024 // 1MB for certifications
+    }
     
     if (file.size > maxSize) {
-      console.warn(`File too large: ${file.name} (${file.size} bytes)`)
+      console.warn(`File too large: ${file.name} (${file.size} bytes, max: ${maxSize})`)
       return { isValid: false, errorKey: 'file_too_large' }
     }
 

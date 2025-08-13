@@ -22,7 +22,9 @@
       "Bash(netlify dev:*)",
       "Bash(curl:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:docs.netlify.com)",
+      "WebFetch(domain:www.netlify.com)"
     ],
     "deny": []
   }

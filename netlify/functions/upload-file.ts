@@ -66,12 +66,20 @@ export const handler: Handler = async (event, context) => {
     let finalContentType = uploadRequest.contentType
     let finalKey = uploadRequest.key
     
-    // File size limit (10MB)
-    if (buffer.length > 10 * 1024 * 1024) {
+    // Dynamic file size limit based on category and expected usage
+    let maxSize = 2 * 1024 * 1024 // Default 2MB
+    
+    // For certification uploads, use smaller limit to accommodate multiple files
+    if (category && category.includes('-cert')) {
+      maxSize = 1 * 1024 * 1024 // 1MB for certifications
+    }
+    
+    if (buffer.length > maxSize) {
+      const sizeMB = Math.round(maxSize / 1024 / 1024 * 10) / 10
       return {
         statusCode: 400,
         body: JSON.stringify({ 
-          error: 'File too large (max 10MB)',
+          error: `File too large (max ${sizeMB}MB for ${category || 'this category'})`,
           errorKey: 'file_too_large'
         })
       }

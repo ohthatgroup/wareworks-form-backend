@@ -1,5 +1,6 @@
 import { ValidatedApplicationData } from '../validation/schemas'
 import { PDFService } from './PDFService'
+import JSZip from 'jszip'
 
 interface EmailAttachment {
   filename: string
@@ -8,6 +9,44 @@ interface EmailAttachment {
 }
 
 export class EmailService {
+  private async createUserDocumentsZip(data: ValidatedApplicationData): Promise<EmailAttachment | null> {
+    if (!data.documents || data.documents.length === 0) {
+      return null
+    }
+
+    try {
+      const zip = new JSZip()
+      
+      // Add each user document to the ZIP
+      for (const doc of data.documents) {
+        // Convert base64 to binary for JSZip
+        const binaryData = Buffer.from(doc.data, 'base64')
+        zip.file(doc.name, binaryData)
+        console.log(`📦 Added to ZIP: ${doc.name} (${doc.mimeType})`)
+      }
+
+      // Generate ZIP file
+      const zipBuffer = await zip.generateAsync({ 
+        type: 'nodebuffer',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 } // Good balance of compression vs speed
+      })
+
+      const originalSize = data.documents.reduce((sum, doc) => sum + Buffer.from(doc.data, 'base64').length, 0)
+      const compressionRatio = Math.round((1 - zipBuffer.length / originalSize) * 100)
+      
+      console.log(`📦 ZIP created: ${zipBuffer.length} bytes (${compressionRatio}% compression from ${originalSize} bytes)`)
+
+      return {
+        filename: `${data.legalFirstName}_${data.legalLastName}_Documents.zip`,
+        content: zipBuffer.toString('base64'),
+        contentType: 'application/zip'
+      }
+    } catch (error) {
+      console.error('Failed to create user documents ZIP:', error)
+      return null
+    }
+  }
   private async fetchWithRetry(url: string, options: RequestInit, maxRetries: number = 3): Promise<Response> {
     const baseDelay = 2000; // 2 seconds
     
@@ -98,16 +137,11 @@ export class EmailService {
         }
       }
 
-      // Add each uploaded document as separate attachment
-      if (data.documents && data.documents.length > 0) {
-        for (const doc of data.documents) {
-          attachments.push({
-            filename: doc.name,
-            content: doc.data,
-            contentType: doc.mimeType
-          })
-          console.log(`📎 Document attachment added: ${doc.name} (${doc.mimeType})`)
-        }
+      // Add user documents as a single ZIP attachment (preserves originals)
+      const userDocumentsZip = await this.createUserDocumentsZip(data)
+      if (userDocumentsZip) {
+        attachments.push(userDocumentsZip)
+        console.log(`📦 User documents ZIP attachment added: ${userDocumentsZip.filename}`)
       }
 
       console.log('Preparing to send email notification:', {
@@ -227,16 +261,11 @@ export class EmailService {
         })
       }
 
-      // Add each uploaded document as separate attachment
-      if (data.documents && data.documents.length > 0) {
-        for (const doc of data.documents) {
-          attachments.push({
-            filename: doc.name,
-            content: doc.data,
-            contentType: doc.mimeType
-          })
-          console.log(`📎 Document attachment added: ${doc.name} (${doc.mimeType})`)
-        }
+      // Add user documents as a single ZIP attachment (preserves originals)
+      const userDocumentsZip = await this.createUserDocumentsZip(data)
+      if (userDocumentsZip) {
+        attachments.push(userDocumentsZip)
+        console.log(`📦 User documents ZIP attachment added: ${userDocumentsZip.filename}`)
       }
       
       this.logMemoryUsage('after-attachments-prepared')
@@ -265,9 +294,38 @@ export class EmailService {
       
       this.logMemoryUsage('before-email-send')
       
-      // Calculate payload size and optimize if needed
+      // Calculate payload size and handle if too large
       const payloadSize = JSON.stringify(emailPayload).length
-      console.log(`📏 Email payload size: ${Math.round(payloadSize / 1024 / 1024 * 100) / 100}MB`)
+      const payloadSizeMB = Math.round(payloadSize / 1024 / 1024 * 100) / 100
+      console.log(`📏 Email payload size: ${payloadSizeMB}MB`)
+      
+      // If payload is still too large (>8MB), fall back to individual attachments
+      if (payloadSizeMB > 8 && userDocumentsZip) {
+        console.log(`⚠️ ZIP payload still too large (${payloadSizeMB}MB), falling back to individual attachments`)
+        
+        // Remove ZIP attachment and add individual documents
+        const attachmentsWithoutZip = attachments.filter(att => att.filename !== userDocumentsZip.filename)
+        
+        // Add individual documents (original approach)
+        if (data.documents && data.documents.length > 0) {
+          for (const doc of data.documents) {
+            attachmentsWithoutZip.push({
+              filename: doc.name,
+              content: doc.data,
+              contentType: doc.mimeType
+            })
+          }
+        }
+        
+        emailPayload.attachments = attachmentsWithoutZip.map(att => ({
+          content: att.content,
+          filename: att.filename,
+          contentType: att.contentType
+        }))
+        
+        const fallbackPayloadSize = JSON.stringify(emailPayload).length
+        console.log(`📏 Fallback payload size: ${Math.round(fallbackPayloadSize / 1024 / 1024 * 100) / 100}MB`)
+      }
       
       const response = await this.fetchWithRetry(emailEndpoint, {
         method: 'POST',
@@ -328,6 +386,11 @@ Application Details:
   }
 
   private generateBilingualPlainTextEmail(data: ValidatedApplicationData, attachmentCount: number): string {
+    const hasUserDocs = data.documents && data.documents.length > 0
+    const docInfo = hasUserDocs 
+      ? `\n\nAttached Documents:\n- Application form (English & Spanish PDFs)\n- I-9 form (PDF)\n- Applicant documents (ZIP file - extract to view originals)`
+      : `\n\nAttached Documents:\n- Application form (English & Spanish PDFs)\n- I-9 form (PDF)`
+    
     return `Applicant Information:
 - Name: ${data.legalFirstName} ${data.legalLastName}
 - Email: ${data.email}
@@ -336,6 +399,6 @@ Application Details:
 
 Application Details:
 - Submission ID: ${data.submissionId}
-- Submitted: ${data.submittedAt}`
+- Submitted: ${data.submittedAt}${docInfo}`
   }
 }

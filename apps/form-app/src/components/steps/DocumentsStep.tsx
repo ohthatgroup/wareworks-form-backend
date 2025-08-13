@@ -14,6 +14,8 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   const { t } = useLanguage()
   const documents = watch('documents') || []
   const [draggedOver, setDraggedOver] = React.useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = React.useState<{[key: string]: number}>({})
+  const [isUploading, setIsUploading] = React.useState(false)
   
   // Group documents by category for display
   const documentsByCategory = documents.reduce((acc: {[key: string]: any[]}, doc) => {
@@ -165,19 +167,62 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       return
     }
     
-    // Check file sizes
-    const oversizedFiles = fileArray.filter(file => file.size > 10 * 1024 * 1024)
+    // Calculate dynamic limits based on selected certifications
+    const maxCertifications = certifiedForklifts.length + certifiedSkills.length
+    const expectedFileCount = 1 + maxCertifications // resume + certifications (ID doesn't count toward size limit)
+    
+    // Dynamic per-file limit: smaller if many certifications expected
+    let maxFileSize: number
+    if (expectedFileCount <= 2) {
+      maxFileSize = 2 * 1024 * 1024 // 2MB if few files
+    } else if (expectedFileCount <= 5) {
+      maxFileSize = 1.5 * 1024 * 1024 // 1.5MB for moderate uploads  
+    } else {
+      maxFileSize = 1 * 1024 * 1024 // 1MB for many certifications
+    }
+    
+    const oversizedFiles = fileArray.filter(file => file.size > maxFileSize)
     if (oversizedFiles.length > 0) {
-      alert(`${t('documents.file_errors.file_too_large')}: ${oversizedFiles.map(f => f.name).join(', ')}`)
+      const limitMB = Math.round(maxFileSize / 1024 / 1024 * 10) / 10
+      const oversizedList = oversizedFiles.map(f => `${f.name} (${Math.round(f.size / 1024 / 1024 * 10) / 10}MB)`).join('\n')
+      alert(`Files too large - maximum ${limitMB}MB per file (reduced due to ${maxCertifications} certifications selected):\n\n${oversizedList}\n\nPlease compress your files or reduce certification selections.`)
       return
     }
     
-    // Process files through backend validation
-    const newDocuments = []
+    // Dynamic total size limit based on expected uploads
+    const baseTotalLimit = 6 * 1024 * 1024 // 6MB base
+    const totalSizeThisUpload = fileArray.reduce((sum, file) => sum + file.size, 0)
+    const existingDocsSize = (documents || []).reduce((sum, doc) => sum + doc.size, 0)
     
-    for (const file of fileArray) {
+    if (existingDocsSize + totalSizeThisUpload > baseTotalLimit) {
+      const currentTotal = Math.round((existingDocsSize + totalSizeThisUpload) / 1024 / 1024 * 10) / 10
+      alert(`Total document size would be ${currentTotal}MB, which exceeds the ${Math.round(baseTotalLimit / 1024 / 1024)}MB limit.\n\nWith ${maxCertifications} certifications selected, consider:\n• Compressing existing files\n• Reducing certification selections\n• Using smaller file formats`)
+      return
+    }
+    
+    // Basic file corruption check
+    const corruptFiles = fileArray.filter(file => file.size === 0 || file.name.length === 0)
+    if (corruptFiles.length > 0) {
+      alert(`Some files appear to be corrupted or empty:\n${corruptFiles.map(f => f.name).join(', ')}\n\nPlease check your files and try again.`)
+      return
+    }
+    
+    // Process files through backend validation with progress tracking
+    const newDocuments = []
+    setIsUploading(true)
+    setUploadProgress({})
+    
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i]
+      const progressKey = `${category}-${file.name}`
+      
       try {
+        // Update progress - processing file
+        setUploadProgress(prev => ({ ...prev, [progressKey]: 10 }))
+        
+        // Convert to base64 with progress
         const base64Data = await fileToBase64(file)
+        setUploadProgress(prev => ({ ...prev, [progressKey]: 50 }))
         
         // Call backend upload function for validation
         const uploadResponse = await fetch('/.netlify/functions/upload-file', {
@@ -192,20 +237,38 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             category: category
           })
         })
-
+        
+        setUploadProgress(prev => ({ ...prev, [progressKey]: 80 }))
         const uploadResult = await uploadResponse.json()
 
         if (!uploadResponse.ok) {
-          // Handle backend validation errors with translation
-          const errorMessage = uploadResult.errorKey ? 
-            t(`documents.file_errors.${uploadResult.errorKey}`) || uploadResult.error :
-            uploadResult.error || 'Upload failed'
+          // Handle specific error cases with detailed messages
+          let errorMessage = 'Upload failed'
+          
+          if (uploadResponse.status === 413) {
+            errorMessage = 'File too large for server processing'
+          } else if (uploadResponse.status === 415) {
+            errorMessage = 'File type not supported'
+          } else if (uploadResponse.status === 400) {
+            if (uploadResult.errorKey === 'file_too_large') {
+              errorMessage = `File too large (max 2MB allowed)`
+            } else if (uploadResult.errorKey === 'invalid_file_type') {
+              errorMessage = getFileTypeErrorMessage(category)
+            } else {
+              errorMessage = uploadResult.error || 'File validation failed'
+            }
+          } else if (uploadResponse.status >= 500) {
+            errorMessage = 'Server error - please try again'
+          } else {
+            errorMessage = uploadResult.error || 'Upload failed'
+          }
           
           alert(`${file.name}: ${errorMessage}`)
+          setUploadProgress(prev => ({ ...prev, [progressKey]: -1 })) // Error state
           continue // Skip this file, continue with others
         }
 
-        // File processed successfully - no conversion needed
+        // File processed successfully
         const processedDocument = {
           type: getDocumentType(category),
           category: category,
@@ -217,14 +280,37 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             base64Data // Use original base64 data
         }
 
+        setUploadProgress(prev => ({ ...prev, [progressKey]: 100 }))
         console.log(`✅ Document uploaded: ${file.name} (${file.type})`)
         newDocuments.push(processedDocument)
 
       } catch (error) {
         console.error('File upload error:', error)
-        alert(`${file.name}: ${t('documents.file_errors.unknown_error') || 'Upload failed'}`)
+        let errorMessage = 'Upload failed'
+        
+        // Handle specific error types
+        if (error instanceof TypeError && error.message.includes('fetch')) {
+          errorMessage = 'Network error - check your connection'
+        } else if (error instanceof Error) {
+          if (error.message.includes('base64')) {
+            errorMessage = 'File appears to be corrupted'
+          } else if (error.message.includes('timeout')) {
+            errorMessage = 'Upload timed out - file may be too large'
+          } else {
+            errorMessage = error.message
+          }
+        }
+        
+        alert(`${file.name}: ${errorMessage}`)
+        setUploadProgress(prev => ({ ...prev, [progressKey]: -1 })) // Error state
       }
     }
+    
+    // Clean up progress after a delay
+    setTimeout(() => {
+      setUploadProgress({})
+      setIsUploading(false)
+    }, 2000)
     
     if (newDocuments.length > 0) {
       // Add successfully processed documents
@@ -349,9 +435,50 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
   }
 
 
+  // Calculate current usage and limits for display
+  const maxCertifications = certifiedForklifts.length + certifiedSkills.length
+  const expectedFileCount = 1 + maxCertifications
+  const currentTotalSize = (documents || []).reduce((sum, doc) => sum + doc.size, 0)
+  const baseTotalLimit = 6 * 1024 * 1024
+  const usagePercent = Math.round((currentTotalSize / baseTotalLimit) * 100)
+  
+  let maxFileSize: number
+  if (expectedFileCount <= 2) {
+    maxFileSize = 2 * 1024 * 1024 // 2MB if few files
+  } else if (expectedFileCount <= 5) {
+    maxFileSize = 1.5 * 1024 * 1024 // 1.5MB for moderate uploads  
+  } else {
+    maxFileSize = 1 * 1024 * 1024 // 1MB for many certifications
+  }
+
   return (
     <div className="space-y-6 relative">
-      
+      {/* Upload Usage Tracker */}
+      {documents.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-medium text-blue-900">Document Upload Status</h3>
+            <span className="text-sm text-blue-700">
+              {Math.round(currentTotalSize / 1024 / 1024 * 10) / 10}MB / {Math.round(baseTotalLimit / 1024 / 1024)}MB
+            </span>
+          </div>
+          <div className="w-full bg-blue-200 rounded-full h-2">
+            <div 
+              className={`h-2 rounded-full transition-all duration-300 ${
+                usagePercent > 90 ? 'bg-red-500' : usagePercent > 70 ? 'bg-yellow-500' : 'bg-blue-500'
+              }`}
+              style={{ width: `${Math.min(100, usagePercent)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-blue-600 mt-1">
+            <span>Per file limit: {Math.round(maxFileSize / 1024 / 1024 * 10) / 10}MB</span>
+            <span>{documents.length} files uploaded</span>
+            {maxCertifications > 0 && (
+              <span>{maxCertifications} certifications selected</span>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Government ID */}
@@ -372,17 +499,49 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             <Upload className={`mx-auto h-12 w-12 ${draggedOver === 'id' ? 'text-primary' : 'text-gray-400'}`} />
             <div className="mt-4">
               <label htmlFor="id-upload" className="cursor-pointer">
-                <span className="btn-primary inline-block">{t('documents.choose_file')}</span>
+                <span className={`btn-primary inline-block ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  {isUploading ? t('documents.uploading') || 'Uploading...' : t('documents.choose_file')}
+                </span>
                 <input
                   id="id-upload"
                   type="file"
                   accept={getAcceptString('id')}
                   multiple
+                  disabled={isUploading}
                   className="sr-only"
                   onChange={(e) => e.target.files && handleFileUpload('id', e.target.files)}
                 />
               </label>
             </div>
+            
+            {/* Progress indicator for ID uploads */}
+            {Object.entries(uploadProgress).some(([key, _]) => key.startsWith('id-')) && (
+              <div className="mt-2 space-y-1">
+                {Object.entries(uploadProgress)
+                  .filter(([key, _]) => key.startsWith('id-'))
+                  .map(([key, progress]) => {
+                    const fileName = key.split('-').slice(1).join('-')
+                    return (
+                      <div key={key} className="text-sm">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="truncate text-gray-600">{fileName}</span>
+                          <span className="text-xs">
+                            {progress === -1 ? '❌ Error' : progress === 100 ? '✅ Done' : `${progress}%`}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                              progress === -1 ? 'bg-red-500' : progress === 100 ? 'bg-green-500' : 'bg-blue-500'
+                            }`}
+                            style={{ width: `${Math.max(0, progress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            )}
             <div className="mt-2 text-sm text-gray-500">
               <p>{draggedOver === 'id' ? t('documents.drop_files') || 'Drop files here' : t('documents.id_description')}</p>
               <p className="mt-1 text-xs text-blue-600">{t('documents.id_file_types') || 'Accepts: JPEG, JPG, PNG image files'}</p>
@@ -409,17 +568,49 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             <Upload className={`mx-auto h-12 w-12 ${draggedOver === 'resume' ? 'text-primary' : 'text-gray-400'}`} />
             <div className="mt-4">
               <label htmlFor="resume-upload" className="cursor-pointer">
-                <span className="btn-secondary inline-block">{t('documents.choose_file')}</span>
+                <span className={`btn-secondary inline-block ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  {isUploading ? t('documents.uploading') || 'Uploading...' : t('documents.choose_file')}
+                </span>
                 <input
                   id="resume-upload"
                   type="file"
                   accept={getAcceptString('resume')}
                   multiple
+                  disabled={isUploading}
                   className="sr-only"
                   onChange={(e) => e.target.files && handleFileUpload('resume', e.target.files)}
                 />
               </label>
             </div>
+            
+            {/* Progress indicator for Resume uploads */}
+            {Object.entries(uploadProgress).some(([key, _]) => key.startsWith('resume-')) && (
+              <div className="mt-2 space-y-1">
+                {Object.entries(uploadProgress)
+                  .filter(([key, _]) => key.startsWith('resume-'))
+                  .map(([key, progress]) => {
+                    const fileName = key.split('-').slice(1).join('-')
+                    return (
+                      <div key={key} className="text-sm">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="truncate text-gray-600">{fileName}</span>
+                          <span className="text-xs">
+                            {progress === -1 ? '❌ Error' : progress === 100 ? '✅ Done' : `${progress}%`}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                              progress === -1 ? 'bg-red-500' : progress === 100 ? 'bg-green-500' : 'bg-blue-500'
+                            }`}
+                            style={{ width: `${Math.max(0, progress)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            )}
             <div className="mt-2 text-sm text-gray-500">
               <p>{draggedOver === 'resume' ? t('documents.drop_files') || 'Drop files here' : t('documents.resume_description')}</p>
               <p className="mt-1 text-xs text-blue-600">{t('documents.resume_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
