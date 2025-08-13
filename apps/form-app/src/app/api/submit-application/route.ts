@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Generate submission ID and timestamp
-      const submissionId = `APP-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+      const submissionId = `${new Date().toISOString().slice(2,4)}${new Date().toISOString().slice(5,7)}${new Date().toISOString().slice(8,10)}-${String(Date.now()).slice(-4)}${Math.random().toString(36).substring(2, 4)}`
       const submittedAt = new Date().toISOString()
       
       const submissionData = {

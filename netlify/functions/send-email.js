@@ -75,42 +75,60 @@ async function sendViaMailgun(emailData) {
     key: process.env.MAILGUN_API_KEY
   });
   
-  try {
-    // Prepare message data
-    const messageData = {
-      from: `Wareworks Applications <postmaster@${process.env.MAILGUN_DOMAIN}>`,
-      to: [emailData.to],
-      subject: emailData.subject,
-      text: emailData.text,
-    };
-    
-    // Add attachments if provided
-    if (emailData.attachments && emailData.attachments.length > 0) {
-      messageData.attachment = emailData.attachments.map(att => {
-        return {
-          data: Buffer.from(att.content, 'base64'),
-          filename: att.filename,
-          contentType: att.contentType || 'application/octet-stream'
-        };
-      });
-      
-      console.log(`📎 Preparing ${emailData.attachments.length} attachments for Mailgun:`, 
-        emailData.attachments.map(a => ({ name: a.filename, size: `${Math.round(a.content.length * 0.75)} bytes` })));
-    }
-
-    const data = await mg.messages.create(process.env.MAILGUN_DOMAIN, messageData);
-
-    console.log('Email sent via Mailgun successfully:', {
-      id: data.id,
-      message: data.message,
-      to: emailData.to,
-      subject: emailData.subject,
-      attachments: emailData.attachments?.length || 0
+  // Prepare message data
+  const messageData = {
+    from: `Wareworks Applications <postmaster@${process.env.MAILGUN_DOMAIN}>`,
+    to: [emailData.to],
+    subject: emailData.subject,
+    text: emailData.text,
+  };
+  
+  // Add attachments if provided
+  if (emailData.attachments && emailData.attachments.length > 0) {
+    messageData.attachment = emailData.attachments.map(att => {
+      return {
+        data: Buffer.from(att.content, 'base64'),
+        filename: att.filename,
+        contentType: att.contentType || 'application/octet-stream'
+      };
     });
     
-    return data;
-  } catch (error) {
-    console.error('Mailgun API error:', error.message);
-    throw new Error(`Mailgun API error: ${error.message}`);
+    console.log(`📎 Preparing ${emailData.attachments.length} attachments for Mailgun:`, 
+      emailData.attachments.map(a => ({ name: a.filename, size: `${Math.round(a.content.length * 0.75)} bytes` })));
+  }
+
+  // Retry logic for Mailgun API calls
+  const maxRetries = 3;
+  const baseDelay = 1000; // 1 second
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const data = await mg.messages.create(process.env.MAILGUN_DOMAIN, messageData);
+
+      console.log('Email sent via Mailgun successfully:', {
+        id: data.id,
+        message: data.message,
+        to: emailData.to,
+        subject: emailData.subject,
+        attachments: emailData.attachments?.length || 0,
+        attempt: attempt
+      });
+      
+      return data;
+    } catch (error) {
+      console.error(`Mailgun API error (attempt ${attempt}/${maxRetries}):`, error.message);
+      
+      // Only retry on 5xx server errors, not 4xx client errors
+      const isRetryableError = error.status >= 500 || !error.status;
+      
+      if (attempt === maxRetries || !isRetryableError) {
+        throw new Error(`Mailgun API error after ${attempt} attempts: ${error.message}`);
+      }
+      
+      // Exponential backoff: wait longer between retries
+      const delay = baseDelay * Math.pow(2, attempt - 1);
+      console.log(`⏳ Retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
   }
 }

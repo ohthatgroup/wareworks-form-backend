@@ -8,6 +8,51 @@ interface EmailAttachment {
 }
 
 export class EmailService {
+  private async fetchWithRetry(url: string, options: RequestInit, maxRetries: number = 3): Promise<Response> {
+    const baseDelay = 2000; // 2 seconds
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`📡 Attempting email send (${attempt}/${maxRetries})...`)
+        
+        const response = await fetch(url, {
+          ...options,
+          signal: AbortSignal.timeout(30000) // 30 second timeout
+        })
+        
+        // If successful or non-retryable error (4xx), return immediately
+        if (response.ok || (response.status >= 400 && response.status < 500)) {
+          return response
+        }
+        
+        // 5xx errors are retryable
+        if (response.status >= 500 && attempt < maxRetries) {
+          console.log(`⚠️ Received ${response.status} error, retrying...`)
+          const delay = baseDelay * Math.pow(2, attempt - 1)
+          console.log(`⏳ Waiting ${delay}ms before retry...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          continue
+        }
+        
+        return response
+        
+      } catch (error) {
+        console.error(`❌ Email send attempt ${attempt}/${maxRetries} failed:`, error)
+        
+        if (attempt === maxRetries) {
+          throw error
+        }
+        
+        // Exponential backoff for network errors, timeouts, etc.
+        const delay = baseDelay * Math.pow(2, attempt - 1)
+        console.log(`⏳ Network error, retrying in ${delay}ms...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+    
+    throw new Error(`Failed after ${maxRetries} attempts`)
+  }
+
   async sendApplicationNotification(
     data: ValidatedApplicationData, 
     pdfResult: Buffer | { applicationPDF: Buffer; i9PDF: Buffer } | null
@@ -81,10 +126,10 @@ export class EmailService {
         attachments: attachments
       }
 
-      // Use custom send-email function (more reliable than Netlify Emails plugin)
+      // Use custom send-email function with retry logic for reliability
       const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
       
-      const response = await fetch(emailEndpoint, {
+      const response = await this.fetchWithRetry(emailEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -99,7 +144,7 @@ export class EmailService {
             contentType: att.contentType
           }))
         })
-      })
+      }, 3)
 
       console.log('Email API response status:', response.status, response.statusText)
       
@@ -196,25 +241,26 @@ export class EmailService {
         attachmentTypes: attachments.map(a => ({ name: a.filename, type: a.contentType }))
       })
 
-      // Use custom send-email function (more reliable than Netlify Emails plugin)
+      // Use custom send-email function with retry logic for reliability
       const emailEndpoint = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/send-email`
+      const emailPayload = {
+        to: hrEmail,
+        subject: subject,
+        text: this.generateBilingualPlainTextEmail(data, attachments.length),
+        attachments: attachments.map(att => ({
+          content: att.content,
+          filename: att.filename,
+          contentType: att.contentType
+        }))
+      }
       
-      const response = await fetch(emailEndpoint, {
+      const response = await this.fetchWithRetry(emailEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          to: hrEmail,
-          subject: subject,
-          text: this.generateBilingualPlainTextEmail(data, attachments.length),
-          attachments: attachments.map(att => ({
-            content: att.content,
-            filename: att.filename,
-            contentType: att.contentType
-          }))
-        })
-      })
+        body: JSON.stringify(emailPayload)
+      }, 3)
 
       console.log('Bilingual email API response status:', response.status, response.statusText)
       

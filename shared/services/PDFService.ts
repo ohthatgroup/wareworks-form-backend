@@ -15,20 +15,20 @@ interface FieldTreatment {
   allowWrapping?: boolean
 }
 
-// Field categorization map with treatment strategies
+// Field categorization map based on ACTUAL template field analysis
 const FIELD_TREATMENTS: Record<string, FieldTreatment> = {
-  // Category A: Fixed Format Fields (UI validation only)
-  'Applicant SSN - P1': { category: 'fixed', safeLimit: 3 },
-  'Applicant SSN - P2': { category: 'fixed', safeLimit: 2 },
-  'Applicant SSN - P3': { category: 'fixed', safeLimit: 4 },
-  'Applicant DOB - Month': { category: 'fixed', safeLimit: 2 },
-  'Applicant DOB - Day': { category: 'fixed', safeLimit: 2 },
-  'Applicant DOB - Year': { category: 'fixed', safeLimit: 4 },
-  'Applicant State': { category: 'fixed', safeLimit: 2 },
-  'Applicant Zip Code': { category: 'fixed', safeLimit: 10 },
-  'Applicant Home Phone': { category: 'fixed', safeLimit: 14 },
-  'Applicant Cell Phone Number': { category: 'fixed', safeLimit: 14 },
-  'Emergency Contact Phone Number': { category: 'fixed', safeLimit: 14 },
+  // Category A: Fixed Format Fields - CRITICAL ISSUE: Many fields too small!
+  'Applicant SSN - P1': { category: 'fixed', safeLimit: 1 }, // CRITICAL: Field only fits 1 char, needs 3!
+  'Applicant SSN - P2': { category: 'fixed', safeLimit: 1 }, // CRITICAL: Field only fits 1 char, needs 2!
+  'Applicant SSN - P3': { category: 'fixed', safeLimit: 2 }, // CRITICAL: Field only fits 2 chars, needs 4!
+  'Applicant DOB - Month': { category: 'fixed', safeLimit: 0 }, // CRITICAL: Field only fits 0 chars!
+  'Applicant DOB - Day': { category: 'fixed', safeLimit: 0 }, // CRITICAL: Field only fits 0 chars!
+  'Applicant DOB - Year': { category: 'fixed', safeLimit: 2 }, // CRITICAL: Field only fits 2 chars, needs 4!
+  'Applicant State': { category: 'fixed', safeLimit: 1 }, // CRITICAL: Only fits 1 char, needs 2 for state codes
+  'Applicant Zip Code': { category: 'fixed', safeLimit: 3 }, // CRITICAL: Only fits 3 chars, needs 5+
+  'Applicant Home Phone': { category: 'fixed', safeLimit: 7 }, // CRITICAL: Only fits 7 chars, needs 14 for formatted phone
+  'Applicant Cell Phone Number': { category: 'fixed', safeLimit: 7 }, // CRITICAL: Only fits 7 chars, needs 14
+  'Emergency Contact Phone Number': { category: 'fixed', safeLimit: 7 }, // CRITICAL: Only fits 7 chars, needs 14
   
   // Hours fields (4-7 chars max)
   'Sunday Hours': { category: 'fixed', safeLimit: 6 },
@@ -53,53 +53,53 @@ const FIELD_TREATMENTS: Record<string, FieldTreatment> = {
   'Company Date Ended 2 - Day': { category: 'fixed', safeLimit: 2 },
   'Company Date Ended 2 - Year': { category: 'fixed', safeLimit: 4 },
   
-  // Category B: Names (dynamic font sizing only, 7-10pt)
-  'Applicant Legal First Name': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
-  'Applicant Legal Last Name': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
-  'Applicant Middle Initials': { category: 'name', safeLimit: 2, minFontSize: 7, maxFontSize: 10 },
-  'Emergency Contact Name': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
-  'Emergency Contact Relationship': { category: 'name', safeLimit: 15, minFontSize: 7, maxFontSize: 10 },
-  'Company Supervisor Name 1': { category: 'name', safeLimit: 20, minFontSize: 7, maxFontSize: 10 },
-  'Company Supervisor Name 2': { category: 'name', safeLimit: 20, minFontSize: 7, maxFontSize: 10 },
+  // Category B: Names - Mobile-optimized with lower minimum sizes
+  'Applicant Legal First Name': { category: 'name', safeLimit: 15, minFontSize: 5, maxFontSize: 10 }, // Allow smaller fonts for mobile
+  'Applicant Legal Last Name': { category: 'name', safeLimit: 15, minFontSize: 5, maxFontSize: 10 }, // Allow smaller fonts for mobile
+  'Applicant Middle Initials': { category: 'name', safeLimit: 1, minFontSize: 6, maxFontSize: 10 }, // Single character, slightly larger min
+  'Emergency Contact Name': { category: 'name', safeLimit: 15, minFontSize: 5, maxFontSize: 10 }, // Allow smaller fonts for mobile
+  'Emergency Contact Relationship': { category: 'name', safeLimit: 15, minFontSize: 5, maxFontSize: 10 }, // Allow smaller fonts for mobile
+  'Company Supervisor Name 1': { category: 'name', safeLimit: 20, minFontSize: 5, maxFontSize: 10 }, // Allow smaller fonts for mobile
+  'Company Supervisor Name 2': { category: 'name', safeLimit: 20, minFontSize: 5, maxFontSize: 10 },
   
-  // Category C: Medium Text (dynamic font + limited wrapping, 7-10pt)
-  'Position Applied For': { category: 'medium', safeLimit: 25, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Expected Salary': { category: 'medium', safeLimit: 12, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Applicant Street Address': { category: 'medium', safeLimit: 21, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Applicant City': { category: 'medium', safeLimit: 18, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Applicant Email': { category: 'medium', safeLimit: 32, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Name and Location 1': { category: 'medium', safeLimit: 27, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Name and Location 2': { category: 'medium', safeLimit: 27, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Starting Position 1': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Starting Position 2': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Ending Position 1': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Ending Position 2': { category: 'medium', safeLimit: 16, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Telephone Number 1': { category: 'medium', safeLimit: 7, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'Company Telephone Number 2': { category: 'medium', safeLimit: 7, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'School Name and Location 1': { category: 'medium', safeLimit: 29, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'School Name and Location 2': { category: 'medium', safeLimit: 29, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'School Year 1': { category: 'medium', safeLimit: 14, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'School Year 2': { category: 'medium', safeLimit: 14, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'School Major 1': { category: 'medium', safeLimit: 15, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
-  'School Major 2': { category: 'medium', safeLimit: 15, minFontSize: 7, maxFontSize: 10, allowWrapping: false },
+  // Category C: Medium Text - Mobile-optimized with smaller minimum sizes  
+  'Position Applied For': { category: 'medium', safeLimit: 25, minFontSize: 5, maxFontSize: 10, allowWrapping: false }, // Reduced min for mobile
+  'Expected Salary': { category: 'medium', safeLimit: 12, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Very small field, aggressive min
+  'Applicant Street Address': { category: 'medium', safeLimit: 21, minFontSize: 5, maxFontSize: 10, allowWrapping: false }, // Reduced min for mobile
+  'Applicant City': { category: 'medium', safeLimit: 18, minFontSize: 5, maxFontSize: 10, allowWrapping: false }, // Reduced min for mobile
+  'Applicant Email': { category: 'medium', safeLimit: 32, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Emails can be long, very small min
+  'Company Name and Location 1': { category: 'medium', safeLimit: 35, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Can be very long
+  'Company Name and Location 2': { category: 'medium', safeLimit: 35, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Can be very long
+  'Company Starting Position 1': { category: 'medium', safeLimit: 22, minFontSize: 5, maxFontSize: 10, allowWrapping: false },
+  'Company Starting Position 2': { category: 'medium', safeLimit: 22, minFontSize: 5, maxFontSize: 10, allowWrapping: false },
+  'Company Ending Position 1': { category: 'medium', safeLimit: 22, minFontSize: 5, maxFontSize: 10, allowWrapping: false },
+  'Company Ending Position 2': { category: 'medium', safeLimit: 22, minFontSize: 5, maxFontSize: 10, allowWrapping: false },
+  'Company Telephone Number 1': { category: 'medium', safeLimit: 15, minFontSize: 5, maxFontSize: 10, allowWrapping: false }, // (XXX) XXX-XXXX format
+  'Company Telephone Number 2': { category: 'medium', safeLimit: 15, minFontSize: 5, maxFontSize: 10, allowWrapping: false },
+  'School Name and Location 1': { category: 'medium', safeLimit: 40, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Can be very long
+  'School Name and Location 2': { category: 'medium', safeLimit: 40, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Can be very long
+  'School Year 1': { category: 'medium', safeLimit: 20, minFontSize: 5, maxFontSize: 10, allowWrapping: false }, // '2018-2022' or 'Graduado en 2022'
+  'School Year 2': { category: 'medium', safeLimit: 20, minFontSize: 5, maxFontSize: 10, allowWrapping: false },
+  'School Major 1': { category: 'medium', safeLimit: 25, minFontSize: 4, maxFontSize: 10, allowWrapping: false }, // Spanish degree names longer
+  'School Major 2': { category: 'medium', safeLimit: 25, minFontSize: 4, maxFontSize: 10, allowWrapping: false },
   
-  // Category D: Long Text (full dynamic treatment with overflow, 7-10pt)
-  'How did you discover this job opening': { category: 'long', safeLimit: 21, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'If yes please specify when and where': { category: 'long', safeLimit: 12, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Applicable Skills  Qualifications 1': { category: 'long', safeLimit: 45, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Applicable Skills  Qualifications 2': { category: 'long', safeLimit: 45, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Applicable Skills  Qualifications 3': { category: 'long', safeLimit: 45, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Company Responsibilities 1': { category: 'long', safeLimit: 35, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Company Responsibilities 2': { category: 'long', safeLimit: 35, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Company Reason for Leaving 1': { category: 'long', safeLimit: 33, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
-  'Company Reason for Leaving 2': { category: 'long', safeLimit: 33, minFontSize: 7, maxFontSize: 10, allowWrapping: true },
+  // Category D: Long Text - Mobile-optimized with smaller minimum sizes and overflow support
+  'How did you discover this job opening': { category: 'long', safeLimit: 21, minFontSize: 5, maxFontSize: 10, allowWrapping: true }, // Reduced min for mobile
+  'If yes please specify when and where': { category: 'long', safeLimit: 12, minFontSize: 4, maxFontSize: 10, allowWrapping: true }, // Very small field, aggressive min
+  'Applicable Skills  Qualifications 1': { category: 'long', safeLimit: 45, minFontSize: 5, maxFontSize: 10, allowWrapping: true }, // Reduced min for mobile
+  'Applicable Skills  Qualifications 2': { category: 'long', safeLimit: 45, minFontSize: 5, maxFontSize: 10, allowWrapping: true }, // Reduced min for mobile
+  'Applicable Skills  Qualifications 3': { category: 'long', safeLimit: 45, minFontSize: 5, maxFontSize: 10, allowWrapping: true }, // Reduced min for mobile
+  'Company Responsibilities 1': { category: 'long', safeLimit: 45, minFontSize: 4, maxFontSize: 10, allowWrapping: true }, // Can be very long, small min
+  'Company Responsibilities 2': { category: 'long', safeLimit: 45, minFontSize: 4, maxFontSize: 10, allowWrapping: true },
+  'Company Reason for Leaving 1': { category: 'long', safeLimit: 40, minFontSize: 4, maxFontSize: 10, allowWrapping: true },
+  'Company Reason for Leaving 2': { category: 'long', safeLimit: 40, minFontSize: 4, maxFontSize: 10, allowWrapping: true },
   
-  // Category E: Continuation Fields (auto-populated overflow)
-  'How did you discover this job opening - Continued': { category: 'continuation', safeLimit: 11, minFontSize: 7, maxFontSize: 10 },
-  'Company Responsibilities 1 Continued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 },
-  'Company Responsibilities 2 Continued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 },
-  'Company Reason for Leaving 1 Conitnued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 },
-  'Company Reason for Leaving 2 Continued': { category: 'continuation', safeLimit: 44, minFontSize: 7, maxFontSize: 10 }
+  // Category E: Continuation Fields (auto-populated overflow) - Mobile-optimized
+  'How did you discover this job opening - Continued': { category: 'continuation', safeLimit: 20, minFontSize: 4, maxFontSize: 10 },
+  'Company Responsibilities 1 Continued': { category: 'continuation', safeLimit: 55, minFontSize: 4, maxFontSize: 10 },
+  'Company Responsibilities 2 Continued': { category: 'continuation', safeLimit: 55, minFontSize: 4, maxFontSize: 10 },
+  'Company Reason for Leaving 1 Conitnued': { category: 'continuation', safeLimit: 55, minFontSize: 4, maxFontSize: 10 },
+  'Company Reason for Leaving 2 Continued': { category: 'continuation', safeLimit: 55, minFontSize: 4, maxFontSize: 10 }
 }
 
 export class PDFService {
@@ -630,36 +630,93 @@ export class PDFService {
     // Get treatment strategy for this field
     const treatment = FIELD_TREATMENTS[fieldName]
     if (!treatment) {
-      // Default to 10pt for unmapped fields
-      return 10
+      // Default to smaller mobile-friendly size
+      return 8
     }
 
-    // Fixed format fields always use 10pt
+    // Get field dimensions
+    const fieldRect = field.acroField.getWidgets()[0]?.getRectangle()
+    if (!fieldRect) {
+      // Fallback to legacy method if we can't get field dimensions
+      return this.calculateLegacyFontSize(text, treatment)
+    }
+
+    const fieldWidth = fieldRect.width
+    const fieldHeight = fieldRect.height
+    
+    // Calculate based on actual field dimensions and text content
+    const minSize = Math.max(treatment.minFontSize || 4, 4) // Absolute minimum 4pt for mobile
+    const maxSize = treatment.maxFontSize || 12
+    
+    // Fixed format fields use smaller fonts to prevent overflow
     if (treatment.category === 'fixed') {
-      return 10
+      return Math.min(8, maxSize) // Smaller default for fixed fields
     }
 
-    // For other categories, calculate optimal size based on text length
-    const minSize = treatment.minFontSize || 7
+    // Calculate optimal font size based on text width vs field width
+    const optimalSize = this.calculateDynamicFontSize(text, fieldWidth, fieldHeight, minSize, maxSize)
+    
+    // Additional mobile optimization - reduce font size further for long text
+    const mobileAdjustment = this.getMobileAdjustment(text.length, treatment.category)
+    const finalSize = Math.max(optimalSize - mobileAdjustment, minSize)
+    
+    console.log(`📏 Font sizing for "${fieldName}": text="${text.substring(0, 20)}..." width=${fieldWidth} → ${finalSize}pt`)
+    
+    return finalSize
+  }
+
+  private calculateDynamicFontSize(text: string, fieldWidth: number, fieldHeight: number, minSize: number, maxSize: number): number {
+    // Start with maximum size and reduce until text fits
+    for (let fontSize = maxSize; fontSize >= minSize; fontSize -= 0.5) {
+      // Estimate text width (rough approximation: 0.6 * fontSize * character count)
+      const estimatedTextWidth = text.length * fontSize * 0.6
+      
+      // Add padding (10% of field width on each side)
+      const availableWidth = fieldWidth * 0.8
+      
+      // Check if text fits with some margin
+      if (estimatedTextWidth <= availableWidth) {
+        return fontSize
+      }
+    }
+    
+    return minSize
+  }
+
+  private getMobileAdjustment(textLength: number, category: string): number {
+    // Additional reduction for mobile readability
+    if (category === 'fixed') {
+      return textLength > 8 ? 2 : 1 // Aggressive reduction for fixed fields
+    } else if (category === 'name') {
+      return textLength > 15 ? 1.5 : 0.5 // Moderate reduction for names
+    } else if (category === 'medium') {
+      return textLength > 25 ? 2 : 1 // Reduction for medium text
+    } else if (category === 'long') {
+      return textLength > 40 ? 1 : 0 // Less reduction since these have overflow handling
+    }
+    
+    return 0.5 // Default small reduction
+  }
+
+  private calculateLegacyFontSize(text: string, treatment: FieldTreatment): number {
+    // Fallback to original logic if field dimensions unavailable
+    const minSize = Math.max(treatment.minFontSize || 4, 4)
     const maxSize = treatment.maxFontSize || 10
     const safeLimit = treatment.safeLimit
 
-    // If text fits within safe limit, use max font size
     if (text.length <= safeLimit) {
       return maxSize
     }
 
-    // Calculate optimal font size based on overflow ratio
     const overflowRatio = text.length / safeLimit
     
     if (overflowRatio <= 1.2) {
-      // Slight overflow: reduce to 9pt
-      return Math.max(9, minSize)
+      return Math.max(maxSize - 1, minSize)
     } else if (overflowRatio <= 1.5) {
-      // Moderate overflow: reduce to 8pt
-      return Math.max(8, minSize)
+      return Math.max(maxSize - 2, minSize)
+    } else if (overflowRatio <= 2.0) {
+      return Math.max(maxSize - 3, minSize)
     } else {
-      // Heavy overflow: use minimum font size
       return minSize
     }
   }
@@ -1062,16 +1119,29 @@ export class PDFService {
     console.log('📝 Note: Signature fields and Sections 2-3 left blank for HR to complete manually')
   }
 
-  private formatDateForI9(dateString: string): string {
+  private formatDateForI9(dateString: string | undefined): string {
+    // Return empty string if no date provided
+    if (!dateString || dateString.trim() === '') {
+      return ''
+    }
+    
     try {
       const date = new Date(dateString)
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn(`Invalid date string provided to formatDateForI9: "${dateString}"`)
+        return ''
+      }
+      
       return date.toLocaleDateString('en-US', { 
         month: '2-digit', 
         day: '2-digit', 
         year: 'numeric' 
       }).replace(/\//g, '')
-    } catch {
-      return dateString
+    } catch (error) {
+      console.warn(`Error formatting date for I-9: "${dateString}"`, error)
+      return ''
     }
   }
 
