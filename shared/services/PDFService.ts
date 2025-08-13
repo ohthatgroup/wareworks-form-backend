@@ -1138,7 +1138,7 @@ export class PDFService {
         month: '2-digit', 
         day: '2-digit', 
         year: 'numeric' 
-      }).replace(/\//g, '')
+      })
     } catch (error) {
       console.warn(`Error formatting date for I-9: "${dateString}"`, error)
       return ''
