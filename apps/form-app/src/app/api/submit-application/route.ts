@@ -4,16 +4,24 @@ import { PDFService } from '../../../../../../shared/services/PDFService'
 import { EmailService } from '../../../../../../shared/services/EmailService'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
+function logMemoryUsage(step: string) {
+  const used = process.memoryUsage()
+  console.log(`🧠 Memory [${step}]: ${Math.round(used.heapUsed / 1024 / 1024)}MB heap, ${Math.round(used.rss / 1024 / 1024)}MB RSS`)
+}
+
 export async function POST(request: NextRequest) {
   console.log('API route called - POST /api/submit-application')
+  logMemoryUsage('start')
     
     try {
       // Parse the request body
       const body = await request.json()
+      logMemoryUsage('after-json-parse')
       console.log('Request body received, fields:', Object.keys(body).length)
       
       // Validate using Zod schema
       const validationResult = applicationSchema.safeParse(body)
+      logMemoryUsage('after-validation')
       if (!validationResult.success) {
         console.error('Validation errors:', validationResult.error.issues)
         return NextResponse.json(
@@ -37,6 +45,7 @@ export async function POST(request: NextRequest) {
         submissionId,
         submittedAt
       }
+      logMemoryUsage('after-data-processing')
       
       console.log('Form submission processed:', {
         submissionId,
@@ -48,8 +57,10 @@ export async function POST(request: NextRequest) {
       // Generate PDF
       let pdfResult: Buffer | { applicationPDF: Buffer; i9PDF: Buffer } | null = null
       try {
+        logMemoryUsage('before-pdf-generation')
         const pdfService = new PDFService()
         pdfResult = await pdfService.generateApplicationPDF(submissionData)
+        logMemoryUsage('after-pdf-generation')
         
         if (Buffer.isBuffer(pdfResult)) {
           console.log('PDF generated successfully, size:', pdfResult.length, 'bytes')
@@ -61,19 +72,23 @@ export async function POST(request: NextRequest) {
         }
       } catch (pdfError) {
         console.error('PDF generation failed:', pdfError)
+        logMemoryUsage('after-pdf-error')
         // Continue without PDF - don't fail the entire submission
       }
 
       // Send bilingual email notification with both English and Spanish PDFs
       try {
         if (process.env.ENABLE_EMAIL_NOTIFICATIONS === 'true') {
+          logMemoryUsage('before-email-generation')
           const emailService = new EmailService()
           await emailService.sendBilingualApplicationNotification(submissionData)
+          logMemoryUsage('after-email-success')
           console.log('Bilingual email notification sent successfully with English and Spanish PDFs')
         } else {
           console.log('Email notifications disabled')
         }
       } catch (emailError) {
+        logMemoryUsage('after-email-error')
         console.error('Bilingual email sending failed:', emailError)
         // Continue without email - don't fail the entire submission
       }

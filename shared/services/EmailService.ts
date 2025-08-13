@@ -180,6 +180,11 @@ export class EmailService {
     }
   }
 
+  private logMemoryUsage(step: string) {
+    const used = process.memoryUsage()
+    console.log(`🧠 Email Memory [${step}]: ${Math.round(used.heapUsed / 1024 / 1024)}MB heap, ${Math.round(used.rss / 1024 / 1024)}MB RSS`)
+  }
+
   async sendBilingualApplicationNotification(data: ValidatedApplicationData): Promise<void> {
     if (!process.env.ENABLE_EMAIL_NOTIFICATIONS || process.env.ENABLE_EMAIL_NOTIFICATIONS !== 'true') {
       console.log('Email notifications disabled')
@@ -190,9 +195,11 @@ export class EmailService {
     const subject = `New Application - ${data.legalFirstName} ${data.legalLastName} - ${data.state}`
 
     try {
+      this.logMemoryUsage('email-start')
       // Generate both English and Spanish PDFs
       const pdfService = new PDFService()
       const bilingualResult = await pdfService.generateBilingualApplicationPDF(data)
+      this.logMemoryUsage('after-bilingual-pdf-generation')
       
       // Prepare attachments
       const attachments: EmailAttachment[] = []
@@ -231,6 +238,8 @@ export class EmailService {
           console.log(`📎 Document attachment added: ${doc.name} (${doc.mimeType})`)
         }
       }
+      
+      this.logMemoryUsage('after-attachments-prepared')
 
       console.log('Preparing to send bilingual email notification:', {
         recipient: hrEmail,
@@ -254,6 +263,12 @@ export class EmailService {
         }))
       }
       
+      this.logMemoryUsage('before-email-send')
+      
+      // Calculate payload size and optimize if needed
+      const payloadSize = JSON.stringify(emailPayload).length
+      console.log(`📏 Email payload size: ${Math.round(payloadSize / 1024 / 1024 * 100) / 100}MB`)
+      
       const response = await this.fetchWithRetry(emailEndpoint, {
         method: 'POST',
         headers: {
@@ -261,6 +276,8 @@ export class EmailService {
         },
         body: JSON.stringify(emailPayload)
       }, 3)
+      
+      this.logMemoryUsage('after-email-send')
 
       console.log('Bilingual email API response status:', response.status, response.statusText)
       
