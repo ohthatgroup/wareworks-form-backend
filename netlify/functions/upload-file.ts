@@ -66,12 +66,13 @@ export const handler: Handler = async (event, context) => {
     let finalContentType = uploadRequest.contentType
     let finalKey = uploadRequest.key
     
-    // Dynamic file size limit based on category and expected usage
-    let maxSize = 2 * 1024 * 1024 // Default 2MB
+    // Smart file size limits based on document type
+    let maxSize = 2 * 1024 * 1024 // Default 2MB (ID documents)
     
-    // For certification uploads, use smaller limit to accommodate multiple files
-    if (category && category.includes('-cert')) {
-      maxSize = 1 * 1024 * 1024 // 1MB for certifications
+    if (category === 'resume') {
+      maxSize = 1 * 1024 * 1024 // 1MB for resume
+    } else if (category && category.includes('-cert')) {
+      maxSize = 0.5 * 1024 * 1024 // 500KB for certifications
     }
     
     if (buffer.length > maxSize) {

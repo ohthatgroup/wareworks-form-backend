@@ -91,10 +91,13 @@ export class FileUploadService {
     // Dynamic file validation matching upload-file.ts logic
     const category = this.mapDocumentTypeToCategory(file.type)
     
-    // Use same logic as upload-file.ts
-    let maxSize = 2 * 1024 * 1024 // Default 2MB
-    if (category && category.includes('-cert')) {
-      maxSize = 1 * 1024 * 1024 // 1MB for certifications
+    // Use same logic as upload-file.ts - smart limits by document type
+    let maxSize = 2 * 1024 * 1024 // Default 2MB (ID documents)
+    
+    if (category === 'resume') {
+      maxSize = 1 * 1024 * 1024 // 1MB for resume
+    } else if (category && category.includes('-cert')) {
+      maxSize = 0.5 * 1024 * 1024 // 500KB for certifications
     }
     
     if (file.size > maxSize) {

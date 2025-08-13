@@ -167,36 +167,32 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
       return
     }
     
-    // Calculate dynamic limits based on selected certifications
-    const maxCertifications = certifiedForklifts.length + certifiedSkills.length
-    const expectedFileCount = 1 + maxCertifications // resume + certifications (ID doesn't count toward size limit)
-    
-    // Dynamic per-file limit: smaller if many certifications expected
+    // Smart file size limits based on document type
     let maxFileSize: number
-    if (expectedFileCount <= 2) {
-      maxFileSize = 2 * 1024 * 1024 // 2MB if few files
-    } else if (expectedFileCount <= 5) {
-      maxFileSize = 1.5 * 1024 * 1024 // 1.5MB for moderate uploads  
+    if (category === 'resume') {
+      maxFileSize = 1 * 1024 * 1024 // 1MB for resume (can be larger document)
+    } else if (category.includes('-cert')) {
+      maxFileSize = 0.5 * 1024 * 1024 // 500KB for certifications (usually smaller)
     } else {
-      maxFileSize = 1 * 1024 * 1024 // 1MB for many certifications
+      maxFileSize = 2 * 1024 * 1024 // 2MB default (ID documents)
     }
     
     const oversizedFiles = fileArray.filter(file => file.size > maxFileSize)
     if (oversizedFiles.length > 0) {
-      const limitMB = Math.round(maxFileSize / 1024 / 1024 * 10) / 10
+      const limitMB = maxFileSize >= 1024 * 1024 ? Math.round(maxFileSize / 1024 / 1024 * 10) / 10 : Math.round(maxFileSize / 1024) + 'KB'
       const oversizedList = oversizedFiles.map(f => `${f.name} (${Math.round(f.size / 1024 / 1024 * 10) / 10}MB)`).join('\n')
-      alert(`Files too large - maximum ${limitMB}MB per file (reduced due to ${maxCertifications} certifications selected):\n\n${oversizedList}\n\nPlease compress your files or reduce certification selections.`)
+      alert(`Files too large - maximum ${limitMB} per ${category === 'resume' ? 'resume' : category.includes('-cert') ? 'certification' : 'file'}:\n\n${oversizedList}\n\nPlease compress your files and try again.`)
       return
     }
     
-    // Dynamic total size limit based on expected uploads
-    const baseTotalLimit = 6 * 1024 * 1024 // 6MB base
+    // Hard total limit: 5MB across all uploads to ensure email delivery
+    const totalLimit = 5 * 1024 * 1024 // 5MB total
     const totalSizeThisUpload = fileArray.reduce((sum, file) => sum + file.size, 0)
     const existingDocsSize = (documents || []).reduce((sum, doc) => sum + doc.size, 0)
     
-    if (existingDocsSize + totalSizeThisUpload > baseTotalLimit) {
+    if (existingDocsSize + totalSizeThisUpload > totalLimit) {
       const currentTotal = Math.round((existingDocsSize + totalSizeThisUpload) / 1024 / 1024 * 10) / 10
-      alert(`Total document size would be ${currentTotal}MB, which exceeds the ${Math.round(baseTotalLimit / 1024 / 1024)}MB limit.\n\nWith ${maxCertifications} certifications selected, consider:\n• Compressing existing files\n• Reducing certification selections\n• Using smaller file formats`)
+      alert(`Total document size would be ${currentTotal}MB, which exceeds the 5MB limit.\n\nTo stay under the limit:\n• Compress existing files\n• Remove some documents\n• Use smaller file formats`)
       return
     }
     
@@ -437,19 +433,9 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
 
   // Calculate current usage and limits for display
   const maxCertifications = certifiedForklifts.length + certifiedSkills.length
-  const expectedFileCount = 1 + maxCertifications
   const currentTotalSize = (documents || []).reduce((sum, doc) => sum + doc.size, 0)
-  const baseTotalLimit = 6 * 1024 * 1024
-  const usagePercent = Math.round((currentTotalSize / baseTotalLimit) * 100)
-  
-  let maxFileSize: number
-  if (expectedFileCount <= 2) {
-    maxFileSize = 2 * 1024 * 1024 // 2MB if few files
-  } else if (expectedFileCount <= 5) {
-    maxFileSize = 1.5 * 1024 * 1024 // 1.5MB for moderate uploads  
-  } else {
-    maxFileSize = 1 * 1024 * 1024 // 1MB for many certifications
-  }
+  const totalLimit = 5 * 1024 * 1024 // 5MB total limit
+  const usagePercent = Math.round((currentTotalSize / totalLimit) * 100)
 
   return (
     <div className="space-y-6 relative">
@@ -459,7 +445,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-medium text-blue-900">Document Upload Status</h3>
             <span className="text-sm text-blue-700">
-              {Math.round(currentTotalSize / 1024 / 1024 * 10) / 10}MB / {Math.round(baseTotalLimit / 1024 / 1024)}MB
+              {Math.round(currentTotalSize / 1024 / 1024 * 10) / 10}MB / {Math.round(totalLimit / 1024 / 1024)}MB
             </span>
           </div>
           <div className="w-full bg-blue-200 rounded-full h-2">
@@ -471,7 +457,7 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
             />
           </div>
           <div className="flex justify-between text-xs text-blue-600 mt-1">
-            <span>Per file limit: {Math.round(maxFileSize / 1024 / 1024 * 10) / 10}MB</span>
+            <span>Resume: 1MB max • Certs: 500KB max</span>
             <span>{documents.length} files uploaded</span>
             {maxCertifications > 0 && (
               <span>{maxCertifications} certifications selected</span>
