@@ -125,6 +125,9 @@ export class PDFService {
       throw new Error('PDF generation disabled')
     }
 
+    let pdfDoc: PDFDocument | null = null
+    let templateBytes: Buffer | null = null
+
     try {
       console.log('Generating PDF for application:', data.submissionId)
       
@@ -142,18 +145,21 @@ export class PDFService {
       }
       
       console.log(`📁 Loading template from: ${templatePath}`)
-      const templateBytes = await fs.readFile(templatePath)
+      templateBytes = await fs.readFile(templatePath)
       
       // Load the PDF document
-      const pdfDoc = await PDFDocument.load(templateBytes)
+      pdfDoc = await PDFDocument.load(templateBytes)
       
       // Register fontkit for custom fonts
       pdfDoc.registerFontkit(fontkit)
       
       const form = pdfDoc.getForm()
       
-      // Fill the form fields based on template analysis
+      // Fill the application form fields
       await this.fillApplicationFields(form, data)
+      
+      // Fill the I-9 form fields (now part of the unified template)
+      await this.fillI9Fields(form, data)
       
       // Skip merging uploaded documents - they will be sent as separate attachments
       if (data.documents && data.documents.length > 0) {
@@ -163,68 +169,64 @@ export class PDFService {
       // Add digital signature if provided
       await this.addSignatureToApplicationPDF(pdfDoc, form, data, false)
       
-      // Generate separate I-9 form if needed
-      let i9Buffer: Buffer | null = null
-      if (this.hasI9Documents(data)) {
-        i9Buffer = await this.addI9Form(pdfDoc, data)
-      }
-      
-      // Serialize the main application PDF
+      // Serialize the unified application PDF (includes I-9 form)
       const applicationPdfBytes = await pdfDoc.save()
       const applicationBuffer = Buffer.from(applicationPdfBytes)
       
-      // Return both PDFs if I-9 is needed
-      if (i9Buffer) {
-        return {
-          applicationPDF: applicationBuffer,
-          i9PDF: i9Buffer
-        }
-      } else {
-        return applicationBuffer
-      }
+      // Explicit memory cleanup
+      this.cleanupPDFResources(pdfDoc, templateBytes)
+      
+      console.log('✅ Generated unified PDF with application and I-9 form')
+      return applicationBuffer
 
     } catch (error) {
       console.error('PDF generation error:', error)
+      // Cleanup on error as well
+      try {
+        if (pdfDoc) this.cleanupPDFResources(pdfDoc, templateBytes)
+      } catch (cleanupError) {
+        console.warn('Error during cleanup:', cleanupError)
+      }
       throw new Error(`Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
-  async generateBilingualApplicationPDF(data: ValidatedApplicationData): Promise<{ englishPDF: Buffer; spanishPDF: Buffer; i9PDF: Buffer | null }> {
+  async generateBilingualApplicationPDF(data: ValidatedApplicationData): Promise<{ englishPDF: Buffer; spanishPDF: Buffer }> {
     if (!process.env.ENABLE_PDF_GENERATION || process.env.ENABLE_PDF_GENERATION !== 'true') {
       throw new Error('PDF generation disabled')
     }
 
     try {
-      console.log('Generating bilingual PDFs for application:', data.submissionId)
+      console.log('Generating bilingual unified PDFs for application:', data.submissionId)
       
       // Generate English PDF
-      const englishResult = await this.generateSingleApplicationPDF(data, 'english')
-      let englishPDF: Buffer
-      let i9PDF: Buffer | null = null
+      const englishPDF = await this.generatePDFForLanguage(data, 'english')
       
-      if (Buffer.isBuffer(englishResult)) {
-        englishPDF = englishResult
-      } else {
-        englishPDF = englishResult.applicationPDF
-        i9PDF = englishResult.i9PDF
-      }
+      // Generate Spanish PDF  
+      const spanishPDF = await this.generatePDFForLanguage(data, 'spanish')
       
-      // Generate Spanish PDF
-      const spanishPDF = await this.generateSingleApplicationPDF(data, 'spanish') as Buffer
+      console.log('✅ Generated bilingual unified PDFs with I-9 forms included')
+      
+      // Force garbage collection after processing both PDFs
+      this.forceGarbageCollection()
       
       return {
         englishPDF,
-        spanishPDF,
-        i9PDF
+        spanishPDF
       }
       
     } catch (error) {
       console.error('Bilingual PDF generation error:', error)
+      // Force cleanup on error as well
+      this.forceGarbageCollection()
       throw new Error(`Failed to generate bilingual PDFs: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
-  private async generateSingleApplicationPDF(data: ValidatedApplicationData, language: 'english' | 'spanish'): Promise<Buffer | { applicationPDF: Buffer; i9PDF: Buffer }> {
+  private async generatePDFForLanguage(data: ValidatedApplicationData, language: 'english' | 'spanish'): Promise<Buffer> {
+    let pdfDoc: PDFDocument | null = null
+    let templateBytes: Buffer | null = null
+
     try {
       console.log(`Generating ${language} PDF for application:`, data.submissionId)
       
@@ -243,18 +245,21 @@ export class PDFService {
       }
       
       console.log(`📁 Loading ${language} template from: ${templatePath}`)
-      const templateBytes = await fs.readFile(templatePath)
+      templateBytes = await fs.readFile(templatePath)
       
       // Load the PDF document
-      const pdfDoc = await PDFDocument.load(templateBytes)
+      pdfDoc = await PDFDocument.load(templateBytes)
       
       // Register fontkit for custom fonts
       pdfDoc.registerFontkit(fontkit)
       
       const form = pdfDoc.getForm()
       
-      // Fill the form fields based on template analysis
+      // Fill the application form fields
       await this.fillApplicationFields(form, data)
+      
+      // Fill the I-9 form fields (now part of the unified template)
+      await this.fillI9Fields(form, data)
       
       // Skip merging uploaded documents - they will be sent as separate attachments
       if (data.documents && data.documents.length > 0) {
@@ -264,31 +269,28 @@ export class PDFService {
       // Add digital signature if provided
       await this.addSignatureToApplicationPDF(pdfDoc, form, data, language === 'spanish')
       
-      // Generate separate I-9 form only for English version
-      let i9Buffer: Buffer | null = null
-      if (language === 'english' && this.hasI9Documents(data)) {
-        i9Buffer = await this.addI9Form(pdfDoc, data)
-      }
-      
-      // Serialize the application PDF
+      // Serialize the unified application PDF (includes I-9 form)
       const applicationPdfBytes = await pdfDoc.save()
       const applicationBuffer = Buffer.from(applicationPdfBytes)
       
-      // Return both PDFs if I-9 is needed (English only)
-      if (i9Buffer) {
-        return {
-          applicationPDF: applicationBuffer,
-          i9PDF: i9Buffer
-        }
-      } else {
-        return applicationBuffer
-      }
+      // Explicit memory cleanup
+      this.cleanupPDFResources(pdfDoc, templateBytes)
+      
+      console.log(`✅ Generated unified ${language} PDF with application and I-9 form`)
+      return applicationBuffer
 
     } catch (error) {
       console.error(`${language} PDF generation error:`, error)
+      // Cleanup on error as well
+      try {
+        if (pdfDoc) this.cleanupPDFResources(pdfDoc, templateBytes)
+      } catch (cleanupError) {
+        console.warn('Error during cleanup:', cleanupError)
+      }
       throw new Error(`Failed to generate ${language} PDF: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
+
 
   private async fillApplicationFields(form: PDFForm, data: ValidatedApplicationData) {
     // Personal Information
@@ -989,51 +991,6 @@ export class PDFService {
     }
   }
 
-  private hasI9Documents(data: ValidatedApplicationData): boolean {
-    // HR needs I-9 form for every application packet regardless of citizenship status
-    return true
-  }
-
-  private async addI9Form(pdfDoc: PDFDocument, data: ValidatedApplicationData): Promise<Buffer | null> {
-    try {
-      console.log('Creating separate filled I-9 form for application packet...')
-      
-      // Handle path resolution for both standalone and Next.js contexts
-      const baseDir = process.cwd()
-      let i9TemplatePath: string
-      
-      // Check if we're in Next.js context (already in apps/form-app)
-      if (baseDir.endsWith('form-app') || baseDir.includes('form-app') && !baseDir.endsWith('wareworks-form-backend')) {
-        i9TemplatePath = path.join(baseDir, 'public', 'templates', 'i-9.pdf')
-      } else {
-        // We're in root directory context
-        i9TemplatePath = path.join(baseDir, 'apps', 'form-app', 'public', 'templates', 'i-9.pdf')
-      }
-      
-      console.log(`📁 Loading I-9 template from: ${i9TemplatePath}`)
-      const i9TemplateBytes = await fs.readFile(i9TemplatePath)
-      const i9Doc = await PDFDocument.load(i9TemplateBytes)
-      
-      // Fill the I-9 form fields
-      console.log('Filling I-9 form fields...')
-      const i9Form = i9Doc.getForm()
-      this.fillI9Fields(i9Form, data)
-      
-      // CRITICAL FIX: Instead of merging into main PDF (which loses form fields),
-      // return the filled I-9 as a separate PDF buffer
-      console.log('Saving filled I-9 form as separate PDF...')
-      const filledI9Bytes = await i9Doc.save()
-      
-      console.log('✅ I-9 form filled successfully with Section 1 data')
-      console.log('📝 Note: I-9 form returned as separate PDF to preserve form fields')
-      
-      return Buffer.from(filledI9Bytes)
-      
-    } catch (error) {
-      console.warn('Could not create I-9 form:', error)
-      return null
-    }
-  }
 
   private fillI9Fields(form: PDFForm, data: ValidatedApplicationData & any) {
     console.log('Filling I-9 form fields with field mappings...')
@@ -1166,6 +1123,63 @@ export class PDFService {
     } catch (error) {
       console.error('❌ Failed to process signature:', error)
       // Continue without signature rather than failing entire PDF generation
+    }
+  }
+
+  /**
+   * Explicit memory cleanup for PDF resources
+   * Helps prevent memory leaks in serverless environments
+   */
+  private cleanupPDFResources(pdfDoc: PDFDocument | null, templateBytes: Buffer | null) {
+    try {
+      if (pdfDoc) {
+        // Clear any cached resources from the PDF document
+        // Note: pdf-lib doesn't expose direct cleanup methods, but we can clear references
+        (pdfDoc as any)._context = null
+        
+        // Clear form references if they exist
+        if ((pdfDoc as any)._form) {
+          (pdfDoc as any)._form = null
+        }
+      }
+
+      // Clear template bytes reference
+      if (templateBytes) {
+        templateBytes = null as any
+      }
+
+      console.log('🧹 PDF resources cleaned up')
+    } catch (error) {
+      console.warn('Warning during PDF resource cleanup:', error)
+    }
+  }
+
+  /**
+   * Force garbage collection hint
+   * Helps free memory in Node.js serverless environments
+   */
+  private forceGarbageCollection() {
+    try {
+      // Log memory usage before cleanup
+      const before = process.memoryUsage()
+      
+      // Force garbage collection if available (requires --expose-gc flag)
+      if (global.gc) {
+        global.gc()
+        console.log('🗑️ Forced garbage collection executed')
+        
+        // Log memory usage after cleanup
+        const after = process.memoryUsage()
+        const heapReduction = before.heapUsed - after.heapUsed
+        if (heapReduction > 0) {
+          console.log(`📉 Memory freed: ${Math.round(heapReduction / 1024 / 1024 * 100) / 100}MB`)
+        }
+      } else {
+        // Fallback: encourage GC through null assignments
+        console.log('🧹 Memory cleanup hint (gc not available)')
+      }
+    } catch (error) {
+      console.warn('Warning during garbage collection:', error)
     }
   }
 }

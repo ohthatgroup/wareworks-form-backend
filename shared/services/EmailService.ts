@@ -94,7 +94,7 @@ export class EmailService {
 
   async sendApplicationNotification(
     data: ValidatedApplicationData, 
-    pdfResult: Buffer | { applicationPDF: Buffer; i9PDF: Buffer } | null
+    pdfResult: Buffer | null
   ): Promise<void> {
     if (!process.env.ENABLE_EMAIL_NOTIFICATIONS || process.env.ENABLE_EMAIL_NOTIFICATIONS !== 'true') {
       console.log('Email notifications disabled')
@@ -110,31 +110,13 @@ export class EmailService {
       const attachments: EmailAttachment[] = []
       
       if (pdfResult) {
-        if (Buffer.isBuffer(pdfResult)) {
-          // Single application PDF
-          attachments.push({
-            filename: `${data.legalFirstName}_${data.legalLastName}_Application.pdf`,
-            content: pdfResult.toString('base64'),
-            contentType: 'application/pdf'
-          })
-          console.log(`📎 Application PDF attachment created: ${pdfResult.length} bytes`)
-        } else {
-          // Application PDF
-          attachments.push({
-            filename: `${data.legalFirstName}_${data.legalLastName}_Application.pdf`,
-            content: pdfResult.applicationPDF.toString('base64'),
-            contentType: 'application/pdf'
-          })
-          console.log(`📎 Application PDF attachment created: ${pdfResult.applicationPDF.length} bytes`)
-          
-          // I-9 PDF as separate attachment
-          attachments.push({
-            filename: `${data.legalFirstName}_${data.legalLastName}_I9_Form.pdf`,
-            content: pdfResult.i9PDF.toString('base64'),
-            contentType: 'application/pdf'
-          })
-          console.log(`📎 I-9 PDF attachment created: ${pdfResult.i9PDF.length} bytes`)
-        }
+        // Unified application PDF (includes I-9 form)
+        attachments.push({
+          filename: `${data.legalFirstName}_${data.legalLastName}_Application.pdf`,
+          content: pdfResult.toString('base64'),
+          contentType: 'application/pdf'
+        })
+        console.log(`📎 Unified application PDF attachment created: ${pdfResult.length} bytes (includes I-9 form)`)
       }
 
       // Add user documents as a single ZIP attachment (preserves originals)
@@ -252,14 +234,8 @@ export class EmailService {
         contentType: 'application/pdf'
       })
       
-      // I-9 PDF if exists
-      if (bilingualResult.i9PDF) {
-        attachments.push({
-          filename: `${data.legalFirstName}_${data.legalLastName}_I9_Form.pdf`,
-          content: bilingualResult.i9PDF.toString('base64'),
-          contentType: 'application/pdf'
-        })
-      }
+      // I-9 form is now included in the unified application PDFs above
+      console.log('✅ I-9 form included in unified application PDFs')
 
       // Add user documents as a single ZIP attachment (preserves originals)
       const userDocumentsZip = await this.createUserDocumentsZip(data)
@@ -388,8 +364,8 @@ Application Details:
   private generateBilingualPlainTextEmail(data: ValidatedApplicationData, attachmentCount: number): string {
     const hasUserDocs = data.documents && data.documents.length > 0
     const docInfo = hasUserDocs 
-      ? `\n\nAttached Documents:\n- Application form (English & Spanish PDFs)\n- I-9 form (PDF)\n- Applicant documents (ZIP file - extract to view originals)`
-      : `\n\nAttached Documents:\n- Application form (English & Spanish PDFs)\n- I-9 form (PDF)`
+      ? `\n\nAttached Documents:\n- Application form (English & Spanish PDFs, includes I-9 form)\n- Applicant documents (ZIP file - extract to view originals)`
+      : `\n\nAttached Documents:\n- Application form (English & Spanish PDFs, includes I-9 form)`
     
     return `Applicant Information:
 - Name: ${data.legalFirstName} ${data.legalLastName}

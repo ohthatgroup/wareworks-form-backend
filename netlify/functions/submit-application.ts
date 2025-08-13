@@ -53,10 +53,39 @@ function checkRateLimit(clientIP: string): { allowed: boolean; resetTime?: numbe
 }
 
 export const handler: Handler = async (event, context) => {
+  // Define allowed origins based on environment and iframe setup
+  const allowedOrigins = process.env.NODE_ENV === 'production' 
+    ? [
+        'https://wareworks.me',                    // Marketing site with iframe
+        'https://wareworks-backend.netlify.app'   // Direct app access
+      ]
+    : [
+        'http://localhost:3000',    // Local dev
+        'http://localhost:3001', 
+        'http://localhost:3002',
+        'http://localhost:3003',
+        'http://localhost:3004',
+        'http://localhost:8888',    // Netlify dev
+        'http://127.0.0.1:3000',    // Alternative localhost
+        'http://127.0.0.1:8888'
+      ]
+
+  // Get the origin from the request
+  const origin = event.headers.origin || event.headers.Origin || ''
+  
+  // Check if the origin is allowed
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : null
+  
+  // Log security events for blocked origins (but don't block the request entirely for backwards compatibility)
+  if (origin && !allowedOrigin) {
+    console.warn(`🚨 CORS: Blocked origin "${origin}". Allowed origins:`, allowedOrigins)
+  }
+  
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': allowedOrigin || 'null',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
     'Content-Type': 'application/json'
   }
 
