@@ -155,51 +155,22 @@ async function uploadToNetlifyBlobs(key: string, buffer: Buffer, contentType: st
 }
 
 
-// Helper functions for file type validation
+// Helper functions for file type validation - IMAGES ONLY
 function getValidMimeTypes(category: string): string[] {
-  switch (category) {
-    case 'id':
-      // ID documents: JPEG, JPG, PNG
-      return ['image/jpeg', 'image/jpg', 'image/png']
-    case 'resume':
-    case 'certification':
-      // Resume and certifications: PDF, DOC, DOCX, and images
-      return [
-        'application/pdf',
-        'application/msword', // .doc
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-        'image/jpeg',
-        'image/jpg', 
-        'image/png'
-      ]
-    default:
-      // Default to ID requirements for backwards compatibility
-      return ['image/jpeg', 'image/jpg', 'image/png']
-  }
+  // All document types now accept images only for optimal compression
+  return ['image/jpeg', 'image/jpg', 'image/png']
 }
 
 function getFileTypeError(category: string): string {
-  switch (category) {
-    case 'id':
-      return 'Only JPEG, JPG, or PNG image files are allowed for ID documents'
-    case 'resume':
-      return 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for resumes'
-    case 'certification':
-      return 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for certifications'
-    default:
-      return 'Invalid file type'
-  }
+  return 'Only JPEG, JPG, or PNG image files are allowed. Please upload an image of your document.'
 }
 
 function getFileTypeMessage(category: string): string {
-  switch (category) {
-    case 'id':
-      return 'Please upload your ID document as JPEG, JPG, or PNG image file.'
-    case 'resume':
-      return 'Please upload your resume as a PDF, DOC, DOCX, JPEG, JPG, or PNG file.'
-    case 'certification':
-      return 'Please upload your certification as a PDF, DOC, DOCX, JPEG, JPG, or PNG file.'
-    default:
-      return 'Please use a supported file format.'
+  if (category === 'id') {
+    return 'Upload a clear image of your ID document (photo, screenshot, or scan).'
+  } else if (category === 'resume') {
+    return 'Upload clear images of your resume (multiple images for multi-page documents).'
+  } else {
+    return 'Upload a clear image of your certification document. Ensure all text is readable.'
   }
 }

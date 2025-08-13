@@ -103,54 +103,30 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
     return 'certification'
   }
 
-  // Get allowed file types based on category
+  // Get allowed file types based on category - IMAGES ONLY for better compression
   const getAllowedFileTypes = (category: string): string[] => {
-    if (category === 'id') {
-      // ID documents: JPEG, JPG, PNG
-      return ['image/jpeg', 'image/jpg', 'image/png']
-    } else if (category === 'resume' || category.includes('-cert')) {
-      // Resume and certifications: PDF, DOC, DOCX, and images
-      return [
-        'application/pdf',
-        'application/msword', // .doc
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-        'image/jpeg',
-        'image/jpg', 
-        'image/png'
-      ]
-    }
-    // Default to ID requirements
+    // All document types now accept images only for optimal ZIP compression
     return ['image/jpeg', 'image/jpg', 'image/png']
   }
 
-  // Get accept attribute string for file inputs
+  // Get accept attribute string for file inputs - IMAGES ONLY
   const getAcceptString = (category: string): string => {
-    if (category === 'id') {
-      return '.jpg,.jpeg,.png,image/jpeg,image/png'
-    } else if (category === 'resume' || category.includes('-cert')) {
-      return '.pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png'
-    }
     return '.jpg,.jpeg,.png,image/jpeg,image/png'
   }
 
-  // Get error message for invalid file types
+  // Get error message for invalid file types - IMAGES ONLY
   const getFileTypeErrorMessage = (category: string): string => {
-    if (category === 'id') {
-      return t('documents.file_errors.id_only_images_allowed') || 'Only JPEG, JPG, or PNG image files are allowed for ID documents'
-    } else if (category === 'resume') {
-      return t('documents.file_errors.resume_only_docs_allowed') || 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for resumes'
-    } else if (category.includes('-cert')) {
-      return t('documents.file_errors.cert_only_docs_allowed') || 'Only PDF, DOC, DOCX, JPEG, JPG, or PNG files are allowed for certifications'
-    }
-    return 'Invalid file type'
+    return 'Only JPEG, JPG, or PNG image files are allowed. Please upload an image of your document.'
   }
 
-  // Get file type instructions
+  // Get file type instructions - IMAGES ONLY
   const getFileTypeInstructions = (category: string): string => {
     if (category === 'id') {
-      return t('documents.id_instructions') || 'Please upload your ID document as JPEG, JPG, or PNG image file.'
+      return 'Upload a clear image of your ID document (photo, screenshot, or scan).'
+    } else if (category === 'resume') {
+      return 'Upload clear images of your resume (multiple images for multi-page documents).'
     } else {
-      return t('documents.docs_instructions') || 'Please upload your document as a PDF, DOC, or DOCX file.'
+      return 'Upload a clear image of your certification document. Ensure all text is readable.'
     }
   }
 
@@ -529,8 +505,8 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               </div>
             )}
             <div className="mt-2 text-sm text-gray-500">
-              <p>{draggedOver === 'id' ? t('documents.drop_files') || 'Drop files here' : t('documents.id_description')}</p>
-              <p className="mt-1 text-xs text-blue-600">{t('documents.id_file_types') || 'Accepts: JPEG, JPG, PNG image files'}</p>
+              <p>{draggedOver === 'id' ? 'Drop image files here' : 'Upload a clear image of your government-issued ID'}</p>
+              <p className="mt-1 text-xs text-blue-600">📷 Photo, screenshot, or scan • JPEG, JPG, PNG only</p>
             </div>
           </div>
           {documentsByCategory['id'] && renderDocumentList('id', documentsByCategory['id'])}
@@ -598,8 +574,8 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
               </div>
             )}
             <div className="mt-2 text-sm text-gray-500">
-              <p>{draggedOver === 'resume' ? t('documents.drop_files') || 'Drop files here' : t('documents.resume_description')}</p>
-              <p className="mt-1 text-xs text-blue-600">{t('documents.resume_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
+              <p>{draggedOver === 'resume' ? 'Drop image files here' : 'Upload clear images of your resume (multiple images for multi-page documents)'}</p>
+              <p className="mt-1 text-xs text-blue-600">📷 Photo, screenshot, or scan • JPEG, JPG, PNG only</p>
             </div>
           </div>
           {documentsByCategory['resume'] && renderDocumentList('resume', documentsByCategory['resume'])}
@@ -646,8 +622,8 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <div className="mt-2 text-sm text-primary">
-                      <p>{draggedOver === `${forklift.key}-cert` ? t('documents.drop_files') || 'Drop files here' : `Upload your official ${forklift.label.toLowerCase()} certification documents`}</p>
-                      <p className="text-xs text-blue-600 mt-1">{t('documents.cert_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
+                      <p>{draggedOver === `${forklift.key}-cert` ? 'Drop image files here' : `Upload image of your ${forklift.label.toLowerCase()} certification`}</p>
+                      <p className="text-xs text-blue-600 mt-1">📷 Photo, screenshot, or scan • JPEG, JPG, PNG only</p>
                     </div>
                   </div>
                   {documentsByCategory[`${forklift.key}-cert`] && renderDocumentList(`${forklift.key}-cert`, documentsByCategory[`${forklift.key}-cert`])}
@@ -685,8 +661,8 @@ export function DocumentsStep({ form }: DocumentsStepProps) {
                       </label>
                     </div>
                     <div className="mt-2 text-sm text-primary">
-                      <p>{draggedOver === `${skill.key}-cert` ? t('documents.drop_files') || 'Drop files here' : `${t('documents.documentation_for')} ${skill.label}`}</p>
-                      <p className="text-xs text-blue-600 mt-1">{t('documents.cert_file_types') || 'Accepts: PDF, DOC, DOCX files'}</p>
+                      <p>{draggedOver === `${skill.key}-cert` ? 'Drop image files here' : `Upload image of your ${skill.label} certification`}</p>
+                      <p className="text-xs text-blue-600 mt-1">📷 Photo, screenshot, or scan • JPEG, JPG, PNG only</p>
                     </div>
                   </div>
                   {documentsByCategory[`${skill.key}-cert`] && renderDocumentList(`${skill.key}-cert`, documentsByCategory[`${skill.key}-cert`])}

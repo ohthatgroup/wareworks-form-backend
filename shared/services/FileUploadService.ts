@@ -161,49 +161,20 @@ export class FileUploadService {
   }
 
   private getAllowedMimeTypes(type: 'identification' | 'resume' | 'certification'): string[] {
-    switch (type) {
-      case 'identification':
-        // ID documents: JPEG, JPG, PNG
-        return ['image/jpeg', 'image/jpg', 'image/png']
-      case 'resume':
-      case 'certification':
-        // Resume and certifications: PDF, DOC, DOCX, and images
-        return [
-          'application/pdf',
-          'application/msword', // .doc
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-          'image/jpeg',
-          'image/jpg', 
-          'image/png'
-        ]
-      default:
-        return ['image/jpeg', 'image/jpg', 'image/png']
-    }
+    // All document types now accept images only for optimal compression
+    return ['image/jpeg', 'image/jpg', 'image/png']
   }
 
   private getValidationErrorKey(type: 'identification' | 'resume' | 'certification'): string {
-    switch (type) {
-      case 'identification':
-        return 'id_only_images_allowed'
-      case 'resume':
-        return 'resume_only_docs_allowed'
-      case 'certification':
-        return 'cert_only_docs_allowed'
-      default:
-        return 'invalid_file_type'
-    }
+    return 'images_only_allowed'
   }
 
   private getExpectedMimeTypes(): { [key: string]: string[] } {
     return {
-      // Image formats
+      // Image formats only
       'jpg': ['image/jpeg', 'image/jpg'],
       'jpeg': ['image/jpeg', 'image/jpg'],
-      'png': ['image/png'],
-      // Document formats
-      'pdf': ['application/pdf'],
-      'doc': ['application/msword'],
-      'docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+      'png': ['image/png']
     }
   }
 }

@@ -25,11 +25,11 @@ export class EmailService {
         console.log(`📦 Added to ZIP: ${doc.name} (${doc.mimeType})`)
       }
 
-      // Generate ZIP file
+      // Generate ZIP file with maximum compression
       const zipBuffer = await zip.generateAsync({ 
         type: 'nodebuffer',
         compression: 'DEFLATE',
-        compressionOptions: { level: 6 } // Good balance of compression vs speed
+        compressionOptions: { level: 9 } // Maximum compression
       })
 
       const originalSize = data.documents.reduce((sum, doc) => sum + Buffer.from(doc.data, 'base64').length, 0)
